@@ -1,0 +1,139 @@
+#' Save print-and-play file of Dotaro Deck
+#'
+#' `save_print_and_play()` saves a print-and-play file
+#' @param filename Filename
+#' @param ... Ignored
+#' @param size Either `"letter"` or `"A4"`.
+#' @return The filename invisible.  As a side effect creates a pdf file.
+#' @export
+save_print_and_play <- function(filename = "dotaro.pdf",
+                                ...,
+                                size = c("letter", "a4")) {
+    xmp <- xmpdf::xmp(creator = "Trevor L. Davis",
+                      date_created = "2025",
+                      spdx_id = "CC-BY-4.0",
+                      title = "Dotaro Deck (Black and White French Suits)")
+
+    envir <- dotaro_decks(round = FALSE, border = FALSE)
+    size <- tolower(size)
+    size <- match.arg(size)
+    width <- switch(size,
+                    letter = 8.5,
+                    a4 = pnpmisc:::A4_WIDTH)
+    height <- switch(size,
+                     letter = 11,
+                     a4 = pnpmisc:::A4_HEIGHT)
+
+    current_dev <- dev.cur()
+    if (current_dev > 1) on.exit(dev.set(current_dev), add = TRUE)
+
+    df <- half_info |> filter(.data$top) |> select("card", "top") |>
+        left_join(full_info, by = c("card", "top")) |>
+        arrange(.data$suit, .data$rank)
+
+    layout <- pnpmisc::layout_grid(nrow = 3L, ncol = 3L,
+                                   width = CARD_WIDTH, height = CARD_HEIGHT,
+                                   bleed = 0,
+                                   paper = size, orientation = "portrait")
+
+    cairo_pdf(filename, onefile = TRUE, width = width, height = height)
+
+    grid.newpage()
+    grid.draw(creditsGrob(xmp))
+
+    for (page in 1:12) {
+        grid.newpage()
+        idx <- seq.int(from = (page - 1L) * 9L + 1L, length.out = 9L)
+        dfx <- df[idx, ] |>
+            select("suit", "rank", "cfg") |>
+            mutate(piece_side = "card_face", x = layout$x, y = layout$y)
+        pmap_piece(dfx, default.units = "in", envir = envir)
+        pmap_piece(dfx, crosshairGrob, default.units = "in", envir = envir)
+    }
+    dev.off()
+
+    filename |>
+        pnpmisc::pdf_set_xmp(xmp = xmp) |>
+        pnpmisc::pdf_set_docinfo(docinfo = xmpdf::as_docinfo(xmp)) |>
+        pnpmisc::pdf_compress(filename, linearize = TRUE)
+    pnpmisc::rm_temp_pdfs()
+
+    invisible(filename)
+}
+
+creditsGrob <- function(xmp = xmpdf::xmp()) {
+    # Prevents `marquee::marque_grob()` from leaving open a graphics device
+    credits <- c(
+      "# Instructions",
+      "",
+      "* These *Dotaro Deck* cards are provided in a 3x3 layout of bridge sized cards",
+      "* Print single-sided preferably on cardstock (this prototype layout lacks card backs).",
+      "* (Optional) laminate the printed sheets of paper.",
+      "* Use the provided crosshairs to cut out the cards.",
+      "* (Optional) use a corner rounding tool to round the corners.",
+      "* (Optional) place card into a plastic card sleeve (in front of a normal playing card).",
+      "",
+      "# Further information",
+      "",
+      "* See https://github.com/trevorld/dotaro.deck for more information",
+      "",
+      "# Credits",
+      "",
+      "* The DejaVu Sans font",
+      "",
+      "  + https://dejavu-fonts.github.io/",
+      "  + DejaVu Fonts License: https://dejavu-fonts.github.io/License.html")
+
+    if (!is.null(xmp$usage_terms)) {
+        license <- xmp$usage_terms
+    } else {
+        license <- "Personal Use Only"
+    }
+    credits <- c("# License", "", license, "", credits)
+    if (!is.null(xmp$title) && !is.null(xmp$attribution_name)) {
+        title <- str_glue('*{xmp$title[["x-default"]]}* by {xmp$attribution_name}')
+        if (!is.null(xmp$rights)) {
+            title <- c(title, "", xmp$rights)
+        }
+        credits <- c(title, credits)
+    }
+    credits <- paste(credits, collapse = "\n") |> marquee::marquee_glue(.trim = FALSE)
+    # cat(credits, sep = "\n")
+    mg <- marquee::marquee_grob(credits,
+                                width = unit(7.0, "in"),
+                                x = unit(1/2, "in"),
+                                y = unit(1, "npc") - unit(1/2, "in"),
+                                style = credits_style())
+    if (is.null(xmp$spdx_id)) {
+        grob_cc <- nullGrob()
+    } else {
+        badge <- piecepackr::spdx_license_list[xmp$spdx_id, "badge"]
+        if (is.na(badge)) {
+            grob_cc <- nullGrob()
+        } else {
+            cc_file <- system.file(paste0("extdata/badges/", badge),
+                                   package="piecepackr")
+            cc_picture <- grImport2::readPicture(cc_file)
+            grob_cc <- grImport2::symbolsGrob(cc_picture,
+                                              x=unit(0.5, "npc"),
+                                              y=unit(1.00, "in"),
+                                              size=unit(1.5, "in"))
+        }
+    }
+
+    gList(grob_cc, mg)
+}
+
+credits_style <- function() {
+    marquee::classic_style(base_size = 10,
+        body_font = "Dejavu Sans", header_font = "Dejavu Sans",
+        lineheight = 1.6,
+        margin = marquee::trbl(0, bottom = marquee::rem(0.7)),
+        bullets = rep("\u2022", 3L)) |>
+        marquee::modify_style("h1", border = NA,
+                               size = marquee::relative(1.4),
+                               border_size = marquee::trbl(NULL),
+                               margin = marquee::trbl(NULL),
+                               padding = marquee::trbl(NULL)) |>
+        marquee::modify_style("ul", padding = marquee::trbl(right = marquee::em(1)))
+}

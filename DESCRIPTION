@@ -1,0 +1,30 @@
+Package: dotaro.deck
+Type: Package
+Title: Dotaro Deck
+Version: 0.1.0-1
+Authors@R: c(person("Trevor L.", "Davis", role=c("aut", "cre"),
+             email="trevor.l.davis@gmail.com",
+             comment = c(ORCID = "0000-0001-6341-4639")))
+URL: https://github.com/trevorld/dotaro.deck, https://trevorldavis.com/R/dotaro.deck/dev/
+BugReports: https://github.com/trevorld/dotaro.deck/issues
+Description: Utilities for the 'Dotaro' deck.
+Depends:
+    R (>= 4.2)
+Imports:
+    dplyr,
+    grDevices,
+    grid,
+    grImport2,
+    marquee,
+    piecepackr,
+    pnpmisc,
+    rlang,
+    stringr,
+    xmpdf
+Suggests:
+    testthat
+Remotes: trevorld/pnpmisc
+License: MIT + file LICENSE
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Encoding: UTF-8

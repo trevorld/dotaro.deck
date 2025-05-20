@@ -1,0 +1,6 @@
+destination: "../../websites/R/dotaro.deck/"
+url: "https://trevorldavis.com/R/dotaro.deck"
+development:
+    mode: auto
+template:
+  bootstrap: 5
