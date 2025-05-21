@@ -190,14 +190,17 @@
 
 ### Selected Multidecks
 
-* [Banjo Deck](https://medium.com/@banjoanton/update-i-created-my-own-minimalistic-deck-and-now-its-available-to-print-or-buy-741d8362b30a)
+* [Badger Deck](https://boardgamegeek.com/boardgame/160950/the-badger-deck)
+* [Banjo Deck](https://banjodeck.com/)
+* [Baron's Proxy](https://www.drivethrucards.com/product/463233/The-Barons-Proxy)
 * [DIY Multideck](https://diymultideck.mauri.app/)
-* [The Everdeck](https://boardgamegeek.com/boardgame/291951/the-everdeck)
-* [The Micaya Deck](https://micaya.selfthinker.org/)
+* [Everdeck](https://boardgamegeek.com/boardgame/291951/the-everdeck)
+* [Glyph](https://boardgamegeek.com/boardgame/153898/glyph)
+* [Micaya Deck](https://micaya.selfthinker.org/)
 * [Rainbow deck](https://boardgamegeek.com/boardgame/59655/rainbow-deck)
 * [Singularity Deck](https://www.singularity.games/singularity-deck)
 * [Skeleton Deck](https://kevan.org/games/skeleton)
-* [Wil Su's Numbered double-deck experiment](https://boardgamegeek.com/thread/1867714/article/36786465#36786465)
+* [Wil Su's numbered double-deck experiment](https://boardgamegeek.com/thread/1867714/article/36786465#36786465)
 
 ### Pyramid decks
 
@@ -219,9 +222,12 @@
 
 * Domino decks:
 
+  + [Bandit](https://www.thegamecrafter.com/games/bandit)
   + [Bicycle Double Dominoes Card Game](https://boardgamegeek.com/thread/1478158/k6t-a-new-playing-cards-deck)
   + [Chinese Domino Cards](http://anthonylesq.blogspot.com/2019/02/chinese-domino-cards.html) and [Antique Chinese Domino Cards](https://www.criticaleyefinds.com/products/antique-chinese-domino-cards?variant=40655289647300)
-  + [Double-6 Pokadeck](https://www.thegamecrafter.com/games/double-6-pokadeck-1x-deck-no-box)
+  + [Domino Deck](https://www.thegamecrafter.com/games/domino-deck)
+  + [Double-Six Suited Deck](https://www.thegamecrafter.com/games/suited-double-6-domino)
+  + [Double-9 Pokadeck](https://www.thegamecrafter.com/games/double-9-pokadeck)
   + [Flexdeck](https://www.amazon.com/Flexdeck-Dominoes-Combined-Playing-Adults/)
   + Cartesian Cards' [One Deck](https://cartesiancards.com/products/one-deck-game-cards)
   + [Quadkopf](https://www.thegamecrafter.com/games/quadkopf-double-9-domino-tin-deck)
