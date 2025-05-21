@@ -2,12 +2,12 @@ library("dplyr")
 library("parallel")
 
 # filename <- "tmp/candidate.csv"
-filename <- "raw-data/step_1/candidate_342_761823.csv" # shaded + dom-6
+# filename <- "raw-data/step_1/candidate_342_761823.csv" # shaded + dom-6
 # filename <- "raw-data/step_1/candidate_242_1985528.csv"
 # filename <- "raw-data/step_1/candidate_242_2590921.csv"
 # filename <- "raw-data/step_1/candidate_311_2641571.csv"
 # filename <- "raw-data/step_1/candidate_911_2720203.csv"
-filename <- "raw-data/step_1/candidate_720_2042613.csv" # shaded + dom-6
+# filename <- "raw-data/step_1/candidate_720_2042613.csv" # shaded + dom-6
 # filename <- "raw-data/step_1/candidate_732_2872840.csv"
 # filename <- "raw-data/step_1/candidate_732_3012693.csv"
 # filename <- "raw-data/step_1/candidate_411_4176423.csv"
@@ -172,8 +172,8 @@ fitness_2 <- function(df) {
 # "D7", "D8", "D9", "L9", "L0", "D0", "D4", "L1", "L7", "L8", "LJ",
 # "DJ", "DQ", "LQ", "DK", "LK")
 
-needs <- c("D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", 
-    "DJ", "DQ", "DK", "L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", 
+needs <- c("D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9",
+    "DJ", "DQ", "DK", "L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7",
     "L8", "L9", "LJ", "LQ", "LK")
 
 swap <- function(df) {
@@ -255,7 +255,7 @@ df <- evolve(filename)
 dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
 
 # filenames <- list.files("raw-data2", full.names = TRUE)
-# 
+#
 # cl <- makeCluster(10L)
 # clusterExport(cl, ls())
 # clusterEvalQ(cl, {

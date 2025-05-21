@@ -141,7 +141,7 @@
 ### One deck of traditional French-suited tarot cards
 
 * The traditional "0" rank is a ten and the "pawn" rank is a jack/page.
-* Treat each of the number suits has a two digit number with the number suit as the ten digit number and the rank as the one digit number.
+* For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
 * Use the star fool as the Fool/Excuse (in French Tarot Nouveau decks the Fool is usually represented by a star index).  However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to "00" or "22".
 
 
