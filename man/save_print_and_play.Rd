@@ -4,7 +4,12 @@
 \alias{save_print_and_play}
 \title{Save print-and-play file of Dotaro Deck}
 \usage{
-save_print_and_play(filename = "dotaro.pdf", ..., size = c("letter", "a4"))
+save_print_and_play(
+  filename = "dotaro.pdf",
+  ...,
+  size = c("letter", "a4"),
+  title = "Dotaro Deck"
+)
 }
 \arguments{
 \item{filename}{Filename}
@@ -12,6 +17,8 @@ save_print_and_play(filename = "dotaro.pdf", ..., size = c("letter", "a4"))
 \item{...}{Ignored}
 
 \item{size}{Either \code{"letter"} or \code{"A4"}.}
+
+\item{title}{pdf metadata title.}
 }
 \value{
 The filename invisible.  As a side effect creates a pdf file.

@@ -102,12 +102,17 @@ top_pip_grob <- function(...) {
 bot_pip_grob <- function(...) {
     l <- list(...)
     # bsuit_grob <- do.call(bot_suit_grob, l)
+    if (l$red == "R") {
+        col = red_color()
+    } else {
+        col = black_color()
+    }
     if (l$blight == "L") {
         bsuit_grob <- circleGrob(r = unit(0.13, "in"),
-                                 gp = gpar(col = "black", fill = NA, lwd = 1.1))
+                                 gp = gpar(col = col, fill = NA, lwd = 1.1))
     } else {
         bsuit_grob <- circleGrob(r = unit(0.13, "in"),
-                                 gp = gpar(col = "black", fill = "black", lwd = 1.1))
+                                 gp = gpar(col = col, fill = col, lwd = 1.1))
     }
 
     n_pips <- as.integer(l$brank)

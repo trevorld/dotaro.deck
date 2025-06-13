@@ -5,12 +5,18 @@ top_face_grob <- function(...) {
     tsuit_grob <- do.call(top_suit_grob, l)
     trank_grob <- do.call(top_rank_grob, l)
     trank <- l$trank
+    red <- l$red
+    if (red == "R") {
+        col <- red_color()
+    } else {
+        col <- black_color()
+    }
     if (trank == "N") {
-        return(knight_grob(tsuit_grob, trank_grob))
+        return(knight_grob(tsuit_grob, trank_grob, col))
     }
     meeple_grob <- pp_shape("meeple")$shape(
         vp = viewport(y = 0.4, width = 0.7, height = 0.5),
-        gp = gpar(col = "black", fill = NA, lwd = 4))
+        gp = gpar(col = col, fill = NA, lwd = 2))
     tsuit_grob <- grobTree(tsuit_grob,
         vp = viewport(y = 0.42),
         gp = gpar(lex = 1.1, cex = 1.1))
@@ -31,14 +37,20 @@ bot_face_grob <- function(...) {
     brank_grob <- do.call(bot_rank_grob, l)
     brank <- l$brank
     blight <- l$blight
+    red <- l$red
+    if (red == "R") {
+        col <- red_color()
+    } else {
+        col <- black_color()
+    }
     if (brank == "N") {
-        return(knight_grob(bsuit_grob, brank_grob))
+        return(knight_grob(bsuit_grob, brank_grob, col))
     } else if (brank %in% c("O", "F")) {
-        return(fool_grob(brank, blight))
+        return(fool_grob(brank, blight, col))
     }
     meeple_grob <- pp_shape("meeple")$shape(
         vp = viewport(y = 0.4, width = 0.7, height = 0.5),
-        gp = gpar(col = "black", fill = NA, lwd = 4))
+        gp = gpar(col = col, fill = NA, lwd = 2))
     bsuit_grob <- grobTree(bsuit_grob,
         vp = viewport(y = 0.42),
         gp = gpar(lex = 1.1, cex = 1.1))
@@ -53,13 +65,13 @@ bot_face_grob <- function(...) {
     gTree(children = gl, vp = vp, gp = gp)
 }
 
-knight_grob <- function(suit_grob, rank_grob) {
+knight_grob <- function(suit_grob, rank_grob, col = "black") {
     circle_grob <- circleGrob(x = 0.34, r = 0.4, y = 0.29,
                               gp = gpar(fill = "white", col = NA),
                               vp = viewport(height = 0.9, mask = rectGrob(gp = gpar(fill =  "white", col = NA))))
     meeple_grob <- pp_shape("meeple")$shape(
         vp = viewport(x = 0.58, y = 0.7, width = 0.4, height = 0.3),
-        gp = gpar(col = "black", fill = NA, lwd = 4))
+        gp = gpar(col = col, fill = NA, lwd = 2))
     suit_grob <- grobTree(suit_grob,
         vp = viewport(x = 0.58, y = 0.7),
         gp = gpar(lex = 0.8, cex = 0.8))
@@ -74,27 +86,27 @@ knight_grob <- function(suit_grob, rank_grob) {
     gTree(children = gl, vp = vp, gp = gp)
 }
 
-fool_grob <- function(rank, light) {
+fool_grob <- function(rank, light, col = "black") {
 
-    gp_meeple <- gpar(col = "black", lwd = 4)
+    gp_meeple <- gpar(col = col, lwd = 2)
     vp_meeple <- viewport(height=unit(0.7, "in"),
                           width=unit(0.6, "in"), y = 0.3)
     meeple_grob <- pp_shape("meeple")$shape(gp=gp_meeple, vp=vp_meeple)
-    gp_triangle <- gpar(fill = "black", col = NA_character_)
+    gp_triangle <- gpar(fill = col, col = NA_character_)
     if (light == "L") {
         if (rank == "O") {
-            gp_circle <- gpar(fill = NA, col = "black", lwd = 1.5)
+            gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
         } else {
-            gp_circle <- gpar(fill = NA, col = "black", lwd = 1.5)
+            gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
         }
-        gp_star <- gpar(fill = NA, col = "black", lwd=1.5)
+        gp_star <- gpar(fill = NA, col = col, lwd=1.5)
     } else {
         if (rank == "O") {
-            gp_circle <- gpar(fill = "black", col = "black", lwd = 1.5)
+            gp_circle <- gpar(fill = col, col = col, lwd = 1.5)
         } else {
-            gp_circle <- gpar(fill = NA, col = "black", lwd = 1.5)
+            gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
         }
-        gp_star <- gpar(fill = "black", col = "black", lwd=1.5)
+        gp_star <- gpar(fill = col, col = col, lwd=1.5)
     }
     y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 -0.10, "in")
     vp_triangle <- viewport(height=unit(0.4, "in"),

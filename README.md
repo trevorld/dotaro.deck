@@ -3,13 +3,19 @@
 ### Table of Contents
 
 * [Overview](#overview)
+* [Orientations](#orientations)
 * [Examples](#examples)
 * [Frequently Asked Questions](#faq)
 * [Prior art](#prior)
 
 
 
-**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There is a [letter-sized print-and-play file](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) and a [A4-sized print-and-play file](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) that can be used to craft a deck.
+**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There are a couple of print-and-play files:
+
+| Variant | File |
+| --- | --- |
+| Black & White | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) |
+| Color | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) |
 
 ## <a name="overview">Overview</a>
 
@@ -51,7 +57,7 @@
 
 <img src="man/figures/README-knight-cards-1.png" alt="The four knight cards"  />
 
-  + Each of the four unsuited "fool" halves is paired with either a Queen of Spades half or a Jack of Diamonds half (which are special cards in Bezique, Hearts, Pinochle, Scabby Queen, etc.).
+  + Each of the four unsuited "fool" halves is paired with either a Queen of Spades half or a Jack of Diamonds half (which are special cards in [Bezique](https://www.pagat.com/marriage/bezique.html), [Hearts](https://www.pagat.com/reverse/hearts.html), [Pinochle](https://www.pagat.com/marriage/pinmain.html), [Scabby Queen](https://en.wikipedia.org/wiki/Old_maid_(card_game)#Scabby_Queen), etc.).
 
 <img src="man/figures/README-fool-cards-1.png" alt="The four fool cards"  />
 
@@ -61,9 +67,9 @@
 
 <img src="man/figures/README-anatomy-1.png" alt="Annotated Dotaro Deck card"  />
 
-## <a name="examples">Examples</a>
+## <a name="orientations">Orientations</a>
 
-### Rotate dark halves up top
+### Dark halves up top
 
 * 4 traditional suits x 14 traditional ranks
 * 5 number suits x 10 number ranks
@@ -76,7 +82,7 @@
 
 ![](man/figures/README-dark_up-1.png)
 
-### Rotate light halves up top
+### Light halves up top
 
 * 4 traditional suits x 14 traditional ranks
 * 5 number suits x 10 number ranks
@@ -89,7 +95,7 @@
 
 ![](man/figures/README-light_up-1.png)
 
-### Rotate traditional suit halves up top
+### Traditional suit halves up top
 
 * Note both halves of the four knights has a traditional suit.
 * Can be treated in the following ways:
@@ -102,7 +108,7 @@
 
 ![](man/figures/README-trad_up-1.png)
 
-### Rotate traditional suit halves down below
+### Traditional suit halves down below
 
 * Can be treated in the following ways:
 
@@ -118,8 +124,11 @@
 
 ![](man/figures/README-num_up-1.png)
 
+## <a name ="examples">Examples</a>
+
 ### One deck of traditional French-suited playing cards
 
+* Orient dark halves up top.
 * Treat the 0 rank as tens and the pawn rank as jacks.
 * If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
 
@@ -127,12 +136,12 @@
 
 ![](man/figures/README-one_french-1.png)
 
-
 ### Two decks of traditional French-suited playing cards
 
+* Orient traditional suit halves up top.
 * Treat each dark/light French suit as the same suit.
 * If necessary use the four knights as jokers e.g. the two hearts/diamonds knights can serve as "red" jokers and the two spades/clubs knights can serve as "black" jokers.
-* The four Pinochle legs (i.e. Queens of Spades / Jacks of Diamonds) are opposite the four Fool cards.
+* The four [Pinochle](https://www.pagat.com/marriage/pinmain.html) legs (i.e. Queens of Spades / Jacks of Diamonds) are opposite the four Fool cards.
 
 
 
@@ -140,6 +149,8 @@
 
 ### One deck of traditional French-suited tarot cards
 
+* [French-suited tarot cards](https://www.pagat.com/class/ftarot.html) feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
+* Orient dark halves up top.
 * The traditional "0" rank is a ten and the "pawn" rank is a jack/page.
 * For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
 * Use the star fool as the Fool/Excuse (in French Tarot Nouveau decks the Fool is usually represented by a star index).  However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to "00" or "22".
@@ -150,13 +161,16 @@
 
 ### One double-nine set of dominoes
 
-* Not only does each of the five number suits (ignoring light/dark distinctions) have exactly 11 cards but for this subset of cards each number suit equals the total number of pips on each card modulo 5.  In particular a *necessary* condition that a card is a scoring card in games like Texas 42 is that the number suit is zero.
+* [Double-nine dominoes](https://www.pagat.com/domino/) features all 55 pairings of the numbers 0 to 9 (including pairing each number with itself).
+* Not only does each of the five number suits (ignoring light/dark distinctions) have exactly 11 cards but for this subset of cards each number suit equals the total number of pips on each card modulo 5.  In particular a *necessary* condition that a card is a scoring card in games like [Texas 42](https://www.pagat.com/domino/trick/42.html) is that the number suit is zero.
 
 
 
 ![](man/figures/README-double_nine-1.png)
 
 ### One set of Chinese dominoes
+
+* [Chinese dominoes](https://www.pagat.com/domino/chinese.html) has 32 combinations of throwing two d6 dice.
 
 
 
@@ -194,6 +208,7 @@
 * [Banjo Deck](https://banjodeck.com/)
 * [Baron's Proxy](https://www.drivethrucards.com/product/463233/The-Barons-Proxy)
 * [DIY Multideck](https://diymultideck.mauri.app/)
+* [EPiC deck](https://www.nemsworld.com/epic/)
 * [Everdeck](https://boardgamegeek.com/boardgame/291951/the-everdeck)
 * [Glyph](https://boardgamegeek.com/boardgame/153898/glyph)
 * [Micaya Deck](https://micaya.selfthinker.org/)
@@ -202,14 +217,18 @@
 * [Skeleton Deck](https://kevan.org/games/skeleton)
 * [Wil Su's numbered double-deck experiment](https://boardgamegeek.com/thread/1867714/article/36786465#36786465)
 
-### Pyramid decks
+### Triangle/Pyramid decks
 
+* [Games You Can Play With a Triangular Deck](https://boardgamegeek.com/geeklist/222403/games-you-can-play-with-a-triangular-deck) Geeklist
+* [List of Triangle/Pyramid deck card games](https://boardgamegeek.com/geeklist/186807/list-of-trianglepyramid-deck-card-games-please-add) Geeklist
+* [The Great Dalmuti](https://boardgamegeek.com/boardgame/929/the-great-dalmuti)
 * [Pairs](https://crabfragmentlabs.com/pairs)
 
 ### Dark/light suits
 
+* [Blossom Deck](https://crabfragmentlabs.com/island-deck)
 * [Dual piecepacks](https://trevorldavis.com/piecepackr/dual-piecepacks-pnp.html)
-* [Duplhex Playing Cards](https://www.thegamecrafter.com/games/duplhex-playing-cards?dept_uri=playing-cards&dept_name=Playing%20Cards)
+* [Duplhex Playing Cards](https://www.thegamecrafter.com/games/duplhex-playing-cards)
 * [Gamelib Pocket](https://www.gamelibpocket.com/en/)
 * [Rainbow deck](https://boardgamegeek.com/boardgame/59655/rainbow-deck)
 
@@ -217,21 +236,20 @@
 
 * [Dark Hand deck](https://www.jankendeck.com/dark)
 * [Dual Deck](https://boardgamegeek.com/boardgame/112802/dual-deck)
+* [Mirror Deck](https://danielsolisblog.blogspot.com/2024/09/analyzing-mirror-deck-for-game-design.html)
 * [Singularity Deck: Asymmetric Layout](https://www.singularity.games/singularity-deck)
 * [Split Suit Playing Cards](https://boardgamegeek.com/boardgame/156181/split-suit-playing-cards)
 
 * Domino decks:
 
   + [Bandit](https://www.thegamecrafter.com/games/bandit)
-  + [Bicycle Double Dominoes Card Game](https://boardgamegeek.com/thread/1478158/k6t-a-new-playing-cards-deck)
   + [Chinese Domino Cards](http://anthonylesq.blogspot.com/2019/02/chinese-domino-cards.html) and [Antique Chinese Domino Cards](https://www.criticaleyefinds.com/products/antique-chinese-domino-cards?variant=40655289647300)
-  + [Domino Deck](https://www.thegamecrafter.com/games/domino-deck)
+  + tjgames' [Domino Deck](https://www.thegamecrafter.com/games/domino-deck)
   + [Double-Six Suited Deck](https://www.thegamecrafter.com/games/suited-double-6-domino)
   + [Double-9 Pokadeck](https://www.thegamecrafter.com/games/double-9-pokadeck)
   + [Flexdeck](https://www.amazon.com/Flexdeck-Dominoes-Combined-Playing-Adults/)
   + Cartesian Cards' [One Deck](https://cartesiancards.com/products/one-deck-game-cards)
   + [Quadkopf](https://www.thegamecrafter.com/games/quadkopf-double-9-domino-tin-deck)
-  + [Scout](https://boardgamegeek.com/image/6764326/scout)
 
 ### Chess-related decks:
 
@@ -244,10 +262,15 @@
 
 ### Tarot decks
 
+* [Classic Tarok](https://www.alpencrowd.eu/classic-tarok-teaser/)
+
+* Elettra Deganello
+
+  + [Genoese Tarot](https://shop.elettradeganello.com/collections/frontpage/products/genoese-tarot)
+  + [Tarocco Genovese](https://shop.elettradeganello.com/collections/frontpage/products/tarocco-genovese)
+
 * French Bourgeois Tarot Nouveau
 
-  + <https://www.wopc.co.uk/france/catel-farcy/jeu-de-tarot>
-  + <https://i-p-c-s.org/pattern/ps-18.html>
   + <https://en.wikipedia.org/wiki/Bourgeois_Tarot>
   + <https://l-pollett.tripod.com/cards28.htm>
 

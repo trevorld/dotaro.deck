@@ -4,15 +4,18 @@
 #' @param filename Filename
 #' @param ... Ignored
 #' @param size Either `"letter"` or `"A4"`.
+#' @param title pdf metadata title.
 #' @return The filename invisible.  As a side effect creates a pdf file.
 #' @export
 save_print_and_play <- function(filename = "dotaro.pdf",
                                 ...,
-                                size = c("letter", "a4")) {
+                                size = c("letter", "a4"),
+                                title = "Dotaro Deck") {
+    check_dots_empty()
     xmp <- xmpdf::xmp(creator = "Trevor L. Davis",
                       date_created = "2025",
                       spdx_id = "CC-BY-4.0",
-                      title = "Dotaro Deck (Black and White French Suits)")
+                      title = title)
 
     envir <- dotaro_decks(round = FALSE, border = FALSE)
     size <- tolower(size)

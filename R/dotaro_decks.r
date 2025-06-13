@@ -33,6 +33,7 @@
 #' }
 #' @export
 dotaro_decks <- function(..., round = TRUE, border = TRUE) {
+    check_dots_empty()
     rect_shape <- ifelse(round, "roundrect", "rect")
     if (border) {
         border_color <- "black"
