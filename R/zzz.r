@@ -5,7 +5,7 @@
 #' @importFrom piecepackr as_pp_cfg pp_cfg pp_shape pmap_piece crosshairGrob
 #' @importFrom rlang abort check_dots_empty .data
 #' @importFrom stringr str_glue str_replace str_sub
-#' @importFrom utils packageDescription
+#' @importFrom utils packageDescription packageVersion
 NULL
 
 # Inches
