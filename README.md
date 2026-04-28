@@ -223,6 +223,7 @@
 * [List of Triangle/Pyramid deck card games](https://boardgamegeek.com/geeklist/186807/list-of-trianglepyramid-deck-card-games-please-add) Geeklist
 * [The Great Dalmuti](https://boardgamegeek.com/boardgame/929/the-great-dalmuti)
 * [Pairs](https://crabfragmentlabs.com/pairs)
+* [Somerset](https://www.somersetgame.com/)
 
 ### Dark/light suits
 
@@ -231,6 +232,7 @@
 * [Duplhex Playing Cards](https://www.thegamecrafter.com/games/duplhex-playing-cards)
 * [Gamelib Pocket](https://www.gamelibpocket.com/en/)
 * [Rainbow deck](https://boardgamegeek.com/boardgame/59655/rainbow-deck)
+- [Star-Pip Playing Cards](http://tamivox.org/xovimat/star_pip/index.html)
 
 ### Asymmetric decks
 
@@ -250,6 +252,7 @@
   + [Flexdeck](https://www.amazon.com/Flexdeck-Dominoes-Combined-Playing-Adults/)
   + Cartesian Cards' [One Deck](https://cartesiancards.com/products/one-deck-game-cards)
   + [Quadkopf](https://www.thegamecrafter.com/games/quadkopf-double-9-domino-tin-deck)
+  + [Xovimat Playing Cards](http://tamivox.org/dave/XovimatCard/index.html)
 
 ### Chess-related decks:
 
