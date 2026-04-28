@@ -25,9 +25,9 @@ library("dplyr")
 library("stringr")
 library("tibble")
 
-df_nt <- read.csv("raw-data/trad_ranks_freq.csv") |> arrange(Var1)
+df_nt <- read.csv("data-raw/trad_ranks_freq.csv") |> arrange(Var1)
 
-df <- read.csv("raw-data/basic_domino_scheme.csv",
+df <- read.csv("data-raw/basic_domino_scheme.csv",
                na.strings = "",
                colClasses = "character")
 
@@ -152,11 +152,11 @@ while (TRUE) {
         offset <- sum(abs(df_tab$Freq - df_nt$Freq))
     }
     if (offset == 0) { # Meets basic needs for dominoes/dice
-        if (!dir.exists("raw-data/step_1"))
-            dir.create("raw-data/step_1")
+        if (!dir.exists("data-raw/step_1"))
+            dir.create("data-raw/step_1")
 
         df <- select(df, -"takes")
-        f <- paste0("raw-data/step_1/candidate_", seed, "_", iter, ".csv")
+        f <- paste0("data-raw/step_1/candidate_", seed, "_", iter, ".csv")
         cat("seed:", seed, "iter:", iter, "\n")
         write.csv(df, f, row.names = FALSE)
     }

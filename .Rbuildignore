@@ -5,8 +5,13 @@ Rakefile
 codecov.yml
 _pkgdown.yml
 ^pkgdown$
+^\.air.toml$
+^\.claude$
+^\.editorconfig$
+^\.git$
 ^\.github$
-^raw-data$
+^\.pre-commit-config.yaml$
+^data-raw$
 ^ivory-skull.jpg$
 ^cran-comments.md$
 ^tmp$
