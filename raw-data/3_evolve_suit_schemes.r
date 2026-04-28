@@ -1,17 +1,38 @@
+# Here we allocate the remaining traditional suit halves and apply
+# evolutionary algorithms to try to achieve further pleasing subdeck features
+#
+# * "shaded tarot" - If flip "shaded" side up do we have numbers 00--49
+# * "chinese dominoes" - Each 8 t. suits has 4 cards, each of 6 ranks at least once
+# * "d6 dice" - Each of 4 fr. suits has 9 cards
+# * "d6 dominoes" - Each of 4 fr. suits has 7 cards, each of 7 ranks at least once
+# * "doubles" - Each of 4 fr. suits has 5 cards
 library("dplyr")
 library("parallel")
 
-# filename <- "tmp/candidate.csv"
-# filename <- "raw-data/step_1/candidate_342_761823.csv" # shaded + dom-6
-# filename <- "raw-data/step_1/candidate_242_1985528.csv"
-# filename <- "raw-data/step_1/candidate_242_2590921.csv"
-# filename <- "raw-data/step_1/candidate_311_2641571.csv"
-# filename <- "raw-data/step_1/candidate_911_2720203.csv"
-# filename <- "raw-data/step_1/candidate_720_2042613.csv" # shaded + dom-6
-# filename <- "raw-data/step_1/candidate_732_2872840.csv"
-# filename <- "raw-data/step_1/candidate_732_3012693.csv"
-# filename <- "raw-data/step_1/candidate_411_4176423.csv"
-filename <- "raw-data/step_1/candidate_98_77435.csv" # shaded + dom-6 + first 20
+# filename <- "raw-data/step_2/candidate_98_77435.csv" # shaded + dom-6 + first 20 with seed 42
+# seed <- 42
+# filename <- "raw-data/step_2/candidate_101_3774175.csv" # shaded + dom-6 with seed 1234
+# seed <- 1234
+# filename <- "raw-data/step_2/candidate_103_6422195.csv" # shaded + dom-6 with seed 1942
+# seed <- 1942
+# filename <- "raw-data/step_2/candidate_102_15642136.csv"
+# filename <- "raw-data/step_2/candidate_108_16090053.csv" # shaded + dom-6 + first 20 with seed 42
+# seed <- 42
+# filename <- "raw-data/step_2/candidate_109_14459887.csv" # shaded + dom-6 with seed 66, 72
+# seed <- 1834344
+# filename <- "raw-data/step_2/candidate_103_32007877.csv" # shaded + dom-6 + first 20 with seed 12
+# seed <- 12
+seed2 <- 1111
+
+# filename <- "raw-data/step_2/candidate_9373927_5080362.csv"
+filename <- "raw-data/step_2/candidate_42_1030905.csv"
+filename <- "raw-data/step_2/candidate_42_6446791.csv"
+filename <- "raw-data/step_2/candidate_42_6775971.csv"
+filename <- "raw-data/step_2/candidate_84_3635820.csv"
+seed <- 5 # Found one that did shaded + dom-6 hard
+
+# seed <- 3210123
+# seed2 <- 1111
 
 dft <- tibble::tibble(tlight = rep(c("L", "D"), each = 52),
                       tsuit = rep(rep(c("H", "S", "C", "D"), 13), 2),
@@ -25,6 +46,10 @@ dft <- tibble::tibble(tlight = rep(c("L", "D"), each = 52),
                       tlight_suit = paste0(tlight, tsuit),
                       tsuit_rank = paste0(tsuit, trank))
 dft <- filter(dft, tsuit_rank != "SQ", tsuit_rank != "DJ")
+
+select_df <- function(dfj) {
+	select(dfj, "label", "lrank", "rrank", "nlabel", "needs", "tlabel", "dom9", "dom6", "d6", "chi")
+}
 
 build_df <- function(filename) {
     df_raw <- read.csv(filename)
@@ -61,36 +86,21 @@ dfn <- tibble::tibble(nsuit = rep(mod, 10L),
                       nlight_suit = paste0(nlight, nsuit),
                       nsuit_rank = paste0(nsuit, nrank))
 
-# fitness functions
-# shaded tarot
-#   if flip shaded up do we have numbers 01--49
-#   historical shaded tarot deck doesn't exist
-# d-6 dominoes
-#   each of 4 fr. suits has 7 cards, each of 7 ranks
-# d-9 dominoes
-#   each of 5 nu. suits has 11 cards
-# double-6 dice
-#   each of 4 fr. suits has 9 cards
-# doubles cards
-#   each of 4 fr. suits has 5 cards
-# chinese dominoes
-#   each of 8 t. suits has 4 cards, each of 6 ranks at least once
-# 3D 1
-# 3D 2
-# 3D 3
-#   each of 5 n. suits has 4 cards: dark/light x red/black
 
 # evolve function
 # genetic algorithm
 
-# Best possible is 50
+# shaded tarot
+#   if flip shaded up do we have numbers 00--49
+#   note however historical shaded tarot deck doesn't exist...
 F_SHADED <- 50L
 fitness_shaded <- function(dfj) {
     length(unique(filter(dfj, !tshaded)$nsuit_rank))
 }
 
-# Best possible is 8 + 48
 # F_CHI <- 8L + 48L
+# chinese dominoes
+#   each of 8 t. suits has 4 cards, each of 6 ranks at least once
 F_CHI <- 4L + 24L
 fitness_chinese <- function(dfj) {
     dfc <- filter(dfj, chi)
@@ -105,38 +115,34 @@ fitness_chinese <- function(dfj) {
     # length(tc) - sum(abs(tc - 4))
 }
 
-# Best possible is 4
+# d6 dice
+#   each of 4 fr. suits has 9 cards
 F_D6 <- 4L
 fitness_d6 <- function(dfj) {
     td6 <- table(filter(dfj, d6)$tsuit)
     length(td6) - sum(abs(td6 - 9))
 }
 
-# Best possible is 4 + 28
-F_DOM6 <- 4L + 28L
+# d-6 dominoes
+#   each of 4 fr. suits has 7 cards, at least one card for each rank
+# F_DOM6 <- 4L + 28L
+F_DOM6 <- 28L
 fitness_dom6 <- function(dfj) {
     df6 <- filter(dfj, dom6)
     tdom6 <- table(df6$tsuit)
     # each French suit has at least one card for each rank
     s6 <- union(paste0(df6$tsuit, df6$lrank),
                 paste0(df6$tsuit, df6$rrank))
-    length(tdom6) - sum(abs(tdom6 - 7)) + length(s6)
+    # length(tdom6) - sum(abs(tdom6 - 7)) + length(s6)
+
+    # each French suit has two halves for each rank
+    tdom6 <- table(c(paste0(df6$tsuit, df6$lrank),
+                     paste0(df6$tsuit, df6$rrank)))
+	length(which(tdom6 == 2L))
 }
 
-# Best possible is 8 * 10 = 80
-# Best possible is 4 * 10 = 40
-F_DOM9 <- 8L * 10L
-fitness_dom9 <- function(dfj) {
-
-    # each suit has at least one card for each rank
-    df9 <- filter(dfj, dom9)
-    s9 <- union(paste0(df9$tlight_suit, df9$lrank),
-                paste0(df9$tlight_suit, df9$rrank))
-    # s9 <- union(paste0(df9$tsuit, df9$lrank),
-    #             paste0(df9$tsuit, df9$rrank))
-    length(s9)
-}
-
+# doubles cards
+#   each of 4 fr. suits has 5 cards
 F_DOUB <- 4L
 fitness_doubles <- function(dfj) {
     dfd <- slice(dfj, 1:20)
@@ -144,33 +150,42 @@ fitness_doubles <- function(dfj) {
     length(td) - sum(abs(td - 5))
 }
 
-# Best possible is 50 + 8 + 4 + 4
-fitness <- function(df) {
+fitness_1 <- function(df) {
     dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
     # fitness_shaded(dfj) + fitness_chinese(dfj) + fitness_d6(dfj) + fitness_dom6(dfj)
     # fitness_chinese(dfj) + fitness_d6(dfj) + fitness_dom6(dfj)
     # fitness_shaded(dfj)
     # fitness_shaded(dfj) + fitness_chinese(dfj)
-    # fitness_dom9(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_chinese(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_d6(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_doubles(dfj)
     fitness_shaded(dfj) + fitness_dom6(dfj)
 }
 
+# F_1 <- F_SHADED + F_CHI
+F_1 <- F_SHADED + F_DOM6
+
 fitness_2 <- function(df) {
     dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_d6(dfj)
     fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_doubles(dfj)
+    # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_doubles(dfj) + fitness_d6(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_chinese(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_chinese(dfj) + fitness_doubles(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_chinese(dfj) + fitness_d6(dfj)
     # fitness_shaded(dfj) + fitness_dom6(dfj) + fitness_doubles(dfj) + fitness_d6(dfj)
 }
 
-# needs <- c("D1", "D2", "L2", "D3", "L3", "L4", "L5", "D5", "L6", "D6",
-# "D7", "D8", "D9", "L9", "L0", "D0", "D4", "L1", "L7", "L8", "LJ",
-# "DJ", "DQ", "LQ", "DK", "LK")
+# F_2 <- (F_1 + F_CHI)
+# F_2 <- (F_1 + F_CHI + F_DOUB)
+# F_2 <- (F_1 + F_CHI + F_D6)
+# F_2 <- (F_1 + F_DOUB + F_D6)
+F_2 <- (F_1 + F_DOUB)
+
+fitness_3 <- function(df) {
+    fitness_2(df) + fitness_chinese(df)
+}
+F_3 <- F_2 + F_CHI
 
 needs <- c("D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9",
     "DJ", "DQ", "DK", "L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7",
@@ -185,31 +200,40 @@ swap <- function(df) {
     df
 }
 
-# Target is 66L
-# while(f < (48L + 8L)) {
-# while(f < (50L + 32L + 56L)) {
-# while(f < (50L + 32L)) {
-# while(f < (50L + 56L)) {
-# while(f < (80L)) {
-# while(f < (F_SHADED + F_DOM6 + F_DOUB)) {
 
-set.seed(42)
+set.seed(seed)
 df <- build_df(filename)
 dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
 
+military_suit_labels <- df |>
+        mutate(label = substr(label, 1, 3)) |>
+        group_by(label) |>
+        mutate(chi_n = n(), chi_l = sum(chi)) |>
+        ungroup() |>
+        filter(chi_n == 2L & chi_l == 1L) |>
+        pull(label) |>
+        unique()
+swap_chi <- function(df) {
+    label <- sample(military_suit_labels, 1L)
+    i_a <- which(df$label == paste0(label, "a"))
+    i_b <- i_a + 1L
+    df$chi[i_a] <- !df$chi[i_a]
+    df$chi[i_b] <- !df$chi[i_b]
+    df
+}
+
 evolve <- function(filename) {
-    set.seed(42)
+    set.seed(seed)
     df <- build_df(filename)
-    f <- fitness(df)
-    cat(filename, ",", f, "\n",
-         sep = "", append = TRUE, file = "raw-data2/fitness.txt")
+    f <- fitness_1(df)
+    # cat(filename, ",", f, "\n",
+    #      sep = "", append = TRUE, file = "raw-data2/fitness.txt")
     start_time <- Sys.time()
-    while(f < (F_SHADED + F_DOM6)) {
-    # while(f < (F_SHADED + F_CHI)) {
+    while(f < F_1) {
         df_new <- swap(df)
-        f_new <- fitness(df_new)
+        f_new <- fitness_1(df_new)
         if (f_new > f) {
-            cat("fitness: ", f_new, "\n")
+            cat("fitness: ", f_new, "/", F_1, "\n")
         }
         if (f_new >= f) {
             f <- f_new
@@ -220,30 +244,38 @@ evolve <- function(filename) {
     # cat(filename, ",", f_new, "\n",
     #     sep = "", append = TRUE, file = "raw-data2/fitness.txt")
 
-    if (TRUE) {
+    if (FALSE) {
+    start_time <- Sys.time()
     f <- fitness_2(df)
-    cat("fitness 2: ", f, "\n")
-    # set.seed(93)
-    # set.seed(428)
-    set.seed(1111)
-    # set.seed(11811)
-    # while(f < (F_SHADED + F_DOM6 + F_CHI)) {
-    while(f < (F_SHADED + F_DOM6 + F_DOUB)) {
-    # while(f < (F_SHADED + F_DOM6 + F_CHI + F_DOUB)) {
-    # while(f < (F_SHADED + F_DOM6 + F_CHI + F_D6)) {
-    # while(f < (F_SHADED + F_DOM6 + F_DOUB + F_D6)) {
-    # while(f < (86L)) {
+    cat("fitness 2: ", f, "/", F_2, "\n")
+    set.seed(seed2)
+    while(f < F_2) {
         df_new <- swap(df)
         f_new <- fitness_2(df_new)
         if (f_new > f) {
-            cat("fitness 2: ", f_new, "\n")
+            cat("fitness 2: ", f_new, "/", F_2, "\n")
         }
         if (f_new >= f) {
             f <- f_new
             df <- df_new
         }
-        if (as.numeric(difftime(Sys.time(), start_time), units = "mins") > 45) return(invisible(NULL))
+        if (as.numeric(difftime(Sys.time(), start_time), units = "mins") > 30) return(invisible(NULL))
     }
+
+    # f <- fitness_3(df)
+    # cat("fitness 3: ", f, "/", F_3, "\n")
+    # while(f < F_3) {
+    #     df_new <- swap_chi(df)
+    #     f_new <- fitness_3(df_new)
+    #     if (f_new > f) {
+    #         cat("fitness 3: ", f_new, "/", F_3, "\n")
+    #     }
+    #     if (f_new >= f) {
+    #         f <- f_new
+    #         df <- df_new
+    #     }
+    #     # if (as.numeric(difftime(Sys.time(), start_time), units = "mins") > 45) return(invisible(NULL))
+    # }
     }
 
     # cat(filename, ",", f_new, "\n",
@@ -251,16 +283,30 @@ evolve <- function(filename) {
     return(invisible(df))
 }
 
-df <- evolve(filename)
-dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
+if (TRUE) {
+    filenames <- list.files("raw-data/step_2", full.names = TRUE)
 
-# filenames <- list.files("raw-data2", full.names = TRUE)
-#
-# cl <- makeCluster(10L)
-# clusterExport(cl, ls())
-# clusterEvalQ(cl, {
-#   library("dplyr")
-# })
-# l <- parLapply(cl, filenames, evolve)
+    cl <- makeCluster(10L)
+    clusterExport(cl, ls())
+    clusterEvalQ(cl, {
+      library("dplyr")
+    })
+    l <- parLapply(cl, filenames, evolve) |> 
+		Filter(f = Negate(is.null)) |>
+		lapply(function(df) {
+			left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
+		})
+	if (length(l)) {
+		cat(paste0("Found ", length(l), " candidates\n"))
+		dfj <- l[[1L]]
+	} else {
+		cat("Found zero candidates\n")
+	}
+} else {
+    df <- evolve(filename)
+    dfj <- left_join(df, dfn, by = "nlabel") |> left_join(dft, by = "tlabel")
+}
 
-# write.csv(dfj, "raw-data/alpha.csv", row.names = FALSE)
+# slice(dfj, 1:20) |> pull(tsuit_rank) |> table() |> as.data.frame()
+
+# write.csv(dfj, "raw-data/alpha_candidate2.csv", row.names = FALSE)
