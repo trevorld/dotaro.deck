@@ -3,5 +3,5 @@ codecov.yml
 pkgdown
 *.swp
 tmp
-raw-data/step_1
-raw-data/step_2
+data-raw/step_1
+data-raw/step_2

@@ -9,26 +9,26 @@
 library("dplyr")
 library("parallel")
 
-# filename <- "raw-data/step_2/candidate_98_77435.csv" # shaded + dom-6 + first 20 with seed 42
+# filename <- "data-raw/step_2/candidate_98_77435.csv" # shaded + dom-6 + first 20 with seed 42
 # seed <- 42
-# filename <- "raw-data/step_2/candidate_101_3774175.csv" # shaded + dom-6 with seed 1234
+# filename <- "data-raw/step_2/candidate_101_3774175.csv" # shaded + dom-6 with seed 1234
 # seed <- 1234
-# filename <- "raw-data/step_2/candidate_103_6422195.csv" # shaded + dom-6 with seed 1942
+# filename <- "data-raw/step_2/candidate_103_6422195.csv" # shaded + dom-6 with seed 1942
 # seed <- 1942
-# filename <- "raw-data/step_2/candidate_102_15642136.csv"
-# filename <- "raw-data/step_2/candidate_108_16090053.csv" # shaded + dom-6 + first 20 with seed 42
+# filename <- "data-raw/step_2/candidate_102_15642136.csv"
+# filename <- "data-raw/step_2/candidate_108_16090053.csv" # shaded + dom-6 + first 20 with seed 42
 # seed <- 42
-# filename <- "raw-data/step_2/candidate_109_14459887.csv" # shaded + dom-6 with seed 66, 72
+# filename <- "data-raw/step_2/candidate_109_14459887.csv" # shaded + dom-6 with seed 66, 72
 # seed <- 1834344
-# filename <- "raw-data/step_2/candidate_103_32007877.csv" # shaded + dom-6 + first 20 with seed 12
+# filename <- "data-raw/step_2/candidate_103_32007877.csv" # shaded + dom-6 + first 20 with seed 12
 # seed <- 12
 seed2 <- 1111
 
-# filename <- "raw-data/step_2/candidate_9373927_5080362.csv"
-filename <- "raw-data/step_2/candidate_42_1030905.csv"
-filename <- "raw-data/step_2/candidate_42_6446791.csv"
-filename <- "raw-data/step_2/candidate_42_6775971.csv"
-filename <- "raw-data/step_2/candidate_84_3635820.csv"
+# filename <- "data-raw/step_2/candidate_9373927_5080362.csv"
+filename <- "data-raw/step_2/candidate_42_1030905.csv"
+filename <- "data-raw/step_2/candidate_42_6446791.csv"
+filename <- "data-raw/step_2/candidate_42_6775971.csv"
+filename <- "data-raw/step_2/candidate_84_3635820.csv"
 seed <- 5 # Found one that did shaded + dom-6 hard
 
 # seed <- 3210123
@@ -227,7 +227,7 @@ evolve <- function(filename) {
     df <- build_df(filename)
     f <- fitness_1(df)
     # cat(filename, ",", f, "\n",
-    #      sep = "", append = TRUE, file = "raw-data2/fitness.txt")
+    #      sep = "", append = TRUE, file = "data-raw2/fitness.txt")
     start_time <- Sys.time()
     while(f < F_1) {
         df_new <- swap(df)
@@ -242,7 +242,7 @@ evolve <- function(filename) {
         if (as.numeric(difftime(Sys.time(), start_time), units = "mins") > 30) return(invisible(NULL))
     }
     # cat(filename, ",", f_new, "\n",
-    #     sep = "", append = TRUE, file = "raw-data2/fitness.txt")
+    #     sep = "", append = TRUE, file = "data-raw2/fitness.txt")
 
     if (FALSE) {
     start_time <- Sys.time()
@@ -279,12 +279,12 @@ evolve <- function(filename) {
     }
 
     # cat(filename, ",", f_new, "\n",
-    #     sep = "", append = TRUE, file = "raw-data2/fitness.txt")
+    #     sep = "", append = TRUE, file = "data-raw2/fitness.txt")
     return(invisible(df))
 }
 
 if (TRUE) {
-    filenames <- list.files("raw-data/step_2", full.names = TRUE)
+    filenames <- list.files("data-raw/step_2", full.names = TRUE)
 
     cl <- makeCluster(10L)
     clusterExport(cl, ls())
@@ -309,4 +309,4 @@ if (TRUE) {
 
 # slice(dfj, 1:20) |> pull(tsuit_rank) |> table() |> as.data.frame()
 
-# write.csv(dfj, "raw-data/alpha_candidate2.csv", row.names = FALSE)
+# write.csv(dfj, "data-raw/alpha_candidate2.csv", row.names = FALSE)

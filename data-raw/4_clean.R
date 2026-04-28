@@ -1,7 +1,7 @@
 library("dplyr")
 library("stringr")
 
-df <- read.csv("raw-data/alpha.csv") |>
+df <- read.csv("data-raw/alpha.csv") |>
     arrange(tlabel) |>
     select("tsuit", "trank", "tlight",
            bsuit = "nsuit", brank = "nrank", blight = "nlight",

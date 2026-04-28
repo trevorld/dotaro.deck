@@ -5,10 +5,10 @@
 # successful candidates get written to `step_2`
 
 library("stringr")
-files <- list.files("raw-data/step_1", full.names = TRUE)
+files <- list.files("data-raw/step_1", full.names = TRUE)
 
-if (!dir.exists("raw-data/step_2"))
-    dir.create("raw-data/step_2")
+if (!dir.exists("data-raw/step_2"))
+    dir.create("data-raw/step_2")
 
 for (file in files) {
 
