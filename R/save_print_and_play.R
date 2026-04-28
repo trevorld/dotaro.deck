@@ -65,11 +65,11 @@ save_print_and_play <- function(
 	}
 	dev.off()
 
-	filename |>
-		pnpmisc::pdf_set_xmp(xmp = xmp) |>
-		pnpmisc::pdf_set_docinfo(docinfo = xmpdf::as_docinfo(xmp)) |>
-		pnpmisc::pdf_compress(filename, linearize = TRUE)
-	pnpmisc::rm_temp_pdfs()
+	tmpfile1 <- pnpmisc::pdf_set_xmp(filename, xmp = xmp)
+	on.exit(unlink(tmpfile1), add = TRUE)
+	tmpfile2 <- pnpmisc::pdf_set_docinfo(tmpfile1, docinfo = xmpdf::as_docinfo(xmp))
+	on.exit(unlink(tmpfile2), add = TRUE)
+	pnpmisc::pdf_compress(tmpfile2, filename, linearize = TRUE)
 
 	invisible(filename)
 }
