@@ -7,21 +7,21 @@
 library("stringr")
 files <- list.files("data-raw/step_1", full.names = TRUE)
 
-if (!dir.exists("data-raw/step_2"))
-    dir.create("data-raw/step_2")
+if (!dir.exists("data-raw/step_2")) {
+	dir.create("data-raw/step_2")
+}
 
 for (file in files) {
+	df <- read.csv(file, colClasses = "character")
 
-    df <- read.csv(file, colClasses = "character")
+	light <- str_sub(df$nlabel[1:20], 1, 1)
+	rank <- str_sub(df$nlabel[1:20], 4, 4)
 
-    light <- str_sub(df$nlabel[1:20], 1, 1)
-    rank <- str_sub(df$nlabel[1:20], 4, 4)
-
-    tlr <- table(paste0(light, rank))
-    l <- length(tlr)
-    if (l >= 20) {
-        cat(file, ":", l , "\n")
-        file2 <- gsub("step_1", "step_2", file)
-        file.copy(file, file2)
-    }
+	tlr <- table(paste0(light, rank))
+	l <- length(tlr)
+	if (l >= 20) {
+		cat(file, ":", l, "\n")
+		file2 <- gsub("step_1", "step_2", file)
+		file.copy(file, file2)
+	}
 }
