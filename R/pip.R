@@ -1,38 +1,10 @@
-xya_pips_dominoes <- function(n_pips, die = FALSE, chinese = FALSE, other_pips = NULL) {
+xya_pips_dominoes <- function(n_pips) {
 	if (n_pips == 0) {
 		return(data.frame(x = numeric(0), y = numeric(0), angle = numeric(0)))
 	}
-	if (die && !chinese) {
-		high <- 0.75
-	} else if (chinese && die) {
-		if (n_pips == 4) {
-			high <- 0.65
-		} else if (n_pips == 6) {
-			high <- 0.75
-		} else {
-			high <- 0.68
-		}
-	} else {
-		high <- 0.78
-	}
+	high <- 0.78
 	low <- 1 - high
-	if (chinese && !die) {
-		low <- 0.2
-		if (n_pips == 3 && other_pips < 5) {
-			high <- 1.0
-		} else if (n_pips == 4 && other_pips == 4) {
-			high <- 0.75
-		} else {
-			high <- 0.84
-		}
-	}
-	if (chinese && die && n_pips == 6) {
-		left <- 0.36
-	} else if (chinese && !die) {
-		left <- 0.30
-	} else {
-		left <- low
-	}
+	left <- low
 	right <- 1 - left
 	mid <- 0.5 * (high + low)
 	if (n_pips > 9L) {
@@ -40,34 +12,14 @@ xya_pips_dominoes <- function(n_pips, die = FALSE, chinese = FALSE, other_pips =
 	}
 	switch(
 		n_pips,
-		if (chinese && !die) {
-			data.frame(x = 0.5, y = low, angle = 0)
-		} else {
-			data.frame(x = 0.5, y = mid, angle = 0)
-		}, # 1
-		if (chinese) {
-			if (die) {
-				data.frame(x = 0.5, y = c(low, high), angle = c(0, 180))
-			} else {
-				data.frame(x = c(left, right), y = low, angle = c(0, 180))
-			}
-		} else {
-			data.frame(x = c(left, right), y = c(high, low), angle = c(0, 180))
-		}, # 2
+		data.frame(x = 0.5, y = mid, angle = 0), # 1
+		data.frame(x = c(left, right), y = c(high, low), angle = c(0, 180)), # 2
 		data.frame(x = c(left, 0.5, right), y = c(high, mid, low), angle = c(0, 0, 180)), # 3
-		if (chinese && !die && other_pips != 4) {
-			data.frame(
-				x = rep(c(left, right), 2), # 4
-				y = rep(c(low, mid), each = 2),
-				angle = rep(c(180, 0), each = 2)
-			)
-		} else {
-			data.frame(
-				x = rep(c(left, right), 2), # 4
-				y = rep(c(low, high), each = 2),
-				angle = rep(c(180, 0), each = 2)
-			)
-		},
+		data.frame(
+			x = rep(c(left, right), 2), # 4
+			y = rep(c(low, high), each = 2),
+			angle = rep(c(180, 0), each = 2)
+		),
 		data.frame(
 			x = c(rep(c(left, right), 2), 0.5), # 5
 			y = c(rep(c(low, high), each = 2), mid),
