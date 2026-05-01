@@ -167,7 +167,7 @@ dotaroFoolFaceGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_fool_face"
+		cl = c("dotaro_fool_face", "dotaro_grob")
 	)
 }
 
@@ -178,7 +178,7 @@ makeContext.dotaro_fool_face <- function(x) {
 }
 
 #' @export
-grobCoords.dotaro_fool_face <- function(x, closed, ...) {
+grobCoords.dotaro_grob <- function(x, closed, ...) {
 	opt <- x$opt
 	shape <- pp_shape(
 		opt$shape,
@@ -257,7 +257,7 @@ dotaroNumFaceGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_num_face"
+		cl = c("dotaro_num_face", "dotaro_grob")
 	)
 }
 
@@ -267,19 +267,6 @@ makeContext.dotaro_num_face <- function(x) {
 	x
 }
 
-#' @export
-grobCoords.dotaro_num_face <- function(x, closed, ...) {
-	opt <- x$opt
-	shape <- pp_shape(
-		opt$shape,
-		opt$shape_t,
-		opt$shape_r,
-		opt$back,
-		width = opt$shape_w,
-		height = opt$shape_h
-	)
-	grobCoords(shape$shape(vp = x$vp), closed = closed, ...)
-}
 
 #' @export
 makeContent.dotaro_num_face <- function(x) {
@@ -347,7 +334,7 @@ dotaroTradFaceGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_trad_face"
+		cl = c("dotaro_trad_face", "dotaro_grob")
 	)
 }
 
@@ -357,19 +344,6 @@ makeContext.dotaro_trad_face <- function(x) {
 	x
 }
 
-#' @export
-grobCoords.dotaro_trad_face <- function(x, closed, ...) {
-	opt <- x$opt
-	shape <- pp_shape(
-		opt$shape,
-		opt$shape_t,
-		opt$shape_r,
-		opt$back,
-		width = opt$shape_w,
-		height = opt$shape_h
-	)
-	grobCoords(shape$shape(vp = x$vp), closed = closed, ...)
-}
 
 #' @export
 makeContent.dotaro_trad_face <- function(x) {
@@ -444,7 +418,7 @@ dotaroTradCornerGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_trad_corner"
+		cl = c("dotaro_trad_corner", "dotaro_grob")
 	)
 }
 
@@ -454,19 +428,6 @@ makeContext.dotaro_trad_corner <- function(x) {
 	x
 }
 
-#' @export
-grobCoords.dotaro_trad_corner <- function(x, closed, ...) {
-	opt <- x$opt
-	shape <- pp_shape(
-		opt$shape,
-		opt$shape_t,
-		opt$shape_r,
-		opt$back,
-		width = opt$shape_w,
-		height = opt$shape_h
-	)
-	grobCoords(shape$shape(vp = x$vp), closed = closed, ...)
-}
 
 #' @export
 makeContent.dotaro_trad_corner <- function(x) {
@@ -549,7 +510,7 @@ dotaroNumCornerGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_num_corner"
+		cl = c("dotaro_num_corner", "dotaro_grob")
 	)
 }
 
@@ -559,19 +520,6 @@ makeContext.dotaro_num_corner <- function(x) {
 	x
 }
 
-#' @export
-grobCoords.dotaro_num_corner <- function(x, closed, ...) {
-	opt <- x$opt
-	shape <- pp_shape(
-		opt$shape,
-		opt$shape_t,
-		opt$shape_r,
-		opt$back,
-		width = opt$shape_w,
-		height = opt$shape_h
-	)
-	grobCoords(shape$shape(vp = x$vp), closed = closed, ...)
-}
 
 #' @export
 makeContent.dotaro_num_corner <- function(x) {
@@ -642,7 +590,7 @@ dotaroFoolCornerGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 		name = NULL,
 		gp = gpar(),
 		vp = NULL,
-		cl = "dotaro_fool_corner"
+		cl = c("dotaro_fool_corner", "dotaro_grob")
 	)
 }
 
@@ -652,19 +600,6 @@ makeContext.dotaro_fool_corner <- function(x) {
 	x
 }
 
-#' @export
-grobCoords.dotaro_fool_corner <- function(x, closed, ...) {
-	opt <- x$opt
-	shape <- pp_shape(
-		opt$shape,
-		opt$shape_t,
-		opt$shape_r,
-		opt$back,
-		width = opt$shape_w,
-		height = opt$shape_h
-	)
-	grobCoords(shape$shape(vp = x$vp), closed = closed, ...)
-}
 
 #' @export
 makeContent.dotaro_fool_corner <- function(x) {
