@@ -51,7 +51,7 @@
 
   + Each of the hundred "number suit" halves is paired with a "traditional suit" half.  These halves are allocated such that there are double-9 domino, Chinese domino, and d6 dice card subdecks.
 
-<img src="man/figures/README-number-cards-1.png" alt="The four fool cards"  />
+<img src="man/figures/README-number-cards-1.png" alt="Example number suit halves paird with traditional suit halves"  />
 
   + Each of the four "knight" rank halves is combined with the other "knight" rank half of the same French suit.
 
@@ -80,7 +80,7 @@
 
 
 
-![](man/figures/README-dark_up-1.png)
+<img src="man/figures/README-dark_up-1.png" alt="All 108 Dotaro Deck cards arranged with dark halves up top"  />
 
 ### Light halves up top
 
@@ -93,7 +93,7 @@
 
 
 
-![](man/figures/README-light_up-1.png)
+<img src="man/figures/README-light_up-1.png" alt="All 108 Dotaro Deck cards arranged with light halves up top"  />
 
 ### Traditional suit halves up top
 
@@ -106,7 +106,7 @@
 
 
 
-![](man/figures/README-trad_up-1.png)
+<img src="man/figures/README-trad_up-1.png" alt="All 108 Dotaro Deck cards arranged with traditional suit halves up top"  />
 
 ### Traditional suit halves down below
 
@@ -122,7 +122,7 @@
 
 
 
-![](man/figures/README-num_up-1.png)
+<img src="man/figures/README-num_up-1.png" alt="All 108 Dotaro Deck cards arranged with number suit halves up top"  />
 
 ## <a name ="examples">Examples</a>
 
@@ -134,7 +134,7 @@
 
 
 
-![](man/figures/README-one_french-1.png)
+<img src="man/figures/README-one_french-1.png" alt="One deck of traditional French-suited playing cards selected from the Dotaro Deck"  />
 
 ### Two decks of traditional French-suited playing cards
 
@@ -145,7 +145,7 @@
 
 
 
-![](man/figures/README-two_french-1.png)
+<img src="man/figures/README-two_french-1.png" alt="Two decks of traditional French-suited playing cards selected from the Dotaro Deck"  />
 
 ### One deck of traditional French-suited tarot cards
 
@@ -157,7 +157,7 @@
 
 
 
-![](man/figures/README-french_tarot-1.png)
+<img src="man/figures/README-french_tarot-1.png" alt="One deck of traditional French-suited tarot cards selected from the Dotaro Deck"  />
 
 ### One double-nine set of dominoes
 
@@ -166,7 +166,7 @@
 
 
 
-![](man/figures/README-double_nine-1.png)
+<img src="man/figures/README-double_nine-1.png" alt="One double-nine set of dominoes selected from the Dotaro Deck"  />
 
 ### One set of Chinese dominoes
 
@@ -174,7 +174,7 @@
 
 
 
-![](man/figures/README-chinese-1.png)
+<img src="man/figures/README-chinese-1.png" alt="One set of Chinese dominoes selected from the Dotaro Deck"  />
 
 ### One set of d6 dice cards
 
@@ -183,7 +183,7 @@
 
 
 
-![](man/figures/README-d6-1.png)
+<img src="man/figures/README-d6-1.png" alt="One set of d6 dice cards selected from the Dotaro Deck"  />
 
 ## <a name="faq">Frequently Asked Questions</a>
 
