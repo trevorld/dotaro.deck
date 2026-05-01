@@ -15,7 +15,7 @@ Imports:
 	grDevices,
 	grid,
 	grImport2,
-	marquee,
+	marquee (>= 1.2.0),
 	piecepackr,
 	pnpmisc,
 	rlang,

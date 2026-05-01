@@ -161,24 +161,5 @@ credits_style <- function() {
 				padding = marquee::trbl(NULL)
 			) |>
 			marquee::modify_style("ul", padding = marquee::trbl(right = marquee::em(1)))
-	} else {
-		# Manually set `bullets` to avoid #53
-		marquee::classic_style(
-			base_size = 10,
-			body_font = "Dejavu Sans",
-			header_font = "Dejavu Sans",
-			lineheight = 1.6,
-			margin = marquee::trbl(0, bottom = marquee::rem(0.7)),
-			bullets = rep("\u2022", 3L)
-		) |>
-			marquee::modify_style(
-				"h1",
-				border = NA,
-				size = marquee::relative(1.4),
-				border_size = marquee::trbl(NULL),
-				margin = marquee::trbl(NULL),
-				padding = marquee::trbl(NULL)
-			) |>
-			marquee::modify_style("ul", padding = marquee::trbl(right = marquee::em(1)))
 	}
 }
