@@ -75,7 +75,7 @@ Y0 <- 0.1 - 0.5 * IH
 
   + Each of the hundred "number suit" halves is paired with a "traditional suit" half.  These halves are allocated such that there are double-9 domino, Chinese domino, and d6 dice card subdecks.
 
-```{r number-cards, fig.width = 9.5, fig.height = 4, fig.alt = "The four fool cards"}
+```{r number-cards, fig.width = 9.5, fig.height = 4, fig.alt = "Example number suit halves paird with traditional suit halves"}
 grid.piece("card_face",
            suit = c(1L, 2L, 7L, 8L), rank = c(4L, 7L, 13L, 14L),
            angle = c(0, 180, 180, 0),
@@ -144,7 +144,7 @@ dark_up_width <- (14 + 10) * IW + 0.5 + X0
 dark_up_height <- 5 * IH + 0.5 + 0.2
 ```
 
-```{r dark_up, fig.width = dark_up_width, fig.height = dark_up_height}
+```{r dark_up, fig.width = dark_up_width, fig.height = dark_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with dark halves up top"}
 df_trad <- filter(half_info, light == "D", suit %in% c("H", "S", "C", "D")) |>
     select("card", "top") |>
     left_join(corner_info, by = c("card", "top")) |>
@@ -171,7 +171,7 @@ df_fool <- filter(half_info, light == "D", is.na(suit)) |>
     mutate(piece_side = "card_face",
            x = X0 + 6 * IW + seq(0, by = IW, length.out = 2L),
            y = max(df_trad$y) + IH + 0.2)
-  
+
 df <- bind_rows(df_trad, df_num, df_fool)
 pmap_piece(df, default.units = "in", envir = envir)
 ```
@@ -190,7 +190,7 @@ light_up_width <- (14 + 10) * IW + 0.5 + X0
 light_up_height <- 5 * IH + 0.5 + 0.2
 ```
 
-```{r light_up, fig.width = light_up_width, fig.height = light_up_height}
+```{r light_up, fig.width = light_up_width, fig.height = light_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with light halves up top"}
 df_trad <- filter(half_info, light == "L", suit %in% c("H", "S", "C", "D")) |>
     select("card", "top") |>
     left_join(corner_info, by = c("card", "top")) |>
@@ -217,7 +217,7 @@ df_fool <- filter(half_info, light == "L", is.na(suit)) |>
     mutate(piece_side = "card_face",
            x = X0 + 6 * IW + seq(0, by = IW, length.out = 2L),
            y = max(df_trad$y) + IH + 0.2)
-  
+
 df <- bind_rows(df_trad, df_num, df_fool)
 pmap_piece(df, default.units = "in", envir = envir)
 ```
@@ -236,7 +236,7 @@ trad_up_width <- 28 * IW + 0.5 + X0 + 0.1
 trad_up_height <- 4 * IH + 0.5 + 0.1
 ```
 
-```{r trad_up, fig.width = trad_up_width, fig.height = trad_up_height}
+```{r trad_up, fig.width = trad_up_width, fig.height = trad_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with traditional suit halves up top"}
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 28L), 4L),
                  y = Y0 + rep(4:1, each = 28L) * IH,
@@ -266,7 +266,7 @@ num_up_width <- (10 + 10) * IW + 0.5 + X0
 num_up_height <- (5 + 1) * IH + 0.5 + 0.2
 ```
 
-```{r num_up, fig.width = num_up_width, fig.height = num_up_height}
+```{r num_up, fig.width = num_up_width, fig.height = num_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with number suit halves up top"}
 df_num_d <- filter(half_info, light == "D", suit %in% as.character(0:4)) |>
     arrange(suit, rank) |>
     select("card", "top") |>
@@ -319,7 +319,7 @@ one_french_width <- (13 + 1) * IW + 0.5 + 0.4
 one_french_height <- 4 * IH + 0.5
 ```
 
-```{r one_french, fig.width = one_french_width, fig.height = one_french_height}
+```{r one_french, fig.width = one_french_width, fig.height = one_french_height, fig.alt = "One deck of traditional French-suited playing cards selected from the Dotaro Deck"}
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 13L), 4L),
                  y = Y0 + rep(4:1, each = 13L) * IH,
@@ -334,7 +334,7 @@ df_fool_d <- filter(half_info, light == "D", is.na(suit)) |>
     arrange(rank) |>
     mutate(piece_side = "card_face",
            x = max(df$x) + IW + 0.2,
-           y = Y0 + 3:2 * IH) 
+           y = Y0 + 3:2 * IH)
 pmap_piece(df_fool_d, envir = envir, default.units = "in")
 ```
 
@@ -350,7 +350,7 @@ two_french_width <- (13 + 13 + 1) * IW + 0.5 + 0.1 + 0.5
 two_french_height <- 4 * IH + 0.5 + 0.1
 ```
 
-```{r two_french, fig.width = two_french_width, fig.height = two_french_height}
+```{r two_french, fig.width = two_french_width, fig.height = two_french_height, fig.alt = "Two decks of traditional French-suited playing cards selected from the Dotaro Deck"}
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 26L), 4L),
                  y = Y0 + rep(4:1, each = 26L) * IH,
@@ -381,7 +381,7 @@ french_tarot_width <- (14 + 10) * IW + 1.0
 french_tarot_height <- 4 * IH + 0.5
 ```
 
-```{r french_tarot, fig.width = french_tarot_width, fig.height = french_tarot_height}
+```{r french_tarot, fig.width = french_tarot_width, fig.height = french_tarot_height, fig.alt = "One deck of traditional French-suited tarot cards selected from the Dotaro Deck"}
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
                  y = Y0 + rep(4:1, each = 14L) * IH,
@@ -420,7 +420,7 @@ dom9_width <- 10 * IW + 0.5
 dom9_height <- 10 * IH + 0.5
 ```
 
-```{r double_nine, fig.width = dom9_width, fig.height = dom9_height}
+```{r double_nine, fig.width = dom9_width, fig.height = dom9_height, fig.alt = "One double-nine set of dominoes selected from the Dotaro Deck"}
 df <- filter(card_info, double9) |>
     mutate(lrank = pmin(trank, brank),
            urank = pmax(trank, brank),
@@ -443,7 +443,7 @@ chinese_width <- 16 * IW + 0.5
 chinese_height <- 2 * IH + 0.5
 ```
 
-```{r chinese, fig.width = chinese_width, fig.height = chinese_height}
+```{r chinese, fig.width = chinese_width, fig.height = chinese_height, fig.alt = "One set of Chinese dominoes selected from the Dotaro Deck"}
 df <- filter(card_info, chinese) |>
     mutate(lrank = pmin(trank, brank),
            urank = pmax(trank, brank),
@@ -467,7 +467,7 @@ d6_width <- 18 * IW + 0.5
 d6_height <- 2 * IH + 0.5
 ```
 
-```{r d6, fig.width = d6_width, fig.height = d6_height}
+```{r d6, fig.width = d6_width, fig.height = d6_height, fig.alt = "One set of d6 dice cards selected from the Dotaro Deck"}
 df <- filter(card_info, d6) |>
     mutate(lrank = pmin(trank, brank),
            urank = pmax(trank, brank),
