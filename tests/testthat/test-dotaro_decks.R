@@ -26,6 +26,20 @@ test_that("dotaro_full_traditional renders", {
 		draw_card(decks$dotaro_full_traditional, suit = 8, rank = 14),
 		writer = write_svg
 	)
+
+	dev_cur <- grDevices::dev.cur()
+	if (dev_cur > 1) {
+		on.exit(grDevices::dev.set(dev_cur), add = TRUE)
+	}
+	pdf(NULL)
+	on.exit(grDevices::dev.off(), add = TRUE)
+	expect_s3_class(
+		grid::grobCoords(
+			piecepackr::pieceGrob("card_face", cfg = decks$dotaro_full_traditional),
+			closed = TRUE
+		),
+		"GridGrobCoords"
+	)
 })
 
 test_that("dotaro_full_number renders", {
