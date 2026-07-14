@@ -1,6 +1,3 @@
-number_suits <- paste0(rep(c("L", "D"), each = 5L), rep(0:4, 2L))
-face_ranks <- c("J", "N", "Q", "K")
-fool_ranks <- c("O", "F")
 number_ranks <- as.character(0:9)
 
 glyphs <- list(
@@ -18,100 +15,112 @@ glyphs <- list(
 	"N" = "\u265E", # ♞
 	"Q" = "\u265B", # ♛
 	"K" = "\u265A", # ♚
-	LH = "\u2661", # ♡
-	LS = "\u2664", # ♤
-	LC = "\u2667", # ♧
-	LD = "\u2662", # ♢
 	DH = "\u2665", # ♥
 	DS = "\u2660", # ♠
 	DC = "\u2663", # ♣
 	DD = "\u2666", # ♦
-	"L0" = "\U0001F10B", # 🄋
-	"L1" = "\u2780", # ➀
-	"L2" = "\u2781", # ➁
-	"L3" = "\u2782", # ➂
-	"L4" = "\u2783", # ➃
-	"D0" = "\U0001F10C", # 🄌
-	"D1" = "\u278A", # ➊
-	"D2" = "\u278B", # ➋
-	"D3" = "\u278C", # ➌
-	"D4" = "\u278D", # ➍
+	"L0" = "\u24EA", # ⓪
+	"L1" = "\u2460", # ①
+	"L2" = "\u2461", # ②
+	"L3" = "\u2462", # ③
+	"L4" = "\u2463", # ④
+	"D0" = "\u24FF", # ⓿
+	"D1" = "\u2776", # ❶
+	"D2" = "\u2777", # ❷
+	"D3" = "\u2778", # ❸
+	"D4" = "\u2779", # ❹
 	"O" = "\u25CF", # ●
 	"F" = "\u2605" # ★
 )
-light_glyphs <- list(
-	"\u265F" = "\u2659", # ♟ = ♙
-	"\u265E" = "\u2658", # ♞ = ♘
-	"\u265B" = "\u2655", # ♛ = ♕
-	"\u265A" = "\u2654", # ♚ = ♔
-	"\u25CF" = "\u25CB", # ● = ○
-	"\u2605" = "\u2606" # ★ = ☆
+
+# `dotaro.font`'s negative circled digit glyphs (dark number suits) draw the
+# interior digit as a thin hole, which doesn't survive being shrunk to the
+# secondary index's cex=0.6 scale.  Draw the digit as a second, separate
+# "counter" glyph on top in the background color instead, matching how the
+# newer number-suit glyphs stay legible at any scale.
+counter_glyphs <- list(
+	D0 = "\uF5E0", # digit 0 counter
+	D1 = "\uF5E1", # digit 1 counter
+	D2 = "\uF5E2", # digit 2 counter
+	D3 = "\uF5E3", # digit 3 counter
+	D4 = "\uF5E4" # digit 4 counter
 )
 
-gp_trad_suit <- function(red, suit, light) {
-	col <- ifelse(red == "R", red_color(), black_color())
-	light_suit <- paste0(light, suit)
-	if (light_suit %in% number_suits) {
-		gpar(fontsize = 20, fontfamily = "Dejavu Sans", col = col)
-	} else {
-		gpar(fontsize = 21, fontfamily = "Dejavu Sans", col = col)
-	}
+# Mathematical bold digits, used for ranks on number-suit cards (tsuit/bsuit
+# one of `number_suits` below) to visually set them apart from the plain
+# digit ranks on traditional (French-suited) pip cards.
+bold_digit_glyphs <- list(
+	"0" = "\U0001D7CE", # 𝟎
+	"1" = "\U0001D7CF", # 𝟏
+	"2" = "\U0001D7D0", # 𝟐
+	"3" = "\U0001D7D1", # 𝟑
+	"4" = "\U0001D7D2", # 𝟒
+	"5" = "\U0001D7D3", # 𝟓
+	"6" = "\U0001D7D4", # 𝟔
+	"7" = "\U0001D7D5", # 𝟕
+	"8" = "\U0001D7D6", # 𝟖
+	"9" = "\U0001D7D7" # 𝟗
+)
+
+# French suits have no separate "light" glyph: draw the (dark) glyph in both
+# cases and let `fill` alone distinguish light from dark, same as every other
+# rank/suit glyph.
+french_suits <- c("H", "S", "C", "D")
+
+number_suits <- c("0", "1", "2", "3", "4")
+
+suit_glyph_key <- function(suit, light) {
+	if (suit %in% french_suits) paste0("D", suit) else paste0(light, suit)
 }
-gp_rank <- function(red, rank, light) {
-	col <- ifelse(red == "R", red_color(), black_color())
-	fill <- ifelse(light == "D", col, light_color())
-	if (rank %in% fool_ranks) {
-		gp_rank <- gpar(fontsize = 25, fontfamily = "Dejavu Sans", col = col, fill = fill)
-	} else {
-		gpar(fontsize = 30, fontfamily = "Dejavu Sans", col = col, fill = fill)
+
+suit_grob <- function(key, col, fill) {
+	glyph <- glyphs[[key]]
+	grob <- dotaro.font:::suitGrob(glyph, col = col, fill = fill)
+	counter <- counter_glyphs[[key]]
+	if (!is.null(counter)) {
+		grob <- grobTree(
+			grob,
+			dotaro.font:::suitGrob(counter, col = light_color(), fill = light_color())
+		)
 	}
+	grob
 }
 
 top_suit_grob <- function(tsuit, tlight, red, ...) {
-	light_suit <- paste0(tlight, tsuit)
-	glyph <- glyphs[[light_suit]]
-	gp_tsuit <- gp_trad_suit(red, tsuit, tlight)
-	tsuit_grob <- textGrob(glyph, gp = gp_tsuit)
-	tsuit_grob
+	col <- ifelse(red == "R", red_color(), black_color())
+	fill <- ifelse(tlight == "D", col, light_color())
+	suit_grob(suit_glyph_key(tsuit, tlight), col = col, fill = fill)
 }
 
 bot_suit_grob <- function(bsuit, blight, red, ...) {
 	if (is.na(bsuit)) {
 		return(nullGrob())
 	}
-	light_suit <- paste0(blight, bsuit)
-	glyph <- glyphs[[light_suit]]
-	gp_bsuit <- gp_trad_suit(red, bsuit, blight)
-	bsuit_grob <- textGrob(glyph, gp = gp_bsuit)
-	bsuit_grob
+	col <- ifelse(red == "R", red_color(), black_color())
+	fill <- ifelse(blight == "D", col, light_color())
+	suit_grob(suit_glyph_key(bsuit, blight), col = col, fill = fill)
 }
 
-top_rank_grob <- function(trank, tlight, red, ...) {
-	glyph <- glyphs[[trank]]
-	trank_grob <- textGrob(glyph, gp = gp_rank(red, trank, tlight))
-	if (tlight == "L") {
-		gp <- gp_rank(red, trank, tlight)
-		if (trank %in% face_ranks) {
-			trank_grob <- textGrob(light_glyphs[[glyph]], gp = gp)
-		} else {
-			trank_grob <- strokeGrob(trank_grob, gp = gp)
-		}
+rank_glyph <- function(rank, suit) {
+	if (suit %in% number_suits && rank %in% number_ranks) {
+		bold_digit_glyphs[[rank]]
+	} else {
+		glyphs[[rank]]
 	}
-	trank_grob
 }
 
-bot_rank_grob <- function(brank, blight, red, ...) {
-	glyph <- glyphs[[brank]]
-	brank_grob <- textGrob(glyph, gp = gp_rank(red, brank, blight))
-	if (blight == "L") {
-		gp <- gp_rank(red, brank, blight)
-		if (brank %in% face_ranks) {
-			brank_grob <- textGrob(light_glyphs[[glyph]], gp = gp)
-		} else {
-			brank_grob <- strokeGrob(brank_grob, gp = gp)
-		}
-	}
-	brank_grob
+top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
+	glyph <- rank_glyph(trank, tsuit)
+	col <- ifelse(red == "R", red_color(), black_color())
+	fill <- ifelse(tlight == "D", col, light_color())
+	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
+}
+
+bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
+	glyph <- rank_glyph(brank, bsuit)
+	col <- ifelse(red == "R", red_color(), black_color())
+	fill <- ifelse(blight == "D", col, light_color())
+	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
 
 top_border_grob <- function(...) {

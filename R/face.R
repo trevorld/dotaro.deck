@@ -16,7 +16,7 @@ top_face_grob <- function(...) {
 		vp = viewport(y = 0.4, width = 0.7, height = 0.5),
 		gp = gpar(col = col, fill = NA, lwd = 2)
 	)
-	tsuit_grob <- grobTree(tsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 1.1, cex = 1.1))
+	tsuit_grob <- grobTree(tsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 0.9, cex = 0.9))
 	trank_grob <- grobTree(trank_grob, vp = viewport(y = 0.78), gp = gpar(lex = 1.2, cex = 1.2))
 	gl <- gList(meeple_grob, tsuit_grob, trank_grob)
 
@@ -46,7 +46,7 @@ bot_face_grob <- function(...) {
 		vp = viewport(y = 0.4, width = 0.7, height = 0.5),
 		gp = gpar(col = col, fill = NA, lwd = 2)
 	)
-	bsuit_grob <- grobTree(bsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 1.1, cex = 1.1))
+	bsuit_grob <- grobTree(bsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 0.9, cex = 0.9))
 	brank_grob <- grobTree(brank_grob, vp = viewport(y = 0.78), gp = gpar(lex = 1.2, cex = 1.2))
 	gl <- gList(meeple_grob, bsuit_grob, brank_grob)
 
@@ -56,25 +56,23 @@ bot_face_grob <- function(...) {
 }
 
 knight_grob <- function(suit_grob, rank_grob, col = "black") {
-	circle_grob <- circleGrob(
-		x = 0.34,
-		r = 0.4,
-		y = 0.29,
-		gp = gpar(fill = "white", col = NA),
-		vp = viewport(height = 0.9, mask = rectGrob(gp = gpar(fill = "white", col = NA)))
-	)
+	# The meeple is drawn from `dotaro.font`'s meeple glyph (same shape as
+	# `pp_shape("meeple")`, just registered in font em-space) rather than a
+	# piecepackr shape, so it composites with the knight/horse-head rank glyph
+	# via ordinary z-order: knight drawn last, on top, so its solid fill
+	# obscures the meeple's lower body -- evoking the meeple riding the horse.
+	# meeple_grob <- grobTree(
+	# 	dotaro.font:::suitGrob("\U000FC431", col = col, fill = "transparent"),
+	# 	vp = viewport(y = 0.70),
+	# 	gp = gpar(cex = 2.0, lex = 1.2)
+	# )
 	meeple_grob <- pp_shape("meeple")$shape(
-		vp = viewport(x = 0.58, y = 0.7, width = 0.4, height = 0.3),
+		vp = viewport(y = 0.74, width = 0.6 * 0.7, height = 0.7 * 0.5),
 		gp = gpar(col = col, fill = NA, lwd = 2)
 	)
-	suit_grob <- grobTree(
-		suit_grob,
-		vp = viewport(x = 0.58, y = 0.7),
-		gp = gpar(lex = 0.8, cex = 0.8)
-	)
-	rank_grob <- grobTree(rank_grob, vp = viewport(y = 0.42), gp = gpar(lex = 3.0, cex = 3.0))
-	gl <- gList(meeple_grob, circle_grob, suit_grob, rank_grob)
-
+	suit_grob <- grobTree(suit_grob, vp = viewport(y = 0.75), gp = gpar(lex = 0.65, cex = 0.65))
+	knight_grob <- grobTree(rank_grob, vp = viewport(y = 0.44), gp = gpar(lex = 1.2, cex = 2.10))
+	gl <- gList(meeple_grob, suit_grob, knight_grob)
 	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)

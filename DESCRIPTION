@@ -1,7 +1,7 @@
 Package: dotaro.deck
 Type: Package
 Title: Dotaro Deck
-Version: 0.1.0-5
+Version: 0.2.0-1
 Authors@R: c(person("Trevor L.", "Davis", role=c("aut", "cre"),
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")))
@@ -11,12 +11,13 @@ Description: Utilities for the 'Dotaro' deck.
 Depends:
 	R (>= 4.2)
 Imports:
+	dotaro.font (>= 0.1.27),
 	dplyr,
 	grDevices,
 	grid,
 	grImport2,
 	marquee (>= 1.2.0),
-	piecepackr,
+	piecepackr (>= 1.16.2-4),
 	pnpmisc,
 	rlang,
 	stringr,
@@ -27,7 +28,7 @@ Suggests:
 	svglite,
 	testthat (>= 3.0.0),
 	vdiffr
-Remotes: trevorld/pnpmisc
+Remotes: trevorld/dotaro.font, trevorld/pnpmisc
 License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
