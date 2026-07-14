@@ -2,7 +2,7 @@
 #' @importFrom dplyr matches select
 #' @import grid
 #' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set
-#' @importFrom piecepackr as_pp_cfg pp_cfg pp_shape pmap_piece crosshairGrob
+#' @importFrom piecepackr as_pp_cfg has_font pp_cfg pp_shape pmap_piece crosshairGrob
 #' @importFrom rlang abort check_dots_empty .data
 #' @importFrom stringr str_glue str_replace str_sub
 #' @importFrom utils packageDescription packageVersion
@@ -29,6 +29,20 @@ dark_color <- function() {
 light_color <- function() {
 	getOption("dotaro.deck.light", "white")
 }
+
+dotaro_fonts_available <- local({
+	checked <- FALSE
+	function() {
+		if (!checked) {
+			stopifnot(
+				`'Dotaro Ranks' font must be installed` = has_font("Dotaro Ranks"),
+				`'Dotaro Suits' font must be installed` = has_font("Dotaro Suits")
+			)
+			checked <<- TRUE
+		}
+		invisible(TRUE)
+	}
+})
 
 save_images <- function(label = "dotaro", dir = "tmp") {
 	envir <- dotaro_decks(border = FALSE)

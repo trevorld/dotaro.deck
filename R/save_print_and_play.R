@@ -93,7 +93,12 @@ creditsGrob <- function(xmp = xmpdf::xmp()) {
 		"",
 		"# Credits",
 		"",
-		"* Uses glyphs from the DejaVu Sans font",
+		"* Uses card glyphs from the Dotaro Font",
+		"",
+		"  + https://github.com/trevorld/dotaro.font",
+		"  + Dotaro Font License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)",
+		"",
+		"* Uses the DejaVu Sans font for the instructions/credits text",
 		"",
 		"  + https://dejavu-fonts.github.io/",
 		"  + DejaVu Fonts License: https://dejavu-fonts.github.io/License.html"

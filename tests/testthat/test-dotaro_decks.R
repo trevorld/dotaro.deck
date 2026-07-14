@@ -14,7 +14,8 @@ draw_card <- function(cfg, suit, rank) {
 test_that("dotaro_full_traditional renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"full-trad-dark-pip",
@@ -45,7 +46,8 @@ test_that("dotaro_full_traditional renders", {
 test_that("dotaro_full_number renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"full-num-dark-pip",
@@ -62,7 +64,8 @@ test_that("dotaro_full_number renders", {
 test_that("dotaro_full_fool renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"full-fool-ordinary",
@@ -79,7 +82,8 @@ test_that("dotaro_full_fool renders", {
 test_that("dotaro_corner_traditional renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"corner-trad-dark-pip",
@@ -96,7 +100,8 @@ test_that("dotaro_corner_traditional renders", {
 test_that("dotaro_corner_number renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"corner-num-dark-pip",
@@ -113,7 +118,8 @@ test_that("dotaro_corner_number renders", {
 test_that("dotaro_corner_fool renders", {
 	skip_if_not_installed("svglite")
 	skip_if_not_installed("systemfonts")
-	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	decks <- dotaro_decks()
 	vdiffr::expect_doppelganger(
 		"corner-fool-ordinary",

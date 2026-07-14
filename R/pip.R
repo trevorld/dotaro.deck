@@ -69,17 +69,16 @@ top_pip_grob <- function(...) {
 
 bot_pip_grob <- function(...) {
 	l <- list(...)
-	# bsuit_grob <- do.call(bot_suit_grob, l)
 	if (l$red == "R") {
-		col = red_color()
+		col <- red_color()
 	} else {
-		col = black_color()
+		col <- black_color()
 	}
-	if (l$blight == "L") {
-		bsuit_grob <- circleGrob(r = unit(0.13, "in"), gp = gpar(col = col, fill = NA, lwd = 1.1))
-	} else {
-		bsuit_grob <- circleGrob(r = unit(0.13, "in"), gp = gpar(col = col, fill = col, lwd = 1.1))
-	}
+	fill <- ifelse(l$blight == "D", col, light_color())
+	# Same circle glyph (and so the same border lwd, after `lex`) as the fool's
+	# "O" rank and every other suit/rank glyph, rather than a separately tuned
+	# circleGrob().
+	bsuit_grob <- dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill)
 
 	n_pips <- as.integer(l$brank)
 
