@@ -17,14 +17,11 @@ INDEX_HEIGHT <- 1.25
 PIP_WIDTH <- CARD_WIDTH - 2 * BLEED - 2 * INDEX_WIDTH
 PIP_HEIGHT <- 2 * PIP_WIDTH
 
-red_color <- function() {
-	getOption("dotaro.deck.red", "black")
+hearts_diamonds_color <- function() {
+	getOption("dotaro.deck.hearts_diamonds_color", "black")
 }
-black_color <- function() {
-	getOption("dotaro.deck.black", "black")
-}
-dark_color <- function() {
-	getOption("dotaro.deck.dark", "black")
+spades_clubs_color <- function() {
+	getOption("dotaro.deck.spades_clubs_color", "black")
 }
 light_color <- function() {
 	getOption("dotaro.deck.light", "white")

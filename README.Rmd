@@ -10,10 +10,9 @@
 
 ```{r hidden, echo = FALSE, message = FALSE}
 vermillion <- palette.colors(names = TRUE)[["vermillion"]]
-options(dotaro.deck.red = vermillion,
-        dotaro.deck.black = "black",
-        dotaro.deck.light = "white",
-        dotaro.dock.dark = "black")
+options(dotaro.deck.hearts_diamonds_color = vermillion,
+        dotaro.deck.spades_clubs_color = "black",
+        dotaro.deck.light = "white")
 
 knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.cap = "", echo = FALSE)
 library("dotaro.deck")
