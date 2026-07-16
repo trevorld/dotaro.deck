@@ -13,11 +13,11 @@ top_face_grob <- function(...) {
 		return(knight_grob(tsuit_grob, trank_grob, col))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
-		vp = viewport(y = 0.4, width = 0.7, height = 0.5),
+		vp = viewport(y = 0.35, width = 0.55, height = 0.46),
 		gp = gpar(col = col, fill = NA, lwd = 2)
 	)
-	tsuit_grob <- grobTree(tsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 0.9, cex = 0.9))
-	trank_grob <- grobTree(trank_grob, vp = viewport(y = 0.78), gp = gpar(lex = 1.2, cex = 1.2))
+	tsuit_grob <- grobTree(tsuit_grob, vp = viewport(y = 0.37), gp = gpar(lex = 0.83, cex = 0.83))
+	trank_grob <- grobTree(trank_grob, vp = viewport(y = 0.70), gp = gpar(lex = 1.11, cex = 1.11))
 	gl <- gList(meeple_grob, tsuit_grob, trank_grob)
 
 	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
@@ -43,11 +43,11 @@ bot_face_grob <- function(...) {
 		return(fool_grob(brank, blight, col))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
-		vp = viewport(y = 0.4, width = 0.7, height = 0.5),
+		vp = viewport(y = 0.35, width = 0.55, height = 0.46),
 		gp = gpar(col = col, fill = NA, lwd = 2)
 	)
-	bsuit_grob <- grobTree(bsuit_grob, vp = viewport(y = 0.42), gp = gpar(lex = 0.9, cex = 0.9))
-	brank_grob <- grobTree(brank_grob, vp = viewport(y = 0.78), gp = gpar(lex = 1.2, cex = 1.2))
+	bsuit_grob <- grobTree(bsuit_grob, vp = viewport(y = 0.37), gp = gpar(lex = 0.83, cex = 0.83))
+	brank_grob <- grobTree(brank_grob, vp = viewport(y = 0.70), gp = gpar(lex = 1.11, cex = 1.11))
 	gl <- gList(meeple_grob, bsuit_grob, brank_grob)
 
 	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
