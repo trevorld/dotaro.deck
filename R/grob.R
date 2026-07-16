@@ -87,7 +87,7 @@ suit_grob <- function(key, col, fill) {
 }
 
 top_suit_grob <- function(tsuit, tlight, red, ...) {
-	col <- ifelse(red == "R", red_color(), black_color())
+	col <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	fill <- ifelse(tlight == "D", col, light_color())
 	suit_grob(suit_glyph_key(tsuit, tlight), col = col, fill = fill)
 }
@@ -96,7 +96,7 @@ bot_suit_grob <- function(bsuit, blight, red, ...) {
 	if (is.na(bsuit)) {
 		return(nullGrob())
 	}
-	col <- ifelse(red == "R", red_color(), black_color())
+	col <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	fill <- ifelse(blight == "D", col, light_color())
 	suit_grob(suit_glyph_key(bsuit, blight), col = col, fill = fill)
 }
@@ -111,14 +111,14 @@ rank_glyph <- function(rank, suit) {
 
 top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	glyph <- rank_glyph(trank, tsuit)
-	col <- ifelse(red == "R", red_color(), black_color())
+	col <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	fill <- ifelse(tlight == "D", col, light_color())
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
 
 bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
 	glyph <- rank_glyph(brank, bsuit)
-	col <- ifelse(red == "R", red_color(), black_color())
+	col <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	fill <- ifelse(blight == "D", col, light_color())
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
@@ -129,9 +129,9 @@ top_border_grob <- function(...) {
 	y_top <- unit(1, "npc") - unit(BLEED, "in") - 0.5 * bar_width
 	width <- unit(1, "npc") - unit(2 * BLEED + 2 * INDEX_WIDTH + 0.2, "in")
 	if (l$red == "R") {
-		col <- red_color()
+		col <- hearts_diamonds_color()
 	} else {
-		col <- black_color()
+		col <- spades_clubs_color()
 	}
 	# col <- "black"
 	if (l$tlight == "D") {
@@ -206,9 +206,9 @@ bot_border_grob <- function(...) {
 	bar_width <- unit(INDEX_WIDTH - 0.05, "in")
 	y_bot <- unit(BLEED, "in") + 0.5 * bar_width
 	if (l$red == "R") {
-		col <- red_color()
+		col <- hearts_diamonds_color()
 	} else {
-		col <- black_color()
+		col <- spades_clubs_color()
 	}
 	# col <- "black"
 	if (l$blight == "D") {

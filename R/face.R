@@ -5,9 +5,9 @@ top_face_grob <- function(...) {
 	trank <- l$trank
 	red <- l$red
 	if (red == "R") {
-		col <- red_color()
+		col <- hearts_diamonds_color()
 	} else {
-		col <- black_color()
+		col <- spades_clubs_color()
 	}
 	if (trank == "N") {
 		return(knight_grob(tsuit_grob, trank_grob, col))
@@ -33,9 +33,9 @@ bot_face_grob <- function(...) {
 	blight <- l$blight
 	red <- l$red
 	if (red == "R") {
-		col <- red_color()
+		col <- hearts_diamonds_color()
 	} else {
-		col <- black_color()
+		col <- spades_clubs_color()
 	}
 	if (brank == "N") {
 		return(knight_grob(bsuit_grob, brank_grob, col))

@@ -70,9 +70,9 @@ top_pip_grob <- function(...) {
 bot_pip_grob <- function(...) {
 	l <- list(...)
 	if (l$red == "R") {
-		col <- red_color()
+		col <- hearts_diamonds_color()
 	} else {
-		col <- black_color()
+		col <- spades_clubs_color()
 	}
 	fill <- ifelse(l$blight == "D", col, light_color())
 	# Same circle glyph (and so the same border lwd, after `lex`) as the fool's
