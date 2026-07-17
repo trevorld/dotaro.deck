@@ -50,7 +50,7 @@ xya_pips_dominoes <- function(n_pips) {
 
 top_pip_grob <- function(...) {
 	l <- list(...)
-	tsuit_grob <- do.call(top_suit_grob, l)
+	tsuit_grob <- do.call(top_suit_grob, c(l, list(pip = TRUE)))
 
 	n_pips <- as.integer(l$trank)
 
@@ -69,16 +69,23 @@ top_pip_grob <- function(...) {
 
 bot_pip_grob <- function(...) {
 	l <- list(...)
-	if (l$red == "R") {
-		col <- hearts_diamonds_color()
+	if (suit_style() == "hybrid" && l$bsuit %in% number_suits) {
+		# The hybrid style's number suits each have their own dedicated pip
+		# shape (droplet/arch/heater shield/square/circle), same as the top
+		# half already gets via `top_suit_grob(pip = TRUE)`.
+		bsuit_grob <- do.call(bot_suit_grob, c(l, list(pip = TRUE)))
 	} else {
-		col <- spades_clubs_color()
+		if (l$red == "R") {
+			col <- hearts_diamonds_color()
+		} else {
+			col <- spades_clubs_color()
+		}
+		fill <- ifelse(l$blight == "D", col, light_color())
+		# Same circle glyph (and so the same border lwd, after `lex`) as the
+		# fool's "O" rank and every other suit/rank glyph, rather than a
+		# separately tuned circleGrob().
+		bsuit_grob <- dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill)
 	}
-	fill <- ifelse(l$blight == "D", col, light_color())
-	# Same circle glyph (and so the same border lwd, after `lex`) as the fool's
-	# "O" rank and every other suit/rank glyph, rather than a separately tuned
-	# circleGrob().
-	bsuit_grob <- dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill)
 
 	n_pips <- as.integer(l$brank)
 

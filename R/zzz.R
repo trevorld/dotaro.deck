@@ -17,6 +17,9 @@ INDEX_HEIGHT <- 1.25
 PIP_WIDTH <- CARD_WIDTH - 2 * BLEED - 2 * INDEX_WIDTH
 PIP_HEIGHT <- 2 * PIP_WIDTH
 
+suit_style <- function() {
+	getOption("dotaro.deck.suits", "french")
+}
 hearts_diamonds_color <- function() {
 	getOption("dotaro.deck.hearts_diamonds_color", "black")
 }
