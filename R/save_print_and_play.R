@@ -5,18 +5,23 @@
 #' @param ... Ignored
 #' @param size Either `"letter"` or `"A4"`.
 #' @param title pdf metadata title.
+#' @param crosshairs Character vector, a subset of `c("front", "back")`, indicating which side(s) of each sheet get crosshairs and cropmarks.
 #' @return The filename invisible.  As a side effect creates a pdf file.
 #' @export
 save_print_and_play <- function(
 	filename = "dotaro.pdf",
 	...,
 	size = c("letter", "a4"),
-	title = "Dotaro Deck"
+	title = "Dotaro Deck",
+	crosshairs = "back"
 ) {
 	check_dots_empty()
+	if (!all(crosshairs %in% c("front", "back"))) {
+		abort('`crosshairs` must be a subset of c("front", "back")')
+	}
 	xmp <- xmpdf::xmp(
 		creator = "Trevor L. Davis",
-		date_created = "2025",
+		date_created = "2026",
 		spdx_id = "CC-BY-4.0",
 		title = title
 	)
@@ -53,15 +58,40 @@ save_print_and_play <- function(
 	grid.newpage()
 	grid.draw(creditsGrob(xmp))
 
+	# Deliberately blank: keeps the instructions page from ending up printed
+	# on the back of the first sheet of cards, so the interleaved front/back
+	# pages below start together on a fresh physical sheet under duplex
+	# printing.
+	grid.newpage()
+	grid.text(
+		"This page deliberately left blank.",
+		gp = gpar(fontfamily = "DejaVu Sans", col = "black", fontsize = 12)
+	)
+
 	for (page in 1:12) {
-		grid.newpage()
 		idx <- seq.int(from = (page - 1L) * 9L + 1L, length.out = 9L)
 		dfx <- df[idx, ] |>
 			select("suit", "rank", "cfg") |>
 			mutate(piece_side = "card_face", x = layout$x, y = layout$y)
+
+		grid.newpage()
 		pmap_piece(dfx, default.units = "in", envir = envir)
-		pnpmisc::grid_add_crosshairs(layout = layout)
-		pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+		if ("front" %in% crosshairs) {
+			pnpmisc::grid_add_crosshairs(layout = layout)
+			pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+		}
+
+		# Every card shares the same back design, so re-using `dfx`'s own
+		# `suit`/`rank`/`cfg` (unused by `card_back`'s grob_fn) at the same
+		# `x`/`y` slots keeps this page aligned with the front page above it
+		# under a standard "flip on long edge" duplex setting.
+		grid.newpage()
+		dfx_back <- mutate(dfx, piece_side = "card_back")
+		pmap_piece(dfx_back, default.units = "in", envir = envir)
+		if ("back" %in% crosshairs) {
+			pnpmisc::grid_add_crosshairs(layout = layout)
+			pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+		}
 	}
 	dev.off()
 
@@ -80,11 +110,11 @@ creditsGrob <- function(xmp = xmpdf::xmp()) {
 		"# Instructions",
 		"",
 		"* These *Dotaro Deck* cards are provided in a 3x3 layout of bridge sized cards.",
-		"* Print single-sided (at actual size) preferably on cardstock (this prototype lacks card backs).",
+		"* Print double-sided (at actual size, flip on the long edge) preferably on cardstock.",
 		"* (Optional) laminate the printed sheets of paper.",
 		"* Use the provided crosshairs and cropmarks to cut out the cards.",
 		"* (Optional) use a corner rounding tool to round the corners.",
-		"* (Optional) place card into a plastic card sleeve (in front of a normal playing card).",
+		"* (Optional) place cards into plastic card sleeves.",
 		"",
 		"# Further information",
 		"",
@@ -93,15 +123,10 @@ creditsGrob <- function(xmp = xmpdf::xmp()) {
 		"",
 		"# Credits",
 		"",
-		"* Uses card glyphs from the Dotaro Font",
+		"* Uses glyphs from the *Dotaro Ranks* and *Dotaro Suits* fonts",
 		"",
 		"  + https://github.com/trevorld/dotaro.font",
-		"  + Dotaro Font License: SIL Open Font License, Version 1.1 (https://openfontlicense.org)",
-		"",
-		"* Uses the DejaVu Sans font for the instructions/credits text",
-		"",
-		"  + https://dejavu-fonts.github.io/",
-		"  + DejaVu Fonts License: https://dejavu-fonts.github.io/License.html"
+		"  + Dotaro Font License: SIL Open Font License, Version 1.1"
 	)
 
 	if (!is.null(xmp$usage_terms)) {

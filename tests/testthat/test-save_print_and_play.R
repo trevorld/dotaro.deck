@@ -4,5 +4,5 @@ test_that("save_print_and_play() works", {
 	f <- tempfile(fileext = ".pdf")
 	on.exit(unlink(f), add = TRUE)
 	save_print_and_play(f)
-	expect_equal(xmpdf::n_pages(f) |> as.integer(), 13L)
+	expect_equal(xmpdf::n_pages(f) |> as.integer(), 26L)
 })

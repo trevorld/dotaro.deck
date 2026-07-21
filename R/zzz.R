@@ -1,7 +1,7 @@
 #' @importFrom dplyr arrange filter left_join mutate slice
 #' @importFrom dplyr matches select
 #' @import grid
-#' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set
+#' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set col2rgb rgb
 #' @importFrom piecepackr as_pp_cfg has_font pp_cfg pp_shape pmap_piece crosshairGrob
 #' @importFrom rlang abort check_dots_empty .data
 #' @importFrom stringr str_glue str_replace str_sub

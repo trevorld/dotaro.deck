@@ -8,7 +8,8 @@ save_print_and_play(
   filename = "dotaro.pdf",
   ...,
   size = c("letter", "a4"),
-  title = "Dotaro Deck"
+  title = "Dotaro Deck",
+  crosshairs = "back"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ save_print_and_play(
 \item{size}{Either \code{"letter"} or \code{"A4"}.}
 
 \item{title}{pdf metadata title.}
+
+\item{crosshairs}{Character vector, a subset of \code{c("front", "back")}, indicating which side(s) of each sheet get crosshairs and cropmarks.}
 }
 \value{
 The filename invisible.  As a side effect creates a pdf file.

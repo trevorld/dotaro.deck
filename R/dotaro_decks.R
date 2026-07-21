@@ -61,7 +61,8 @@ dotaro_full_fool <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = 3.5,
 		width = 2.25, # bridge size
-		grob_fn.card_face = dotaroFoolFaceGrob
+		grob_fn.card_face = dotaroFoolFaceGrob,
+		grob_fn.card_back = dotaroCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -78,7 +79,8 @@ dotaro_full_traditional <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = 3.5,
 		width = 2.25, # bridge size
-		grob_fn.card_face = dotaroTradFaceGrob
+		grob_fn.card_face = dotaroTradFaceGrob,
+		grob_fn.card_back = dotaroCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -95,7 +97,8 @@ dotaro_full_number <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = 3.5,
 		width = 2.25, # bridge size
-		grob_fn.card_face = dotaroNumFaceGrob
+		grob_fn.card_face = dotaroNumFaceGrob,
+		grob_fn.card_back = dotaroCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -152,6 +155,74 @@ dotaro_corner_fool <- function(rect_shape, border_color, border_lex) {
 	cfg$has_piecepack <- FALSE
 	cfg$has_cards <- TRUE
 	cfg
+}
+
+dotaroCardBackGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
+	cfg <- as_pp_cfg(cfg)
+	opt <- cfg$get_piece_opt(piece_side, suit, rank)
+	gTree(
+		opt = opt,
+		border = TRUE,
+		flip = FALSE,
+		scale = 1,
+		name = NULL,
+		gp = gpar(),
+		vp = NULL,
+		cl = c("dotaro_card_back", "dotaro_grob")
+	)
+}
+
+#' @export
+makeContext.dotaro_card_back <- function(x) {
+	x <- piecepackr:::update_gp(x, gp = gpar(cex = x$scale, lex = x$scale))
+	x
+}
+
+#' @export
+makeContent.dotaro_card_back <- function(x) {
+	opt <- x$opt
+	shape <- pp_shape(
+		opt$shape,
+		opt$shape_t,
+		opt$shape_r,
+		opt$back,
+		width = opt$shape_w,
+		height = opt$shape_h
+	)
+	# Possibly shrink background and gridlines to not overlap mat
+	# which sometimes prevents visual glitch if no border line
+	# but do not do this if mat color is transparent.
+	if (any(as.logical(grDevices::col2rgb(opt$mat_color, alpha = TRUE)[4, ] < 255))) {
+		bg_mat_width <- 0
+	} else {
+		bg_mat_width <- opt$mat_width
+	}
+
+	# Background
+	background_grob <- shape$shape(
+		gp = gpar(col = NA, fill = opt$background_color),
+		name = "background",
+		mat_width = bg_mat_width
+	)
+	gp_mat <- gpar(col = NA, lwd = 0, fill = opt$mat_color)
+	mat_grob <- shape$mat(opt$mat_width, gp = gp_mat, name = "mat")
+
+	# Every card in the deck shares this one back design (no suit/rank).
+	main_grob <- card_back_grob()
+
+	if (x$border) {
+		gp_border <- gpar(col = opt$border_color, fill = NA, lex = opt$border_lex)
+		border_grob <- shape$shape(gp = gp_border, name = "border")
+	} else {
+		border_grob <- nullGrob(name = "border")
+	}
+	if (x$flip) {
+		gl <- gList(main_grob, mat_grob, background_grob, border_grob)
+	} else {
+		gl <- gList(background_grob, mat_grob, main_grob, border_grob)
+	}
+
+	setChildren(x, gl)
 }
 
 dotaroFoolFaceGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
