@@ -506,3 +506,229 @@ bot_inner_grob <- function(...) {
 	)
 	grobTree(grob, vp = vp)
 }
+
+# Card back: a "4.8*.4**.8*" polygon tiling (big squares + small diamonds
+# rotated 45 degrees between them) reworked as a mini scoring track. Every
+# card in the deck shares this one design, so `card_back_grob()` (unlike
+# `card_grob()`) takes no suit/rank arguments.
+CARD_BACK_NROW <- 5L
+CARD_BACK_NCOL <- 3L
+CARD_BACK_SQUARE_WIDTH <- unit(1, "cm")
+CARD_BACK_SQUARE_GAP <- unit(0.8, "cm")
+CARD_BACK_LWD <- 2
+
+# The fool "star" rank glyph, rendered via the "Dotaro Suits" font/grob (not
+# "Dotaro Ranks", which is what actually renders it elsewhere in the
+# package) so it sits stylistically with the 4 French suits alongside it.
+# Left column of the back, bottom-to-top.
+card_back_suit_keys <- c("star", "S", "C", "D", "H")
+
+normalize_color <- function(color) {
+	rgb(t(col2rgb(color)), maxColorValue = 255L)
+}
+
+# The "light" rendering of a suit symbol, tracking whatever color theme is
+# currently active (including the experimental "hybrid" suits, which swap
+# in fused German/Spanish/Hanafuda-style glyphs for the 4 French suits). The
+# fool "star" has no hybrid variant of its own, so it always falls back to
+# the plain light suit-glyph treatment.
+card_back_suit_grob <- function(key) {
+	if (key == "star") {
+		return(dotaro.font:::suitGrob(glyphs[["F"]], col = "black", fill = light_color()))
+	}
+	if (suit_style() == "hybrid") {
+		return(hybrid_suit_grob(key, "L"))
+	}
+	accent <- if (key %in% c("H", "D")) hearts_diamonds_color() else spades_clubs_color()
+	dotaro.font:::suitGrob(glyphs[[paste0("D", key)]], col = accent, fill = light_color())
+}
+
+card_back_grob <- function() {
+	nrow <- CARD_BACK_NROW
+	ncol <- CARD_BACK_NCOL
+	width <- CARD_BACK_SQUARE_WIDTH
+	gap <- CARD_BACK_SQUARE_GAP
+
+	# `side` marks a cribbage-style score path (left/right columns), `middle`
+	# a possible snaking score path (center column), and the checkerboard
+	# colors are just possible board-game cells -- shape (square vs. star vs.
+	# diamond) and the black borders between every piece already separate
+	# these categories, so color only has to distinguish *within* each one:
+	# side vs. middle, and checker1 vs. checker2.
+	side_fill <- light_color()
+	middle_fill <- light_color()
+	if (normalize_color(spades_clubs_color()) == "#000000") {
+		if (normalize_color(hearts_diamonds_color()) == "#000000") {
+			checker_fill1 <- checker_fill2 <- "white"
+		} else {
+			checker_fill1 <- checker_fill2 <- hearts_diamonds_color()
+		}
+	} else {
+		checker_fill1 <- hearts_diamonds_color()
+		checker_fill2 <- spades_clubs_color()
+	}
+	if (suit_style() == "hybrid") {
+		middle_fill <- hearts_diamonds_color()
+		checker_fill1 <- "white"
+		checker_fill2 <- spades_clubs_color()
+	}
+	marker_fill <- middle_fill
+	diamond_fill <- "black"
+	bg_fill <- "black" # doesn't need to be distinguished from `diamond_fill`
+
+	gap_in <- convertWidth(gap, "in", valueOnly = TRUE)
+	width_in <- convertWidth(width, "in", valueOnly = TRUE)
+	pitch_in <- width_in + gap_in
+	pitch <- width + gap
+	total_width <- ncol * width + (ncol - 1) * gap
+	total_height <- nrow * width + (nrow - 1) * gap
+	X <- function(j) (j - 1) * pitch_in + 0.5 * width_in
+	Y <- function(i) (i - 1) * pitch_in + 0.5 * width_in
+
+	bg_grob <- rectGrob(gp = gpar(fill = bg_fill, col = NA))
+
+	# Checkerboard-colored bounding box squares at the old tiling's
+	# eight-pointed-star positions: the (nrow + 1) x (ncol + 1) lattice sitting
+	# half a pitch diagonally off of every big square, i.e. at the shared
+	# corner of (up to) 4 neighboring big squares. The 4 diamonds directly
+	# above/below/left/right of a star position are each a distance
+	# `pitch / 2` away (axis-aligned) - that's exactly how far a star's own
+	# points used to reach, so a box side of `pitch` (reaching from the star's
+	# center out to each of those 4 diamond centers) is what bounds it. This
+	# is drawn under the diamonds and big squares, which cover most of it,
+	# leaving just its corner tips showing through.
+	#
+	# Only draw a box where all 4 of those neighboring diamonds actually
+	# exist (`di` in [2, nrow], `dj` in [2, ncol]): a star position on the
+	# perimeter is missing 1 or more of its 4 points to begin with, so its
+	# box would just be a mostly-cropped rectangle sticking out past the
+	# card edge. Skip it and let the plain background color show instead.
+	star_grid <- expand.grid(di = seq(2, nrow), dj = seq(2, ncol))
+	star_grobs <- Map(
+		function(di, dj) {
+			cx <- (dj - 1.5) * pitch_in + 0.5 * width_in
+			cy <- (di - 1.5) * pitch_in + 0.5 * width_in
+			fill <- if ((di + dj) %% 2 == 0) checker_fill1 else checker_fill2
+			rectGrob(
+				x = unit(cx, "in"),
+				y = unit(cy, "in"),
+				width = unit(pitch_in, "in"),
+				height = unit(pitch_in, "in"),
+				gp = gpar(fill = fill, col = "black", lwd = CARD_BACK_LWD)
+			)
+		},
+		star_grid$di,
+		star_grid$dj
+	)
+
+	# Diamond ("small rotated square") positions sit directly *between* two
+	# edge-adjacent big squares - i.e. in the same gap that a big square's
+	# neighbor would occupy, not diagonally off of it. That means two
+	# distinct families: `ncol - 1` of them between each row's squares
+	# (same y as that row, x centered in each horizontal gap), and `ncol`
+	# of them between each pair of adjacent rows (same x as that column, y
+	# centered in each vertical gap).
+	#
+	# The diamond's corner nearest a neighboring big square, and that
+	# square's nearest edge, are both a distance `gap / 2` from the
+	# diamond's center (one along the diagonal, one along the axis) - so a
+	# diamond side of `gap * sqrt(2) / 2` is exactly the size at which the
+	# diamond's corner touches that edge's midpoint, with no gap and no
+	# overlap. The diamond's other two corners (pointing where there is no
+	# adjacent square) poke the same distance into empty space, where the
+	# big squares (drawn on top, below) don't reach.
+	diamond_side_in <- gap_in / sqrt(2)
+	within_row <- expand.grid(i = seq_len(nrow), j = seq_len(ncol - 1))
+	between_row <- expand.grid(i = seq_len(nrow - 1), j = seq_len(ncol))
+	diamond_cx <- c(0.5 * (X(within_row$j) + X(within_row$j + 1)), X(between_row$j))
+	diamond_cy <- c(Y(within_row$i), 0.5 * (Y(between_row$i) + Y(between_row$i + 1)))
+
+	# Most (within-row) diamonds are a single plain color, except the topmost
+	# (then leftmost) and bottommost (then rightmost) diamond, which get a
+	# distinct marker color - e.g. to mark the start/end of a scoring path
+	# that continues onto other cards. The between-row diamonds sit in a
+	# column directly above/below a big square, so they instead take that
+	# column's own color: `side_fill` under the leftmost/rightmost column
+	# (matching the big squares there), and `marker_fill` under the
+	# interior column(s) (turning the center column into a second, vertical
+	# marker path).
+	diamond_fills <- c(
+		rep(diamond_fill, nrow(within_row)),
+		ifelse(between_row$j %in% c(1, ncol), side_fill, marker_fill)
+	)
+	is_top_marker <- order(-diamond_cy, diamond_cx)[1]
+	is_bot_marker <- order(diamond_cy, -diamond_cx)[1]
+	diamond_fills[c(is_top_marker, is_bot_marker)] <- marker_fill
+
+	diamond_grobs <- Map(
+		function(cx, cy, fill) {
+			grobTree(
+				rectGrob(gp = gpar(fill = fill, col = "black", lwd = CARD_BACK_LWD)),
+				vp = viewport(
+					x = unit(cx, "in"),
+					y = unit(cy, "in"),
+					width = unit(diamond_side_in, "in"),
+					height = unit(diamond_side_in, "in"),
+					angle = 45
+				)
+			)
+		},
+		diamond_cx,
+		diamond_cy,
+		diamond_fills
+	)
+
+	# Functional grid of big squares, on top of the diamond lattice (covering
+	# all but the diamonds' corner tips). The left column carries the suit
+	# symbols bottom-to-top; the right column carries the same symbols
+	# top-to-bottom, each rotated 180 degrees - so the whole card looks
+	# identical if rotated 180 degrees (a common card-back trait), and the
+	# two columns can be read as a snaking, connectable path.
+	left <- unit(0.5, "npc") - 0.5 * total_width
+	bottom <- unit(0.5, "npc") - 0.5 * total_height
+	square_grid <- expand.grid(i = seq_len(nrow), j = seq_len(ncol))
+	square_grobs <- Map(
+		function(i, j) {
+			x <- left + (j - 1) * pitch + 0.5 * width
+			y <- bottom + (i - 1) * pitch + 0.5 * width
+			fill <- if (j %in% c(1, ncol)) side_fill else middle_fill
+			square_grob <- rectGrob(
+				x = x,
+				y = y,
+				width = width,
+				height = width,
+				gp = gpar(fill = fill, col = "black", lwd = CARD_BACK_LWD)
+			)
+			if (j != 1 && j != ncol) {
+				return(square_grob)
+			}
+			key <- if (j == 1) card_back_suit_keys[i] else card_back_suit_keys[nrow - i + 1]
+			angle <- if (j == 1) 0 else 180
+			symbol_grob <- grobTree(
+				card_back_suit_grob(key),
+				vp = viewport(
+					x = x,
+					y = y,
+					width = 0.7 * width,
+					height = 0.7 * width,
+					angle = angle
+				)
+			)
+			grobTree(square_grob, symbol_grob)
+		},
+		square_grid$i,
+		square_grid$j
+	)
+
+	block_border_grob <- rectGrob(
+		width = total_width,
+		height = total_height,
+		gp = gpar(fill = NA, col = "black", lwd = CARD_BACK_LWD)
+	)
+
+	gl <- do.call(
+		gList,
+		c(list(bg_grob), star_grobs, diamond_grobs, square_grobs, list(block_border_grob))
+	)
+	grobTree(children = gl, vp = viewport(width = total_width, height = total_height, clip = TRUE))
+}
