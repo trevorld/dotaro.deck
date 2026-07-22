@@ -85,28 +85,30 @@ fool_grob <- function(rank, light, col = "black", tshaded = NA) {
 		# the light half (whose icon fill is the light color instead).
 		border <- if (light == "D") "black" else col
 		icon_fill <- if (light == "D") col else light_color()
-		# `half_info`'s bottom-half `shaded` is the top-half's `tshaded`
-		# negated, since the two halves always shade oppositely.
-		shading <- if (isFALSE(tshaded)) "hbinary" else "none"
-		return(hybrid_fool_grob(rank, border, col, icon_fill, shading))
+		# The fool has its own dedicated icon (star/plain ring), so -- like the
+		# number suits -- it doesn't get the "hbinary" shading effect.
+		return(hybrid_fool_grob(rank, border, col, icon_fill, shading = "none"))
 	}
 	gp_meeple <- gpar(col = col, lwd = 2)
 	vp_meeple <- viewport(height = unit(0.7, "in"), width = unit(0.6, "in"), y = 0.3)
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
-	gp_triangle <- gpar(fill = col, col = NA_character_)
+	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
+	# accent border always, accent fill on the dark half, light-color fill on
+	# the light half.
+	index_fill <- if (light == "D") col else light_color()
+	gp_triangle <- gpar(fill = index_fill, col = col, lwd = 1.5)
+	if (rank == "O") {
+		# Same index-matching fill as the triangle.
+		gp_circle <- gpar(fill = index_fill, col = col, lwd = 1.5)
+	} else {
+		# White (not left hollow), same trick as `hybrid_fool_grob()`'s ring,
+		# so the star's concave notches don't let the triangle's tip poke
+		# through visually.
+		gp_circle <- gpar(fill = "white", col = col, lwd = 1.5)
+	}
 	if (light == "L") {
-		if (rank == "O") {
-			gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
-		} else {
-			gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
-		}
 		gp_star <- gpar(fill = NA, col = col, lwd = 1.5)
 	} else {
-		if (rank == "O") {
-			gp_circle <- gpar(fill = col, col = col, lwd = 1.5)
-		} else {
-			gp_circle <- gpar(fill = NA, col = col, lwd = 1.5)
-		}
 		gp_star <- gpar(fill = col, col = col, lwd = 1.5)
 	}
 	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
@@ -130,18 +132,17 @@ fool_grob <- function(rank, light, col = "black", tshaded = NA) {
 	)
 }
 
-hybrid_fool_grob <- function(rank, border, triangle_fill, icon_fill, shading) {
+hybrid_fool_grob <- function(rank, border, accent, icon_fill, shading) {
 	# Unlike the triangle/ring/icon border (black on the dark half), the
 	# meeple's outline always stays the accent color.
-	gp_meeple <- gpar(col = triangle_fill, lwd = 2)
+	gp_meeple <- gpar(col = accent, lwd = 2)
 	vp_meeple <- viewport(height = unit(0.7, "in"), width = unit(0.6, "in"), y = 0.3)
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
 
-	# The triangle plays the same role as the crown/hat rank ornament on the
-	# other face cards, so -- like those -- it stays a flat accent fill on
-	# both halves rather than switching to the light color or picking up the
-	# card's shading.
-	gp_triangle <- gpar(fill = triangle_fill, col = border, lwd = 1.5)
+	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
+	# `border`/`icon_fill` are already that same black-or-accent border and
+	# accent-or-light-color fill, computed by the caller.
+	gp_triangle <- gpar(fill = icon_fill, col = border, lwd = 1.5)
 	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
 	vp_triangle <- viewport(height = unit(0.4, "in"), width = unit(0.30, "in"), y = y_triangle)
 	triangle_grob <- pp_shape("pyramid")$shape(gp = gp_triangle, vp = vp_triangle)
