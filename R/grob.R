@@ -189,7 +189,12 @@ top_suit_grob <- function(tsuit, tlight, red, tshaded = NA, ..., pip = FALSE) {
 	# Number suits always use the "negated" (solid disc + counter) glyph, even
 	# on the light half: the "positive" glyph's digit is stroked but its
 	# interior is a true hole, so almost none of `fill` ever actually shows.
-	counter_color <- if (tlight == "D") "white" else "black"
+	# The counter needs to contrast against `fill`, so it takes the *other*
+	# color of the pair: `light_color()` on the dark half (solid accent disc,
+	# light digit) and `accent` on the light half (accent-ringed light disc,
+	# accent digit) -- matching how French suits' light half is purely
+	# accent + light with no black, instead of a literal "white"/"black".
+	counter_color <- if (tlight == "D") light_color() else accent
 	suit_grob(suit_glyph_key(tsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
 
@@ -217,7 +222,7 @@ bot_suit_grob <- function(bsuit, blight, red, tshaded = NA, ..., pip = FALSE) {
 		))
 	}
 	col <- accent
-	counter_color <- if (blight == "D") "white" else "black"
+	counter_color <- if (blight == "D") light_color() else accent
 	suit_grob(suit_glyph_key(bsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
 

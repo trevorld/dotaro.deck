@@ -14,8 +14,9 @@
 
 | Variant | File |
 | --- | --- |
-| Black & White | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) |
-| Color | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) |
+| Black and White French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) |
+| Black and Red French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) |
+| Hybrid Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_a4.pdf) |
 
 ## <a name="overview">Overview</a>
 
