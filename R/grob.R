@@ -127,10 +127,21 @@ hybrid_layer_color <- function(role) {
 
 hybrid_suit_grob <- function(suit, light) {
 	layers <- if (light == "D") list(hybrid_suits_dark[[suit]]) else hybrid_suits_light[[suit]]
+	# Trying the light half's layers bordered in a darkened shade of the
+	# suit's own accent color instead of black -- the same darkened half
+	# already used by the "hbinary"-shaded layers' (clubs, diamonds) own
+	# two-tone fill, now applied uniformly to all 4 suits' light borders.
+	# The dark half's border stays black.
+	accent <- if (suit %in% c("H", "D")) hearts_diamonds_color() else spades_clubs_color()
+	col <- if (light == "D") {
+		"black"
+	} else {
+		dotaro.font:::darken(accent, dotaro.font:::BINARY_SHADING_AMOUNT)
+	}
 	grobs <- lapply(layers, function(layer) {
 		dotaro.font:::suitGrob(
 			layer$glyph,
-			col = "black",
+			col = col,
 			fill = hybrid_layer_color(layer$color),
 			shading = layer$shading
 		)
@@ -153,11 +164,21 @@ hybrid_number_shapes <- list(
 	"4" = list(glyph = "\u25A0", counter = "\uF594") # square
 )
 
-hybrid_number_suit_grob <- function(suit, col, fill, counter = TRUE, shading = "none") {
+hybrid_number_suit_grob <- function(
+	suit,
+	col,
+	fill,
+	counter = TRUE,
+	shading = "none",
+	counter_color = "black"
+) {
 	shape <- hybrid_number_shapes[[suit]]
 	grob <- dotaro.font:::suitGrob(shape$glyph, col = col, fill = fill, shading = shading)
 	if (counter) {
-		grob <- grobTree(grob, dotaro.font:::suitGrob(shape$counter, col = "black", fill = "black"))
+		grob <- grobTree(
+			grob,
+			dotaro.font:::suitGrob(shape$counter, col = counter_color, fill = counter_color)
+		)
 	}
 	grob
 }
@@ -176,13 +197,21 @@ top_suit_grob <- function(tsuit, tlight, red, tshaded = NA, ..., pip = FALSE) {
 	fill <- ifelse(tlight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (tlight == "D") "black" else accent
-		shading <- if (isTRUE(tshaded)) "hbinary" else "none"
+		# Trying the light half's counter in the suit's own accent color
+		# (matching its border) instead of black; the dark half's counter
+		# stays black for now.
+		counter_color <- if (tlight == "D") "black" else accent
+		# Unlike the French suits (whose hybrid shading is a fixed property of
+		# the suit, not `tshaded`), number suits don't get the "hbinary"
+		# shading effect at all -- each already has its own dedicated shape,
+		# so shading isn't needed to help tell them apart.
 		return(hybrid_number_suit_grob(
 			tsuit,
 			col = col,
 			fill = fill,
 			counter = !pip,
-			shading = shading
+			shading = "none",
+			counter_color = counter_color
 		))
 	}
 	col <- accent
@@ -210,15 +239,17 @@ bot_suit_grob <- function(bsuit, blight, red, tshaded = NA, ..., pip = FALSE) {
 	fill <- ifelse(blight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (blight == "D") "black" else accent
-		# `half_info`'s bottom-half `shaded` is the top-half's `tshaded`
-		# negated, since the two halves always shade oppositely.
-		shading <- if (isFALSE(tshaded)) "hbinary" else "none"
+		# See `top_suit_grob()`: trying the light half's counter in the suit's
+		# accent color, and number suits don't get the "hbinary" shading
+		# effect.
+		counter_color <- if (blight == "D") "black" else accent
 		return(hybrid_number_suit_grob(
 			bsuit,
 			col = col,
 			fill = fill,
 			counter = !pip,
-			shading = shading
+			shading = "none",
+			counter_color = counter_color
 		))
 	}
 	col <- accent
@@ -238,6 +269,13 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	glyph <- rank_glyph(trank, tsuit)
 	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	hybrid <- suit_style() == "hybrid"
+	if (hybrid && tlight == "L") {
+		# Trying the light half's rank glyph (number-suit digit or
+		# traditional-suit digit/letter alike) in the suit's accent color
+		# (border) against the theme's light color (fill), instead of the
+		# "always black border, always accent fill" rule the dark half uses.
+		return(dotaro.font:::rankGrob(glyph, col = accent, fill = light_color()))
+	}
 	col <- if (hybrid) "black" else accent
 	# Hybrid ranks stay in the accent color on both halves rather than
 	# switching to the light color -- unlike the suit glyphs, there's no
@@ -257,10 +295,12 @@ bot_rank_grob <- function(brank, blight, red, bsuit, tshaded = NA, ...) {
 		# rule every other rank glyph uses.
 		col <- if (blight == "D") "black" else accent
 		fill <- if (blight == "D") accent else light_color()
-		# `half_info`'s bottom-half `shaded` is the top-half's `tshaded`
-		# negated, since the two halves always shade oppositely.
-		shading <- if (isFALSE(tshaded)) "hbinary" else "none"
-		return(dotaro.font:::rankGrob(glyph, col = col, fill = fill, shading = shading))
+		# See `fool_grob()`: the fool doesn't get the "hbinary" shading effect.
+		return(dotaro.font:::rankGrob(glyph, col = col, fill = fill, shading = "none"))
+	}
+	if (hybrid && blight == "L") {
+		# See `top_rank_grob()`.
+		return(dotaro.font:::rankGrob(glyph, col = accent, fill = light_color()))
 	}
 	col <- if (hybrid) "black" else accent
 	fill <- if (hybrid) accent else ifelse(blight == "D", accent, light_color())
@@ -539,7 +579,11 @@ normalize_color <- function(color) {
 # the plain light suit-glyph treatment.
 card_back_suit_grob <- function(key) {
 	if (key == "star") {
-		return(dotaro.font:::suitGrob(glyphs[["F"]], col = "black", fill = light_color()))
+		# The fool rank is always in the "B" (spades/clubs) family (see
+		# `card_info`), so that's the light fool corner index's own border
+		# color under the hybrid style (see `bot_rank_grob()`).
+		col <- if (suit_style() == "hybrid") spades_clubs_color() else "black"
+		return(dotaro.font:::suitGrob(glyphs[["F"]], col = col, fill = light_color()))
 	}
 	if (suit_style() == "hybrid") {
 		return(hybrid_suit_grob(key, "L"))
