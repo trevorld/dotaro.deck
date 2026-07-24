@@ -115,7 +115,8 @@ dotaro_corner_traditional <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = INDEX_HEIGHT + 2 * BLEED,
 		width = INDEX_WIDTH + 2 * BLEED,
-		grob_fn.card_face = dotaroTradCornerGrob
+		grob_fn.card_face = dotaroTradCornerGrob,
+		grob_fn.card_back = dotaroCornerCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -132,7 +133,8 @@ dotaro_corner_number <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = INDEX_HEIGHT + 2 * BLEED,
 		width = INDEX_WIDTH + 2 * BLEED,
-		grob_fn.card_face = dotaroNumCornerGrob
+		grob_fn.card_face = dotaroNumCornerGrob,
+		grob_fn.card_back = dotaroCornerCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -149,7 +151,8 @@ dotaro_corner_fool <- function(rect_shape, border_color, border_lex) {
 		shape.card = rect_shape,
 		height = INDEX_HEIGHT + 2 * BLEED,
 		width = INDEX_WIDTH + 2 * BLEED,
-		grob_fn.card_face = dotaroFoolCornerGrob
+		grob_fn.card_face = dotaroFoolCornerGrob,
+		grob_fn.card_back = dotaroCornerCardBackGrob
 	)
 	cfg <- pp_cfg(l)
 	cfg$has_piecepack <- FALSE
@@ -221,6 +224,68 @@ makeContent.dotaro_card_back <- function(x) {
 	} else {
 		gl <- gList(background_grob, mat_grob, main_grob, border_grob)
 	}
+
+	setChildren(x, gl)
+}
+
+# The corner cfgs' card back: at index size, there's no room to show any of
+# `card_back_grob()`'s tiling pattern, so it's just a plain background and
+# border instead.
+dotaroCornerCardBackGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
+	cfg <- as_pp_cfg(cfg)
+	opt <- cfg$get_piece_opt(piece_side, suit, rank)
+	gTree(
+		opt = opt,
+		border = TRUE,
+		scale = 1,
+		name = NULL,
+		gp = gpar(),
+		vp = NULL,
+		cl = c("dotaro_corner_card_back", "dotaro_grob")
+	)
+}
+
+#' @export
+makeContext.dotaro_corner_card_back <- function(x) {
+	x <- piecepackr:::update_gp(x, gp = gpar(cex = x$scale, lex = x$scale))
+	x
+}
+
+#' @export
+makeContent.dotaro_corner_card_back <- function(x) {
+	opt <- x$opt
+	shape <- pp_shape(
+		opt$shape,
+		opt$shape_t,
+		opt$shape_r,
+		opt$back,
+		width = opt$shape_w,
+		height = opt$shape_h
+	)
+	# Possibly shrink background and gridlines to not overlap mat
+	# which sometimes prevents visual glitch if no border line
+	# but do not do this if mat color is transparent.
+	if (any(as.logical(grDevices::col2rgb(opt$mat_color, alpha = TRUE)[4, ] < 255))) {
+		bg_mat_width <- 0
+	} else {
+		bg_mat_width <- opt$mat_width
+	}
+
+	background_grob <- shape$shape(
+		gp = gpar(col = NA, fill = opt$background_color),
+		name = "background",
+		mat_width = bg_mat_width
+	)
+	gp_mat <- gpar(col = NA, lwd = 0, fill = opt$mat_color)
+	mat_grob <- shape$mat(opt$mat_width, gp = gp_mat, name = "mat")
+
+	if (x$border) {
+		gp_border <- gpar(col = opt$border_color, fill = NA, lex = opt$border_lex)
+		border_grob <- shape$shape(gp = gp_border, name = "border")
+	} else {
+		border_grob <- nullGrob(name = "border")
+	}
+	gl <- gList(background_grob, mat_grob, border_grob)
 
 	setChildren(x, gl)
 }
