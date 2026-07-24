@@ -6,7 +6,7 @@
 * [Orientations](#orientations)
 * [Examples](#examples)
 * [Frequently Asked Questions](#faq)
-* [Prior art](#prior)
+* [External links](#external)
 
 ```{r hidden, echo = FALSE, message = FALSE}
 vermillion <- palette.colors(names = TRUE)[["vermillion"]]
@@ -145,34 +145,7 @@ dark_up_height <- 5 * IH + 0.5 + 0.2
 ```
 
 ```{r dark_up, fig.width = dark_up_width, fig.height = dark_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with dark halves up top"}
-df_trad <- filter(half_info, light == "D", suit %in% c("H", "S", "C", "D")) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    arrange(suit, rank) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
-           y = Y0 + rep(4:1, each = 14L) * IH)
-
-df_num <- filter(half_info, light == "D", suit %in% as.character(0:4)) |>
-    arrange(suit, rank) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = max(df_trad$x) + IW + X0 + rep(seq(0, by = IW, length.out = 10L), 5L),
-           y = Y0 + rep(5:1, each = 10L) * IH)
-
-df_fool <- filter(half_info, light == "D", is.na(suit)) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    arrange(rank) |>
-    mutate(piece_side = "card_face",
-           x = X0 + 6 * IW + seq(0, by = IW, length.out = 2L),
-           y = max(df_trad$y) + IH + 0.2)
-
-df <- bind_rows(df_trad, df_num, df_fool)
+df <- dotaro.deck:::dotaro_orientation_dark_up(envir = envir)
 pmap_piece(df, default.units = "in", envir = envir)
 ```
 
@@ -191,34 +164,7 @@ light_up_height <- 5 * IH + 0.5 + 0.2
 ```
 
 ```{r light_up, fig.width = light_up_width, fig.height = light_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with light halves up top"}
-df_trad <- filter(half_info, light == "L", suit %in% c("H", "S", "C", "D")) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    arrange(suit, rank) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
-           y = Y0 + rep(4:1, each = 14L) * IH)
-
-df_num <- filter(half_info, light == "L", suit %in% as.character(0:4)) |>
-    arrange(suit, rank) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = max(df_trad$x) + IW + X0 + rep(seq(0, by = IW, length.out = 10L), 5L),
-           y = Y0 + rep(5:1, each = 10L) * IH)
-
-df_fool <- filter(half_info, light == "L", is.na(suit)) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    arrange(rank) |>
-    mutate(piece_side = "card_face",
-           x = X0 + 6 * IW + seq(0, by = IW, length.out = 2L),
-           y = max(df_trad$y) + IH + 0.2)
-
-df <- bind_rows(df_trad, df_num, df_fool)
+df <- dotaro.deck:::dotaro_orientation_light_up(envir = envir)
 pmap_piece(df, default.units = "in", envir = envir)
 ```
 
@@ -237,16 +183,8 @@ trad_up_height <- 4 * IH + 0.5 + 0.1
 ```
 
 ```{r trad_up, fig.width = trad_up_width, fig.height = trad_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with traditional suit halves up top"}
-df <- data.frame(piece_side = "card_face",
-                 x = X0 + rep(seq(0, by = IW, length.out = 28L), 4L),
-                 y = Y0 + rep(4:1, each = 28L) * IH,
-                 rank = rep(1:14, 8L), suit = rep(c(1, 2, 5, 6, 3, 4, 7, 8), each = 14L))
-df <- filter(df, rank != 12L | suit <= 4)
-df$y[which(df$rank == 12L)] <- df$y[which(df$rank == 12L)] - 0.5 * IH
-df$x[which(df$x > median(df$x))] <- df$x[which(df$x > median(df$x))] + 0.1
-df$y[which(df$y > median(df$y))] <- df$y[which(df$y > median(df$y))] + 0.1
-
-pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+df <- dotaro.deck:::dotaro_orientation_trad_up(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
 ```
 
 ### Traditional suit halves down below
@@ -267,42 +205,7 @@ num_up_height <- (5 + 1) * IH + 0.5 + 0.2
 ```
 
 ```{r num_up, fig.width = num_up_width, fig.height = num_up_height, fig.alt = "All 108 Dotaro Deck cards arranged with number suit halves up top"}
-df_num_d <- filter(half_info, light == "D", suit %in% as.character(0:4)) |>
-    arrange(suit, rank) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = X0 + rep(seq(0, by = IW, length.out = 10L), 5L),
-           y = Y0 + rep(5:1, each = 10L) * IH)
-
-df_fool_d <- filter(half_info, light == "D", is.na(suit)) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    arrange(rank) |>
-    mutate(piece_side = "card_face",
-           x = X0 + IW * 4 + seq(0, by = IW, length.out = 2L),
-           y = max(df_num_d$y) + IH + 0.2)
-
-df_num_l <- filter(half_info, light == "L", suit %in% as.character(0:4)) |>
-    arrange(suit, rank) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    mutate(piece_side = "card_face",
-           x = X0 + IW * 10 + 0.2 + rep(seq(0, by = IW, length.out = 10L), 5L),
-           y = Y0 + rep(5:1, each = 10L) * IH)
-
-df_fool_l <- filter(half_info, light == "L", is.na(suit)) |>
-    select("card", "top") |>
-    left_join(corner_info, by = c("card", "top")) |>
-    select("suit", "rank", "cfg") |>
-    arrange(rank) |>
-    mutate(piece_side = "card_face",
-           x = X0 + IW * 14 + 0.2 + seq(0, by = IW, length.out = 2L),
-           y = max(df_num_d$y) + IH + 0.2)
-df <- bind_rows(df_num_d, df_fool_d, df_num_l, df_fool_l)
+df <- dotaro.deck:::dotaro_orientation_num_up(envir = envir)
 pmap_piece(df, default.units = "in", envir = envir)
 ```
 
@@ -323,7 +226,7 @@ one_french_height <- 4 * IH + 0.5
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 13L), 4L),
                  y = Y0 + rep(4:1, each = 13L) * IH,
-                 rank = rep(c(1:11, 13:14), 4L), suit = rep(1:4, each = 13L))
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(1, 4, 3, 2), each = 13L))
 
 pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
 
@@ -351,18 +254,20 @@ two_french_height <- 4 * IH + 0.5 + 0.1
 ```
 
 ```{r two_french, fig.width = two_french_width, fig.height = two_french_height, fig.alt = "Two decks of traditional French-suited playing cards selected from the Dotaro Deck"}
-df <- data.frame(piece_side = "card_face",
-                 x = X0 + rep(seq(0, by = IW, length.out = 26L), 4L),
-                 y = Y0 + rep(4:1, each = 26L) * IH,
-                 rank = rep(c(1:11, 13:14), 8L), suit = rep(c(1, 2, 5, 6, 3, 4, 7, 8), each = 13L))
-df$x[which(df$x > median(df$x))] <- df$x[which(df$x > median(df$x))] + 0.1
-df$y[which(df$y > median(df$y))] <- df$y[which(df$y > median(df$y))] + 0.1
+df_dark <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 13L), 4L),
+                 y = Y0 + rep(4:1, each = 13L) * IH,
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(1, 4, 3, 2), each = 13L))
+df_light <- data.frame(piece_side = "card_face",
+                 x = max(df_dark$x) + IW + 0.2 + rep(seq(0, by = IW, length.out = 13L), 4L),
+                 y = Y0 + rep(4:1, each = 13L) * IH,
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(5, 8, 7, 6), each = 13L))
+df <- bind_rows(df_dark, df_light)
 
 df_joker <- data.frame(piece_side = "card_face",
-                       x = max(df$x) + IW + 0.2,
+                       x = max(df_light$x) + IW + 0.2,
                        y = Y0 + 4:1 * IH,
-                       rank = 12, suit = 1:4)
-df_joker$y[which(df_joker$y > median(df_joker$y))] <- df_joker$y[which(df_joker$y > median(df_joker$y))] + 0.1
+                       rank = 12, suit = c(1, 4, 3, 2))
 df <- bind_rows(df, df_joker)
 
 pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
@@ -386,7 +291,7 @@ df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
                  y = Y0 + rep(4:1, each = 14L) * IH,
                  rank = rep(c(1:14), 4L),
-                 suit = rep(1:4, each = 14L))
+                 suit = rep(c(1, 4, 3, 2), each = 14L))
 
 pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
 
@@ -488,7 +393,7 @@ pmap_piece(df, envir = envir, default.units = "in")
 * The *Dotaro Deck* is inspired by domino sets and tarot decks and Dotaro is an abbreviation of Domino Tarot.
 * In Esperanto the word "dotaro" would mean something like "collection of endowments" and the *Dotaro Deck* can be used to play a wide variety of the playing card legacies our ancestors have endowed us with.
 
-## <a name="prior">Prior Art</a>
+## <a name="external">External links</a>
 
 ### Overviews
 
