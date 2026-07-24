@@ -1,6 +1,8 @@
 test_that("save_images() works", {
 	skip_if_not_installed("systemfonts")
 	skip_if_not(piecepackr::has_font("DejaVu Sans"))
+	skip_if_not(piecepackr::has_font("Dotaro Ranks"))
+	skip_if_not(piecepackr::has_font("Dotaro Suits"))
 	local_dotaro_deck_default_options()
 	dir <- tempfile()
 	dir.create(dir)
