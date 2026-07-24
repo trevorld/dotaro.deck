@@ -6,7 +6,7 @@
 * [Orientations](#orientations)
 * [Examples](#examples)
 * [Frequently Asked Questions](#faq)
-* [Prior art](#prior)
+* [External links](#external)
 
 
 
@@ -193,7 +193,7 @@
 * The *Dotaro Deck* is inspired by domino sets and tarot decks and Dotaro is an abbreviation of Domino Tarot.
 * In Esperanto the word "dotaro" would mean something like "collection of endowments" and the *Dotaro Deck* can be used to play a wide variety of the playing card legacies our ancestors have endowed us with.
 
-## <a name="prior">Prior Art</a>
+## <a name="external">External links</a>
 
 ### Overviews
 
