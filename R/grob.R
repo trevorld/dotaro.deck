@@ -183,7 +183,7 @@ hybrid_number_suit_grob <- function(
 	grob
 }
 
-top_suit_grob <- function(tsuit, tlight, red, tshaded = NA, ..., pip = FALSE) {
+top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	if (suit_style() == "hybrid" && tsuit %in% french_suits) {
 		return(hybrid_suit_grob(tsuit, tlight))
 	}
@@ -202,9 +202,10 @@ top_suit_grob <- function(tsuit, tlight, red, tshaded = NA, ..., pip = FALSE) {
 		# stays black for now.
 		counter_color <- if (tlight == "D") "black" else accent
 		# Unlike the French suits (whose hybrid shading is a fixed property of
-		# the suit, not `tshaded`), number suits don't get the "hbinary"
-		# shading effect at all -- each already has its own dedicated shape,
-		# so shading isn't needed to help tell them apart.
+		# the suit, baked into `hybrid_suits_dark`/`hybrid_suits_light`), number
+		# suits don't get the "hbinary" shading effect at all -- each already
+		# has its own dedicated shape, so shading isn't needed to help tell
+		# them apart.
 		return(hybrid_number_suit_grob(
 			tsuit,
 			col = col,
@@ -227,7 +228,7 @@ top_suit_grob <- function(tsuit, tlight, red, tshaded = NA, ..., pip = FALSE) {
 	suit_grob(suit_glyph_key(tsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
 
-bot_suit_grob <- function(bsuit, blight, red, tshaded = NA, ..., pip = FALSE) {
+bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 	if (is.na(bsuit)) {
 		return(nullGrob())
 	}
@@ -284,7 +285,7 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
 
-bot_rank_grob <- function(brank, blight, red, bsuit, tshaded = NA, ...) {
+bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
 	glyph <- rank_glyph(brank, bsuit)
 	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	hybrid <- suit_style() == "hybrid"

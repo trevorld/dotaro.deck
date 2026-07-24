@@ -40,7 +40,7 @@ bot_face_grob <- function(...) {
 	if (brank == "N") {
 		return(knight_grob(bsuit_grob, brank_grob, col))
 	} else if (brank %in% c("O", "F")) {
-		return(fool_grob(brank, blight, col, tshaded = l$tshaded))
+		return(fool_grob(brank, blight, col))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.35, width = 0.55, height = 0.46),
@@ -56,16 +56,9 @@ bot_face_grob <- function(...) {
 }
 
 knight_grob <- function(suit_grob, rank_grob, col = "black") {
-	# The meeple is drawn from `dotaro.font`'s meeple glyph (same shape as
-	# `pp_shape("meeple")`, just registered in font em-space) rather than a
-	# piecepackr shape, so it composites with the knight/horse-head rank glyph
-	# via ordinary z-order: knight drawn last, on top, so its solid fill
-	# obscures the meeple's lower body -- evoking the meeple riding the horse.
-	# meeple_grob <- grobTree(
-	# 	dotaro.font:::suitGrob("\U000FC431", col = col, fill = "transparent"),
-	# 	vp = viewport(y = 0.70),
-	# 	gp = gpar(cex = 2.0, lex = 1.2)
-	# )
+	# The knight/horse-head rank glyph is drawn last (on top of the meeple, via
+	# ordinary z-order in `gl` below), so its solid fill obscures the meeple's
+	# lower body -- evoking the meeple riding the horse.
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.74, width = 0.6 * 0.7, height = 0.7 * 0.5),
 		gp = gpar(col = col, fill = NA, lwd = 2)
@@ -78,7 +71,7 @@ knight_grob <- function(suit_grob, rank_grob, col = "black") {
 	gTree(children = gl, vp = vp, gp = gp)
 }
 
-fool_grob <- function(rank, light, col = "black", tshaded = NA) {
+fool_grob <- function(rank, light, col = "black") {
 	if (suit_style() == "hybrid") {
 		# The border follows the same split as the suit badges: black on the
 		# dark half (whose icon fill is already the accent color), accent on
