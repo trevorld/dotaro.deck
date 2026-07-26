@@ -5,7 +5,8 @@
 #' @param ... Ignored
 #' @param size Either `"letter"` or `"A4"`.
 #' @param title pdf metadata title.
-#' @param crosshairs Character vector, a subset of `c("front", "back")`, indicating which side(s) of each sheet get crosshairs and cropmarks.
+#' @param crosshairs Character vector, a subset of `c("front", "back")`,
+#'   indicating which side(s) of each sheet get crosshairs and cropmarks.
 #' @return The filename invisible.  As a side effect creates a pdf file.
 #' @export
 save_print_and_play <- function(
@@ -58,10 +59,10 @@ save_print_and_play <- function(
 	grid.newpage()
 	grid.draw(creditsGrob(xmp))
 
-	# Deliberately blank: keeps the instructions page from ending up printed
-	# on the back of the first sheet of cards, so the interleaved front/back
-	# pages below start together on a fresh physical sheet under duplex
-	# printing.
+	# Deliberately blank:
+	# keeps the instructions page from ending up printed on the back of the
+	# first sheet of cards, so the interleaved front/back pages below start
+	# together on a fresh physical sheet under duplex printing.
 	grid.newpage()
 	grid.text(
 		"This page deliberately left blank.",

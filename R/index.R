@@ -1,9 +1,12 @@
 # Vertical layout of a corner index, expressed as distances below the top of
 # the safe zone (mirroring `dotaro.font:::indexGrob()`'s margins for the
-# primary rank/suit: rank (3/8in cap height) flush to the top, suit (1/4in cap
-# height) after a 0.10in gap).  The secondary (mirrored, `cex_small`-scaled)
-# rank/suit pair below the divider line gets its own, smaller gaps: `line_gap`
-# on both sides of the line (symmetric), `small_gap` between the pair itself.
+# primary rank/suit:
+# rank (3/8in cap height) flush to the top, suit (1/4in cap height) after a
+# 0.10in gap).
+# The secondary (mirrored, `cex_small`-scaled) rank/suit pair below the
+# divider line gets its own, smaller gaps:
+# `line_gap` on both sides of the line (symmetric), `small_gap` between the
+# pair itself.
 corner_index_y <- function() {
 	cex_small <- 0.6
 	rank_h <- 3 / 8
