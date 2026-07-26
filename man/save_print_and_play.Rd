@@ -21,7 +21,8 @@ save_print_and_play(
 
 \item{title}{pdf metadata title.}
 
-\item{crosshairs}{Character vector, a subset of \code{c("front", "back")}, indicating which side(s) of each sheet get crosshairs and cropmarks.}
+\item{crosshairs}{Character vector, a subset of \code{c("front", "back")},
+indicating which side(s) of each sheet get crosshairs and cropmarks.}
 }
 \value{
 The filename invisible.  As a side effect creates a pdf file.

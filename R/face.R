@@ -58,7 +58,8 @@ bot_face_grob <- function(...) {
 knight_grob <- function(suit_grob, rank_grob, col = "black") {
 	# The knight/horse-head rank glyph is drawn last (on top of the meeple, via
 	# ordinary z-order in `gl` below), so its solid fill obscures the meeple's
-	# lower body -- evoking the meeple riding the horse.
+	# lower body --
+	# evoking the meeple riding the horse.
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.74, width = 0.6 * 0.7, height = 0.7 * 0.5),
 		gp = gpar(col = col, fill = NA, lwd = 2)
@@ -73,9 +74,10 @@ knight_grob <- function(suit_grob, rank_grob, col = "black") {
 
 fool_grob <- function(rank, light, col = "black") {
 	if (suit_style() == "hybrid") {
-		# The border follows the same split as the suit badges: black on the
-		# dark half (whose icon fill is already the accent color), accent on
-		# the light half (whose icon fill is the light color instead).
+		# The border follows the same split as the suit badges:
+		# black on the dark half (whose icon fill is already the accent
+		# color), accent on the light half (whose icon fill is the light
+		# color instead).
 		border <- if (light == "D") "black" else col
 		icon_fill <- if (light == "D") col else light_color()
 		# The fool has its own dedicated icon (star/plain ring), so -- like the
@@ -145,8 +147,8 @@ hybrid_fool_grob <- function(rank, border, accent, icon_fill, shading) {
 	gp_icon <- gpar(fill = dotaro.font:::shaded_fill(icon_fill, shading), col = border, lwd = 1.5)
 	if (rank == "F") {
 		# `pp_shape("concave5")`'s regular 5-point star polygon fits the ring
-		# circle exactly (a font star glyph doesn't line up as cleanly). The
-		# ring is filled white (rather than left hollow) so the star's
+		# circle exactly (a font star glyph doesn't line up as cleanly).
+		# The ring is filled white (rather than left hollow) so the star's
 		# concave notches don't let the triangle's tip show through.
 		ring_grob <- circleGrob(vp = vp_circle, gp = gpar(fill = "white", col = border, lwd = 1.5))
 		icon_grob <- pp_shape("concave5")$shape(gp = gp_icon, vp = vp_circle)

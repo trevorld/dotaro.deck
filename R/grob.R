@@ -35,9 +35,10 @@ glyphs <- list(
 
 # `dotaro.font`'s negative circled digit glyphs (dark number suits) draw the
 # interior digit as a thin hole, which doesn't survive being shrunk to the
-# secondary index's cex=0.6 scale.  Draw the digit as a second, separate
-# "counter" glyph on top in the background color instead, matching how the
-# newer number-suit glyphs stay legible at any scale.
+# secondary index's cex=0.6 scale.
+# Draw the digit as a second, separate "counter" glyph on top in the
+# background color instead, matching how the newer number-suit glyphs stay
+# legible at any scale.
 counter_glyphs <- list(
 	D0 = "\uF5E0", # digit 0 counter
 	D1 = "\uF5E1", # digit 1 counter
@@ -62,9 +63,9 @@ bold_digit_glyphs <- list(
 	"9" = "\U0001D7D7" # 𝟗
 )
 
-# French suits have no separate "light" glyph: draw the (dark) glyph in both
-# cases and let `fill` alone distinguish light from dark, same as every other
-# rank/suit glyph.
+# French suits have no separate "light" glyph:
+# draw the (dark) glyph in both cases and let `fill` alone distinguish light
+# from dark, same as every other rank/suit glyph.
 french_suits <- c("H", "S", "C", "D")
 
 number_suits <- c("0", "1", "2", "3", "4")
@@ -87,14 +88,22 @@ suit_grob <- function(key, col, fill, counter_color) {
 }
 
 # Experimental "hybrid" suits (`dotaro.deck.suits = "hybrid"`), per
-# `dotaro.font`'s own "Dotaro Deck hybrid traditional suits" design: the dark
-# half of each French suit is the plain suit glyph in its accent color, and
-# the light half is a fused German/Spanish/Hanafuda suit-system glyph (drawn
-# as a base shape plus an accent-colored detail overlay) -- gold appears only
-# on the light half. Every layer is outlined in black, never an accent color.
-# Layer colors reuse the same options as every other glyph: "red"/"green" are
-# the hearts/diamonds and spades/clubs ink colors, and "gold" (the hybrid
-# suits' shared accent, not tied to either suit family) is the light color.
+# `dotaro.font`'s own "Dotaro Deck hybrid traditional suits" design.
+# The light half is a fused glyph (a base shape plus a gold accent-colored
+# detail overlay) pairing each French suit with a corresponding suit from
+# another system:
+# hearts with Spanish cups, spades with Spanish swords, clubs with both
+# Spanish clubs (bastos) and German acorns, and diamonds with both Spanish
+# coins and German bells.
+# The dark half is just the plain French glyph, but for hearts and spades
+# specifically it doubles as the corresponding German suit too (hearts and
+# leaves respectively, which share the same outline) --
+# marked by the "hbinary" shaded fill rather than a second overlay layer.
+# Every layer is outlined in black, never an accent color.
+# Layer colors reuse the same options as every other glyph:
+# "red"/"green" are the hearts/diamonds and spades/clubs ink colors, and
+# "gold" (the hybrid suits' shared accent, not tied to either suit family)
+# is the light color.
 hybrid_suits_dark <- list(
 	H = list(glyph = "\u2665", color = "red", shading = "hbinary"), # heart
 	S = list(glyph = "\u2660", color = "green", shading = "hbinary"), # spade
@@ -128,9 +137,10 @@ hybrid_layer_color <- function(role) {
 hybrid_suit_grob <- function(suit, light) {
 	layers <- if (light == "D") list(hybrid_suits_dark[[suit]]) else hybrid_suits_light[[suit]]
 	# Trying the light half's layers bordered in a darkened shade of the
-	# suit's own accent color instead of black -- the same darkened half
-	# already used by the "hbinary"-shaded layers' (clubs, diamonds) own
-	# two-tone fill, now applied uniformly to all 4 suits' light borders.
+	# suit's own accent color instead of black --
+	# the same darkened half already used by the "hbinary"-shaded layers'
+	# (clubs, diamonds) own two-tone fill, now applied uniformly to all 4
+	# suits' light borders.
 	# The dark half's border stays black.
 	accent <- if (suit %in% c("H", "D")) hearts_diamonds_color() else spades_clubs_color()
 	col <- if (light == "D") {
@@ -149,13 +159,15 @@ hybrid_suit_grob <- function(suit, light) {
 	do.call(grobTree, grobs)
 }
 
-# Hybrid number suits: a dedicated (digit-free) shape per suit, plus a
-# separate digit "counter" to identify which suit -- the same shape works
-# as-is for pip dots (repeated, no counter) or as a suit badge (single glyph,
-# with the counter layered on top). Only the "dark"/solid form of each shape
-# is used, on both halves (fill alone distinguishes light from dark): like the
-# circled digits, each shape also has a "light"/hollow form, but its fill area
-# is too thin for `fill` to ever actually show.
+# Hybrid number suits:
+# a dedicated (digit-free) shape per suit, plus a separate digit "counter"
+# to identify which suit --
+# the same shape works as-is for pip dots (repeated, no counter) or as a
+# suit badge (single glyph, with the counter layered on top).
+# Only the "dark"/solid form of each shape is used, on both halves (fill
+# alone distinguishes light from dark):
+# like the circled digits, each shape also has a "light"/hollow form, but
+# its fill area is too thin for `fill` to ever actually show.
 hybrid_number_shapes <- list(
 	"0" = list(glyph = "\u25CF", counter = "\uF590"), # circle
 	"1" = list(glyph = "\uF5A8", counter = "\uF591"), # droplet
@@ -188,24 +200,25 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 		return(hybrid_suit_grob(tsuit, tlight))
 	}
 	# Reaching here means a number suit (French suits are always diverted
-	# above under the hybrid style). Unlike the French suits, the light-half
-	# number suit shape's own border takes its accent color (red or green)
-	# rather than black; the dark half keeps a black border since its fill is
-	# already the accent color and a same-color border would be invisible.
+	# above under the hybrid style).
+	# Unlike the French suits, the light-half number suit shape's own border
+	# takes its accent color (red or green) rather than black;
+	# the dark half keeps a black border since its fill is already the
+	# accent color and a same-color border would be invisible.
 	hybrid <- suit_style() == "hybrid"
 	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	fill <- ifelse(tlight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (tlight == "D") "black" else accent
 		# Trying the light half's counter in the suit's own accent color
-		# (matching its border) instead of black; the dark half's counter
-		# stays black for now.
+		# (matching its border) instead of black;
+		# the dark half's counter stays black for now.
 		counter_color <- if (tlight == "D") "black" else accent
 		# Unlike the French suits (whose hybrid shading is a fixed property of
 		# the suit, baked into `hybrid_suits_dark`/`hybrid_suits_light`), number
-		# suits don't get the "hbinary" shading effect at all -- each already
-		# has its own dedicated shape, so shading isn't needed to help tell
-		# them apart.
+		# suits don't get the "hbinary" shading effect at all --
+		# each already has its own dedicated shape, so shading isn't needed to
+		# help tell them apart.
 		return(hybrid_number_suit_grob(
 			tsuit,
 			col = col,
@@ -217,13 +230,15 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	}
 	col <- accent
 	# Number suits always use the "negated" (solid disc + counter) glyph, even
-	# on the light half: the "positive" glyph's digit is stroked but its
-	# interior is a true hole, so almost none of `fill` ever actually shows.
+	# on the light half:
+	# the "positive" glyph's digit is stroked but its interior is a true hole,
+	# so almost none of `fill` ever actually shows.
 	# The counter needs to contrast against `fill`, so it takes the *other*
-	# color of the pair: `light_color()` on the dark half (solid accent disc,
-	# light digit) and `accent` on the light half (accent-ringed light disc,
-	# accent digit) -- matching how French suits' light half is purely
-	# accent + light with no black, instead of a literal "white"/"black".
+	# color of the pair:
+	# `light_color()` on the dark half (solid accent disc, light digit) and
+	# `accent` on the light half (accent-ringed light disc, accent digit) --
+	# matching how French suits' light half is purely accent + light with no
+	# black, instead of a literal "white"/"black".
 	counter_color <- if (tlight == "D") light_color() else accent
 	suit_grob(suit_glyph_key(tsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
@@ -240,9 +255,9 @@ bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 	fill <- ifelse(blight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (blight == "D") "black" else accent
-		# See `top_suit_grob()`: trying the light half's counter in the suit's
-		# accent color, and number suits don't get the "hbinary" shading
-		# effect.
+		# See `top_suit_grob()`:
+		# trying the light half's counter in the suit's accent color, and
+		# number suits don't get the "hbinary" shading effect.
 		counter_color <- if (blight == "D") "black" else accent
 		return(hybrid_number_suit_grob(
 			bsuit,
@@ -279,8 +294,9 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	}
 	col <- if (hybrid) "black" else accent
 	# Hybrid ranks stay in the accent color on both halves rather than
-	# switching to the light color -- unlike the suit glyphs, there's no
-	# separate light/dark rank glyph to fill instead.
+	# switching to the light color --
+	# unlike the suit glyphs, there's no separate light/dark rank glyph to
+	# fill instead.
 	fill <- if (hybrid) accent else ifelse(tlight == "D", accent, light_color())
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
@@ -553,10 +569,11 @@ bot_inner_grob <- function(...) {
 	grobTree(grob, vp = vp)
 }
 
-# Card back: a "4.8*.4**.8*" polygon tiling (big squares + small diamonds
-# rotated 45 degrees between them) reworked as a mini scoring track. Every
-# card in the deck shares this one design, so `card_back_grob()` (unlike
-# `card_grob()`) takes no suit/rank arguments.
+# Card back:
+# a "4.8*.4**.8*" polygon tiling (big squares + small diamonds rotated 45
+# degrees between them) reworked as a mini scoring track.
+# Every card in the deck shares this one design, so `card_back_grob()`
+# (unlike `card_grob()`) takes no suit/rank arguments.
 CARD_BACK_NROW <- 5L
 CARD_BACK_NCOL <- 3L
 CARD_BACK_SQUARE_WIDTH <- unit(1, "cm")
@@ -575,9 +592,10 @@ normalize_color <- function(color) {
 
 # The "light" rendering of a suit symbol, tracking whatever color theme is
 # currently active (including the experimental "hybrid" suits, which swap
-# in fused German/Spanish/Hanafuda-style glyphs for the 4 French suits). The
-# fool "star" has no hybrid variant of its own, so it always falls back to
-# the plain light suit-glyph treatment.
+# in fused Spanish- or German-suit-style glyphs for the 4 French suits, per
+# `hybrid_suits_light`).
+# The fool "star" has no hybrid variant of its own, so it always falls back
+# to the plain light suit-glyph treatment.
 card_back_suit_grob <- function(key) {
 	if (key == "star") {
 		# The fool rank is always in the "B" (spades/clubs) family (see
@@ -601,9 +619,10 @@ card_back_grob <- function() {
 
 	# `side` marks a cribbage-style score path (left/right columns), `middle`
 	# a possible snaking score path (center column), and the checkerboard
-	# colors are just possible board-game cells -- shape (square vs. star vs.
-	# diamond) and the black borders between every piece already separate
-	# these categories, so color only has to distinguish *within* each one:
+	# colors are just possible board-game cells --
+	# shape (square vs. star vs. diamond) and the black borders between every
+	# piece already separate these categories, so color only has to
+	# distinguish *within* each one:
 	# side vs. middle, and checker1 vs. checker2.
 	side_fill <- light_color()
 	middle_fill <- light_color()
@@ -638,21 +657,24 @@ card_back_grob <- function() {
 	bg_grob <- rectGrob(gp = gpar(fill = bg_fill, col = NA))
 
 	# Checkerboard-colored bounding box squares at the old tiling's
-	# eight-pointed-star positions: the (nrow + 1) x (ncol + 1) lattice sitting
-	# half a pitch diagonally off of every big square, i.e. at the shared
-	# corner of (up to) 4 neighboring big squares. The 4 diamonds directly
-	# above/below/left/right of a star position are each a distance
-	# `pitch / 2` away (axis-aligned) - that's exactly how far a star's own
-	# points used to reach, so a box side of `pitch` (reaching from the star's
-	# center out to each of those 4 diamond centers) is what bounds it. This
-	# is drawn under the diamonds and big squares, which cover most of it,
-	# leaving just its corner tips showing through.
+	# eight-pointed-star positions:
+	# the (nrow + 1) x (ncol + 1) lattice sitting half a pitch diagonally off
+	# of every big square, i.e. at the shared corner of (up to) 4 neighboring
+	# big squares.
+	# The 4 diamonds directly above/below/left/right of a star position are
+	# each a distance `pitch / 2` away (axis-aligned) -
+	# that's exactly how far a star's own points used to reach, so a box
+	# side of `pitch` (reaching from the star's center out to each of those
+	# 4 diamond centers) is what bounds it.
+	# This is drawn under the diamonds and big squares, which cover most of
+	# it, leaving just its corner tips showing through.
 	#
 	# Only draw a box where all 4 of those neighboring diamonds actually
-	# exist (`di` in [2, nrow], `dj` in [2, ncol]): a star position on the
-	# perimeter is missing 1 or more of its 4 points to begin with, so its
-	# box would just be a mostly-cropped rectangle sticking out past the
-	# card edge. Skip it and let the plain background color show instead.
+	# exist (`di` in [2, nrow], `dj` in [2, ncol]):
+	# a star position on the perimeter is missing 1 or more of its 4 points
+	# to begin with, so its box would just be a mostly-cropped rectangle
+	# sticking out past the card edge.
+	# Skip it and let the plain background color show instead.
 	star_grid <- expand.grid(di = seq(2, nrow), dj = seq(2, ncol))
 	star_grobs <- Map(
 		function(di, dj) {
@@ -672,21 +694,24 @@ card_back_grob <- function() {
 	)
 
 	# Diamond ("small rotated square") positions sit directly *between* two
-	# edge-adjacent big squares - i.e. in the same gap that a big square's
-	# neighbor would occupy, not diagonally off of it. That means two
-	# distinct families: `ncol - 1` of them between each row's squares
-	# (same y as that row, x centered in each horizontal gap), and `ncol`
-	# of them between each pair of adjacent rows (same x as that column, y
-	# centered in each vertical gap).
+	# edge-adjacent big squares -
+	# i.e. in the same gap that a big square's neighbor would occupy, not
+	# diagonally off of it.
+	# That means two distinct families:
+	# `ncol - 1` of them between each row's squares (same y as that row, x
+	# centered in each horizontal gap), and `ncol` of them between each pair
+	# of adjacent rows (same x as that column, y centered in each vertical
+	# gap).
 	#
 	# The diamond's corner nearest a neighboring big square, and that
 	# square's nearest edge, are both a distance `gap / 2` from the
-	# diamond's center (one along the diagonal, one along the axis) - so a
-	# diamond side of `gap * sqrt(2) / 2` is exactly the size at which the
-	# diamond's corner touches that edge's midpoint, with no gap and no
-	# overlap. The diamond's other two corners (pointing where there is no
-	# adjacent square) poke the same distance into empty space, where the
-	# big squares (drawn on top, below) don't reach.
+	# diamond's center (one along the diagonal, one along the axis) -
+	# so a diamond side of `gap * sqrt(2) / 2` is exactly the size at which
+	# the diamond's corner touches that edge's midpoint, with no gap and no
+	# overlap.
+	# The diamond's other two corners (pointing where there is no adjacent
+	# square) poke the same distance into empty space, where the big
+	# squares (drawn on top, below) don't reach.
 	diamond_side_in <- gap_in / sqrt(2)
 	within_row <- expand.grid(i = seq_len(nrow), j = seq_len(ncol - 1))
 	between_row <- expand.grid(i = seq_len(nrow - 1), j = seq_len(ncol))
@@ -695,13 +720,14 @@ card_back_grob <- function() {
 
 	# Most (within-row) diamonds are a single plain color, except the topmost
 	# (then leftmost) and bottommost (then rightmost) diamond, which get a
-	# distinct marker color - e.g. to mark the start/end of a scoring path
-	# that continues onto other cards. The between-row diamonds sit in a
-	# column directly above/below a big square, so they instead take that
-	# column's own color: `side_fill` under the leftmost/rightmost column
-	# (matching the big squares there), and `marker_fill` under the
-	# interior column(s) (turning the center column into a second, vertical
-	# marker path).
+	# distinct marker color -
+	# e.g. to mark the start/end of a scoring path that continues onto other
+	# cards.
+	# The between-row diamonds sit in a column directly above/below a big
+	# square, so they instead take that column's own color:
+	# `side_fill` under the leftmost/rightmost column (matching the big
+	# squares there), and `marker_fill` under the interior column(s)
+	# (turning the center column into a second, vertical marker path).
 	diamond_fills <- c(
 		rep(diamond_fill, nrow(within_row)),
 		ifelse(between_row$j %in% c(1, ncol), side_fill, marker_fill)
@@ -729,11 +755,13 @@ card_back_grob <- function() {
 	)
 
 	# Functional grid of big squares, on top of the diamond lattice (covering
-	# all but the diamonds' corner tips). The left column carries the suit
-	# symbols bottom-to-top; the right column carries the same symbols
-	# top-to-bottom, each rotated 180 degrees - so the whole card looks
-	# identical if rotated 180 degrees (a common card-back trait), and the
-	# two columns can be read as a snaking, connectable path.
+	# all but the diamonds' corner tips).
+	# The left column carries the suit symbols bottom-to-top;
+	# the right column carries the same symbols top-to-bottom, each rotated
+	# 180 degrees -
+	# so the whole card looks identical if rotated 180 degrees (a common
+	# card-back trait), and the two columns can be read as a snaking,
+	# connectable path.
 	left <- unit(0.5, "npc") - 0.5 * total_width
 	bottom <- unit(0.5, "npc") - 0.5 * total_height
 	square_grid <- expand.grid(i = seq_len(nrow), j = seq_len(ncol))

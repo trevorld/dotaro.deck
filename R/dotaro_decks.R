@@ -228,9 +228,9 @@ makeContent.dotaro_card_back <- function(x) {
 	setChildren(x, gl)
 }
 
-# The corner cfgs' card back: at index size, there's no room to show any of
-# `card_back_grob()`'s tiling pattern, so it's just a plain background and
-# border instead.
+# The corner cfgs' card back:
+# at index size, there's no room to show any of `card_back_grob()`'s tiling
+# pattern, so it's just a plain background and border instead.
 dotaroCornerCardBackGrob <- function(piece_side, suit, rank, cfg = pp_cfg()) {
 	cfg <- as_pp_cfg(cfg)
 	opt <- cfg$get_piece_opt(piece_side, suit, rank)

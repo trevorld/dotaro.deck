@@ -1,7 +1,9 @@
 # Display order (top to bottom, or left to right) for the French suits in the
-# README's illustrations: hearts, diamonds, clubs, spades. Indexed by
-# `corner_info$suit`'s own integer code (1:4 = dark H,S,C,D; 5:8 = light
-# H,S,C,D), giving each code's rank in the desired H,D,C,S display order.
+# README's illustrations:
+# hearts, diamonds, clubs, spades.
+# Indexed by `corner_info$suit`'s own integer code (1:4 = dark H,S,C,D; 5:8 =
+# light H,S,C,D), giving each code's rank in the desired H,D,C,S display
+# order.
 dotaro_french_suit_order <- rep(c(1, 4, 3, 2), 2)
 
 #' Split a positioned `pmap_piece()` data frame into left/right halves
@@ -9,11 +11,12 @@ dotaro_french_suit_order <- rep(c(1, 4, 3, 2), 2)
 #' Splits a data frame of piece positions (as built by the
 #' `dotaro_orientation_*()` helpers) into a left and right half at `cutoff`,
 #' re-anchoring the right half's `x` so it starts back at the left half's own
-#' starting `x` -- e.g. so each half can be laid out on its own booklet page.
+#' starting `x` --
+#' e.g. so each half can be laid out on its own booklet page.
 #'
 #' @param df A data frame with an `x` column.
-#' @param cutoff An x-coordinate (in `df`'s own units) to split on; pieces
-#'   with `x < cutoff` go left, the rest go right.
+#' @param cutoff An x-coordinate (in `df`'s own units) to split on;
+#'   pieces with `x < cutoff` go left, the rest go right.
 #' @return A list with `left` and `right` data frames.
 #' @noRd
 dotaro_split_lr <- function(df, cutoff) {
@@ -44,15 +47,15 @@ dotaro_scale_xy <- function(df, scale) {
 #' Build a `pmap_piece()` data frame for one of the "orientation" layouts
 #'
 #' These lay out all 108 *Dotaro Deck* cards' corner indices by a shared
-#' orientation (which half is "up top"), as shown in `README.Rmd`. Each
-#' returns a data frame ready for `pmap_piece(df, default.units = "in", envir
-#' = envir)`, e.g. for a bridge-sized booklet where a layout needs to be
-#' split across two facing pages.
+#' orientation (which half is "up top"), as shown in `README.Rmd`.
+#' Each returns a data frame ready for `pmap_piece(df, default.units = "in",
+#' envir = envir)`, e.g. for a bridge-sized booklet where a layout needs to
+#' be split across two facing pages.
 #'
 #' @param scale A scale factor, applied to the `x`/`y` positions and passed
 #'   through to `pieceGrob()`/`pmap_piece()` to shrink the pieces themselves
-#'   by the same amount (see `dotaro_scale_xy()`) -- e.g. to shrink the whole
-#'   layout to fit a smaller page.
+#'   by the same amount (see `dotaro_scale_xy()`) --
+#'   e.g. to shrink the whole layout to fit a smaller page.
 #' @param side Either `"both"` (the full layout) or `"left"`/`"right"` (just
 #'   that half, as split by `dotaro_split_lr()`, re-anchored back to the same
 #'   starting `x` as the full layout's left edge).
@@ -86,8 +89,8 @@ dotaro_orientation_light_up <- function(
 
 # Shared by `dotaro_orientation_dark_up()`/`dotaro_orientation_light_up()`:
 # the traditional-suit block (left) and number-suit block (right), with the
-# 2 fool cards floating above the traditional-suit block. The natural
-# left/right cutoff sits in the gap between the two blocks.
+# 2 fool cards floating above the traditional-suit block.
+# The natural left/right cutoff sits in the gap between the two blocks.
 dotaro_orientation_dark_light_up <- function(light, scale, side, envir) {
 	cfg_corner_trad <- envir$dotaro_corner_traditional
 	IW <- cfg_corner_trad$get_width("card_face")
