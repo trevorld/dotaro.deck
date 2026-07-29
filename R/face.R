@@ -77,12 +77,13 @@ knight_grob <- function(suit_grob, rank_grob, col = "black") {
 }
 
 fool_grob <- function(rank, light, col = "black") {
+	# The border follows the same split as the suit badges (see
+	# `top_suit_grob()`): black on the dark half (whose icon fill is already
+	# the accent color), accent on the light half (whose icon fill is the
+	# light color instead). The meeple's own outline stays flat accent,
+	# same as every other face rank's meeple.
+	border <- if (light == "D") "black" else col
 	if (suit_style() == "hybrid") {
-		# The border follows the same split as the suit badges:
-		# black on the dark half (whose icon fill is already the accent
-		# color), accent on the light half (whose icon fill is the light
-		# color instead).
-		border <- if (light == "D") "black" else col
 		icon_fill <- if (light == "D") col else light_color()
 		# The fool has its own dedicated icon (star/plain ring), so -- like the
 		# number suits -- it doesn't get the "hbinary" shading effect.
@@ -92,23 +93,22 @@ fool_grob <- function(rank, light, col = "black") {
 	vp_meeple <- viewport(height = unit(0.7, "in"), width = unit(0.6, "in"), y = 0.3)
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
 	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
-	# accent border always, accent fill on the dark half, light-color fill on
-	# the light half.
+	# accent fill on the dark half, light-color fill on the light half.
 	index_fill <- if (light == "D") col else light_color()
-	gp_triangle <- gpar(fill = index_fill, col = col, lwd = 1.5)
+	gp_triangle <- gpar(fill = index_fill, col = border, lwd = 1.5)
 	if (rank == "O") {
 		# Same index-matching fill as the triangle.
-		gp_circle <- gpar(fill = index_fill, col = col, lwd = 1.5)
+		gp_circle <- gpar(fill = index_fill, col = border, lwd = 1.5)
 	} else {
 		# White (not left hollow), same trick as `hybrid_fool_grob()`'s ring,
 		# so the star's concave notches don't let the triangle's tip poke
 		# through visually.
-		gp_circle <- gpar(fill = "white", col = col, lwd = 1.5)
+		gp_circle <- gpar(fill = "white", col = border, lwd = 1.5)
 	}
 	if (light == "L") {
-		gp_star <- gpar(fill = NA, col = col, lwd = 1.5)
+		gp_star <- gpar(fill = NA, col = border, lwd = 1.5)
 	} else {
-		gp_star <- gpar(fill = col, col = col, lwd = 1.5)
+		gp_star <- gpar(fill = col, col = border, lwd = 1.5)
 	}
 	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
 	vp_triangle <- viewport(height = unit(0.4, "in"), width = unit(0.30, "in"), y = y_triangle)
