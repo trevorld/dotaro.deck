@@ -69,13 +69,16 @@ top_pip_grob <- function(...) {
 
 bot_pip_grob <- function(...) {
 	l <- list(...)
-	if (suit_style() == "hybrid" && l$bsuit %in% number_suits) {
+	is_number_suit <- l$bsuit %in% number_suits
+	if (suit_style() == "hybrid" && is_number_suit) {
 		# The hybrid style's number suits each have their own dedicated pip
 		# shape (droplet/arch/heater shield/square/circle), same as the top
 		# half already gets via `top_suit_grob(pip = TRUE)`.
 		bsuit_grob <- do.call(bot_suit_grob, c(l, list(pip = TRUE)))
 	} else {
-		if (l$red == "R") {
+		if (is_number_suit) {
+			col <- number_suits_color()
+		} else if (l$red == "R") {
 			col <- hearts_diamonds_color()
 		} else {
 			col <- spades_clubs_color()

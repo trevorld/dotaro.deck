@@ -27,6 +27,14 @@ hearts_diamonds_color <- function() {
 spades_clubs_color <- function() {
 	getOption("dotaro.deck.spades_clubs_color", "black")
 }
+# Number suits (`grob.R`'s `number_suits`) are paired card-by-card with a
+# French suit's red/black family purely for domino-scheme balance, not
+# because they belong to that family --
+# using their own dedicated color option instead avoids implying a
+# red/black identity they don't actually have.
+number_suits_color <- function() {
+	getOption("dotaro.deck.number_suits_color", "black")
+}
 light_color <- function() {
 	getOption("dotaro.deck.light", "white")
 }

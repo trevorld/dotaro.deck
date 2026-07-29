@@ -32,6 +32,12 @@ bot_face_grob <- function(...) {
 	brank <- l$brank
 	blight <- l$blight
 	red <- l$red
+	# The fool isn't really part of either red/black French-suit family (it
+	# just borrows whichever suit it happens to be paired with on the top
+	# half), so it gets the same dedicated color as the number suits instead.
+	if (brank %in% c("O", "F")) {
+		return(fool_grob(brank, blight, number_suits_color()))
+	}
 	if (red == "R") {
 		col <- hearts_diamonds_color()
 	} else {
@@ -39,8 +45,6 @@ bot_face_grob <- function(...) {
 	}
 	if (brank == "N") {
 		return(knight_grob(bsuit_grob, brank_grob, col))
-	} else if (brank %in% c("O", "F")) {
-		return(fool_grob(brank, blight, col))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.35, width = 0.55, height = 0.46),

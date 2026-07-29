@@ -1,5 +1,6 @@
 # The `dotaro.deck.*` option defaults baked into `R/zzz.R` (`suit_style()`,
-# `hearts_diamonds_color()`, `spades_clubs_color()`, `light_color()`).
+# `hearts_diamonds_color()`, `spades_clubs_color()`, `number_suits_color()`,
+# `light_color()`).
 # Tests that render cards should pin these explicitly, so a `dotaro.deck.*`
 # option left set in the developer's own session doesn't change test output.
 dotaro_deck_default_options <- function() {
@@ -7,6 +8,7 @@ dotaro_deck_default_options <- function() {
 		dotaro.deck.suits = "french",
 		dotaro.deck.hearts_diamonds_color = "black",
 		dotaro.deck.spades_clubs_color = "black",
+		dotaro.deck.number_suits_color = "black",
 		dotaro.deck.light = "white"
 	)
 }
