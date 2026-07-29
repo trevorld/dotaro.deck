@@ -69,26 +69,7 @@ top_pip_grob <- function(...) {
 
 bot_pip_grob <- function(...) {
 	l <- list(...)
-	is_number_suit <- l$bsuit %in% number_suits
-	if (suit_style() == "hybrid" && is_number_suit) {
-		# The hybrid style's number suits each have their own dedicated pip
-		# shape (droplet/arch/heater shield/square/circle), same as the top
-		# half already gets via `top_suit_grob(pip = TRUE)`.
-		bsuit_grob <- do.call(bot_suit_grob, c(l, list(pip = TRUE)))
-	} else {
-		if (is_number_suit) {
-			col <- number_suits_color()
-		} else if (l$red == "R") {
-			col <- hearts_diamonds_color()
-		} else {
-			col <- spades_clubs_color()
-		}
-		fill <- ifelse(l$blight == "D", col, light_color())
-		# Same circle glyph (and so the same border lwd, after `lex`) as the
-		# fool's "O" rank and every other suit/rank glyph, rather than a
-		# separately tuned circleGrob().
-		bsuit_grob <- dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill)
-	}
+	bsuit_grob <- do.call(bot_suit_grob, c(l, list(pip = TRUE)))
 
 	n_pips <- as.integer(l$brank)
 

@@ -159,42 +159,6 @@ hybrid_suit_grob <- function(suit, light) {
 	do.call(grobTree, grobs)
 }
 
-# Hybrid number suits:
-# a dedicated (digit-free) shape per suit, plus a separate digit "counter"
-# to identify which suit --
-# the same shape works as-is for pip dots (repeated, no counter) or as a
-# suit badge (single glyph, with the counter layered on top).
-# Only the "dark"/solid form of each shape is used, on both halves (fill
-# alone distinguishes light from dark):
-# like the circled digits, each shape also has a "light"/hollow form, but
-# its fill area is too thin for `fill` to ever actually show.
-hybrid_number_shapes <- list(
-	"0" = list(glyph = "\u25CF", counter = "\uF590"), # circle
-	"1" = list(glyph = "\uF5A8", counter = "\uF591"), # droplet
-	"2" = list(glyph = "\uF5AA", counter = "\uF592"), # arch
-	"3" = list(glyph = "\uF5AC", counter = "\uF593"), # heater shield
-	"4" = list(glyph = "\u25A0", counter = "\uF594") # square
-)
-
-hybrid_number_suit_grob <- function(
-	suit,
-	col,
-	fill,
-	counter = TRUE,
-	shading = "none",
-	counter_color = "black"
-) {
-	shape <- hybrid_number_shapes[[suit]]
-	grob <- dotaro.font:::suitGrob(shape$glyph, col = col, fill = fill, shading = shading)
-	if (counter) {
-		grob <- grobTree(
-			grob,
-			dotaro.font:::suitGrob(shape$counter, col = counter_color, fill = counter_color)
-		)
-	}
-	grob
-}
-
 top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	if (suit_style() == "hybrid" && tsuit %in% french_suits) {
 		return(hybrid_suit_grob(tsuit, tlight))
@@ -213,38 +177,30 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	}
 	fill <- ifelse(tlight == "D", accent, light_color())
-	if (hybrid) {
-		col <- if (tlight == "D") "black" else accent
-		# Trying the light half's counter in the suit's own accent color
-		# (matching its border) instead of black;
-		# the dark half's counter stays black for now.
-		counter_color <- if (tlight == "D") "black" else accent
-		# Unlike the French suits (whose hybrid shading is a fixed property of
-		# the suit, baked into `hybrid_suits_dark`/`hybrid_suits_light`), number
-		# suits don't get the "hbinary" shading effect at all --
-		# each already has its own dedicated shape, so shading isn't needed to
-		# help tell them apart.
-		return(hybrid_number_suit_grob(
-			tsuit,
-			col = col,
-			fill = fill,
-			counter = !pip,
-			shading = "none",
-			counter_color = counter_color
-		))
-	}
-	col <- accent
-	# Number suits always use the "negated" (solid disc + counter) glyph, even
-	# on the light half:
+	# Number suits always use the "negated" (solid disc + counter) circled-digit
+	# glyph, even on the light half:
 	# the "positive" glyph's digit is stroked but its interior is a true hole,
 	# so almost none of `fill` ever actually shows.
-	# The counter needs to contrast against `fill`, so it takes the *other*
-	# color of the pair:
-	# `light_color()` on the dark half (solid accent disc, light digit) and
-	# `accent` on the light half (accent-ringed light disc, accent digit) --
-	# matching how French suits' light half is purely accent + light with no
-	# black, instead of a literal "white"/"black".
-	counter_color <- if (tlight == "D") light_color() else accent
+	if (hybrid) {
+		col <- if (tlight == "D") "black" else accent
+		counter_color <- col
+	} else {
+		col <- accent
+		# The counter needs to contrast against `fill`, so it takes the *other*
+		# color of the pair:
+		# `light_color()` on the dark half (solid accent disc, light digit) and
+		# `accent` on the light half (accent-ringed light disc, accent digit) --
+		# matching how French suits' light half is purely accent + light with no
+		# black, instead of a literal "white"/"black".
+		counter_color <- if (tlight == "D") light_color() else accent
+	}
+	if (pip && tsuit %in% number_suits) {
+		# Repeated pip dots stay plain circles, matching how French suits'
+		# pips are just their plain suit symbol with no extra embellishment --
+		# the digit is only spelled out in the single corner-index/suit-badge
+		# instance drawn below.
+		return(dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill))
+	}
 	suit_grob(suit_glyph_key(tsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
 
@@ -262,23 +218,18 @@ bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	}
 	fill <- ifelse(blight == "D", accent, light_color())
+	# See `top_suit_grob()`.
 	if (hybrid) {
 		col <- if (blight == "D") "black" else accent
-		# See `top_suit_grob()`:
-		# trying the light half's counter in the suit's accent color, and
-		# number suits don't get the "hbinary" shading effect.
-		counter_color <- if (blight == "D") "black" else accent
-		return(hybrid_number_suit_grob(
-			bsuit,
-			col = col,
-			fill = fill,
-			counter = !pip,
-			shading = "none",
-			counter_color = counter_color
-		))
+		counter_color <- col
+	} else {
+		col <- accent
+		counter_color <- if (blight == "D") light_color() else accent
 	}
-	col <- accent
-	counter_color <- if (blight == "D") light_color() else accent
+	if (pip && bsuit %in% number_suits) {
+		# See `top_suit_grob()`.
+		return(dotaro.font:::suitGrob(glyphs[["O"]], col = col, fill = fill))
+	}
 	suit_grob(suit_glyph_key(bsuit, "D"), col = col, fill = fill, counter_color = counter_color)
 }
 
