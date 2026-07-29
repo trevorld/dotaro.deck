@@ -166,10 +166,6 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	# Under the hybrid style, reaching here always means a number suit
 	# (French suits are always diverted above); under the default "french"
 	# style, French suits reach here too and keep the red/black split.
-	# Unlike the French suits, the light-half number suit shape's own border
-	# takes its accent color rather than black;
-	# the dark half keeps a black border since its fill is already the
-	# accent color and a same-color border would be invisible.
 	hybrid <- suit_style() == "hybrid"
 	accent <- if (tsuit %in% number_suits) {
 		number_suits_color()
@@ -177,15 +173,17 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	}
 	fill <- ifelse(tlight == "D", accent, light_color())
+	# The dark half's border is black since its fill is already the accent
+	# color and a same-color border would be invisible; the light half's own
+	# border takes the accent color instead.
+	col <- if (tlight == "D") "black" else accent
 	# Number suits always use the "negated" (solid disc + counter) circled-digit
 	# glyph, even on the light half:
 	# the "positive" glyph's digit is stroked but its interior is a true hole,
 	# so almost none of `fill` ever actually shows.
 	if (hybrid) {
-		col <- if (tlight == "D") "black" else accent
 		counter_color <- col
 	} else {
-		col <- accent
 		# The counter needs to contrast against `fill`, so it takes the *other*
 		# color of the pair:
 		# `light_color()` on the dark half (solid accent disc, light digit) and
@@ -193,6 +191,13 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 		# matching how French suits' light half is purely accent + light with no
 		# black, instead of a literal "white"/"black".
 		counter_color <- if (tlight == "D") light_color() else accent
+	}
+	if (tsuit %in% number_suits && normalize_color(number_suits_color()) != "#000000") {
+		# A non-black number-suit color (e.g. an experimental accent like
+		# blue) doesn't contrast as cleanly against itself/`light_color()` as
+		# black does, so pin the digit counter to plain black instead of
+		# tracking the theme.
+		counter_color <- "black"
 	}
 	if (pip && tsuit %in% number_suits) {
 		# Repeated pip dots stay plain circles, matching how French suits'
@@ -219,12 +224,15 @@ bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 	}
 	fill <- ifelse(blight == "D", accent, light_color())
 	# See `top_suit_grob()`.
+	col <- if (blight == "D") "black" else accent
 	if (hybrid) {
-		col <- if (blight == "D") "black" else accent
 		counter_color <- col
 	} else {
-		col <- accent
 		counter_color <- if (blight == "D") light_color() else accent
+	}
+	if (bsuit %in% number_suits && normalize_color(number_suits_color()) != "#000000") {
+		# See `top_suit_grob()`.
+		counter_color <- "black"
 	}
 	if (pip && bsuit %in% number_suits) {
 		# See `top_suit_grob()`.
@@ -256,7 +264,9 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 		# "always black border, always accent fill" rule the dark half uses.
 		return(dotaro.font:::rankGrob(glyph, col = accent, fill = light_color()))
 	}
-	col <- if (hybrid) "black" else accent
+	# The dark half's border is black (see `top_suit_grob()`); the light
+	# half's border takes the accent color instead.
+	col <- if (tlight == "D") "black" else accent
 	# Hybrid ranks stay in the accent color on both halves rather than
 	# switching to the light color --
 	# unlike the suit glyphs, there's no separate light/dark rank glyph to
@@ -275,21 +285,14 @@ bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
 		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
 	}
 	hybrid <- suit_style() == "hybrid"
-	if (hybrid && brank %in% c("O", "F")) {
-		# The corner index draws the fool ranks via this same function, so it
-		# needs the fool's own suit-badge-like border/fill/shading split (see
-		# `fool_grob()`), not the "always black border, always accent fill"
-		# rule every other rank glyph uses.
-		col <- if (blight == "D") "black" else accent
-		fill <- if (blight == "D") accent else light_color()
-		# See `fool_grob()`: the fool doesn't get the "hbinary" shading effect.
-		return(dotaro.font:::rankGrob(glyph, col = col, fill = fill, shading = "none"))
-	}
 	if (hybrid && blight == "L") {
 		# See `top_rank_grob()`.
 		return(dotaro.font:::rankGrob(glyph, col = accent, fill = light_color()))
 	}
-	col <- if (hybrid) "black" else accent
+	# See `top_rank_grob()`. This also covers the fool ranks (O/F): their
+	# suit-badge-like border/fill split (see `fool_grob()`) already matches
+	# this same dark/light rule, so they no longer need a separate branch.
+	col <- if (blight == "D") "black" else accent
 	fill <- if (hybrid) accent else ifelse(blight == "D", accent, light_color())
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
@@ -607,7 +610,7 @@ card_back_grob <- function() {
 		}
 	} else {
 		checker_fill1 <- hearts_diamonds_color()
-		checker_fill2 <- spades_clubs_color()
+		checker_fill2 <- number_suits_color()
 	}
 	if (suit_style() == "hybrid") {
 		middle_fill <- hearts_diamonds_color()
