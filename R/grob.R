@@ -199,14 +199,19 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	if (suit_style() == "hybrid" && tsuit %in% french_suits) {
 		return(hybrid_suit_grob(tsuit, tlight))
 	}
-	# Reaching here means a number suit (French suits are always diverted
-	# above under the hybrid style).
+	# Under the hybrid style, reaching here always means a number suit
+	# (French suits are always diverted above); under the default "french"
+	# style, French suits reach here too and keep the red/black split.
 	# Unlike the French suits, the light-half number suit shape's own border
-	# takes its accent color (red or green) rather than black;
+	# takes its accent color rather than black;
 	# the dark half keeps a black border since its fill is already the
 	# accent color and a same-color border would be invisible.
 	hybrid <- suit_style() == "hybrid"
-	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	accent <- if (tsuit %in% number_suits) {
+		number_suits_color()
+	} else {
+		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	}
 	fill <- ifelse(tlight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (tlight == "D") "black" else accent
@@ -251,7 +256,11 @@ bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 		return(hybrid_suit_grob(bsuit, blight))
 	}
 	hybrid <- suit_style() == "hybrid"
-	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	accent <- if (bsuit %in% number_suits) {
+		number_suits_color()
+	} else {
+		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	}
 	fill <- ifelse(blight == "D", accent, light_color())
 	if (hybrid) {
 		col <- if (blight == "D") "black" else accent
@@ -283,7 +292,11 @@ rank_glyph <- function(rank, suit) {
 
 top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	glyph <- rank_glyph(trank, tsuit)
-	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	accent <- if (tsuit %in% number_suits) {
+		number_suits_color()
+	} else {
+		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	}
 	hybrid <- suit_style() == "hybrid"
 	if (hybrid && tlight == "L") {
 		# Trying the light half's rank glyph (number-suit digit or
@@ -303,7 +316,13 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 
 bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
 	glyph <- rank_glyph(brank, bsuit)
-	accent <- ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	# Fools borrow whichever suit they're paired with (see `bot_face_grob()`),
+	# so like the number suits they get the dedicated color instead.
+	accent <- if (bsuit %in% number_suits || brank %in% c("O", "F")) {
+		number_suits_color()
+	} else {
+		ifelse(red == "R", hearts_diamonds_color(), spades_clubs_color())
+	}
 	hybrid <- suit_style() == "hybrid"
 	if (hybrid && brank %in% c("O", "F")) {
 		# The corner index draws the fool ranks via this same function, so it
@@ -598,11 +617,14 @@ normalize_color <- function(color) {
 # to the plain light suit-glyph treatment.
 card_back_suit_grob <- function(key) {
 	if (key == "star") {
-		# The fool rank is always in the "B" (spades/clubs) family (see
-		# `card_info`), so that's the light fool corner index's own border
-		# color under the hybrid style (see `bot_rank_grob()`).
-		col <- if (suit_style() == "hybrid") spades_clubs_color() else "black"
-		return(dotaro.font:::suitGrob(glyphs[["F"]], col = col, fill = light_color()))
+		# Matches the fool's own dedicated color everywhere else (see
+		# `bot_rank_grob()`/`bot_face_grob()`), rather than the red/black
+		# family it happens to be paired with on the top half.
+		return(dotaro.font:::suitGrob(
+			glyphs[["F"]],
+			col = number_suits_color(),
+			fill = light_color()
+		))
 	}
 	if (suit_style() == "hybrid") {
 		return(hybrid_suit_grob(key, "L"))

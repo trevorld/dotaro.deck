@@ -12,6 +12,7 @@
 vermillion <- palette.colors(names = TRUE)[["vermillion"]]
 options(dotaro.deck.hearts_diamonds_color = vermillion,
         dotaro.deck.spades_clubs_color = "black",
+        dotaro.deck.number_suits_color = dotaro.font:::BLUE,
         dotaro.deck.light = "white")
 
 knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.cap = "", echo = FALSE)
