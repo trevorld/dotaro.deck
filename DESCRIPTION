@@ -16,6 +16,7 @@ Imports:
 	grDevices,
 	grid,
 	grImport2,
+	knitr,
 	marquee (>= 1.2.0),
 	piecepackr (>= 1.16.2-4),
 	pnpmisc,
@@ -34,3 +35,4 @@ Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+SystemRequirements: xelatex

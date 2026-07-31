@@ -1,0 +1,28 @@
+%% Standalone knitting (e.g. for manual testing) requires setting
+%% `options(dotaro.deck.suits = ...)` (and matching color options) plus
+%% defining `size` and `title` variables by hand first -- `save_manual()`
+%% normally does all of this itself before knitting "shared.Rtex", since
+%% that's where the example figures below actually get rendered.
+%% begin.rcode documentclass, echo=FALSE, results='asis'
+cat(str_glue("\\documentclass[{size}paper,onecolumn]{{article}}"))
+%% end.rcode
+
+\usepackage[colorlinks]{hyperref}
+\usepackage{enumitem}
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+%% begin.rcode title, echo=FALSE, results='asis'
+cat(str_glue("\\title{{{title}}}"))
+%% end.rcode
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+
+\input{shared}
+
+\end{document}
