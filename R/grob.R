@@ -159,6 +159,19 @@ hybrid_suit_grob <- function(suit, light) {
 	do.call(grobTree, grobs)
 }
 
+# The dark half's fill for number suits (and the fool and number-suit rank
+# glyphs, whose color also tracks `number_suits_color()`) gets lightened
+# when that color isn't black, so their still-black border/counter/icon
+# keeps good contrast against it instead of nearly vanishing into a
+# same-color fill.
+lighten_number_fill <- function(accent) {
+	if (normalize_color(number_suits_color()) == "#000000") {
+		accent
+	} else {
+		dotaro.font:::lighten(accent, 0.4)
+	}
+}
+
 top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 	if (suit_style() == "hybrid" && tsuit %in% french_suits) {
 		return(hybrid_suit_grob(tsuit, tlight))
@@ -193,11 +206,18 @@ top_suit_grob <- function(tsuit, tlight, red, ..., pip = FALSE) {
 		counter_color <- if (tlight == "D") light_color() else accent
 	}
 	if (tsuit %in% number_suits && normalize_color(number_suits_color()) != "#000000") {
-		# A non-black number-suit color (e.g. an experimental accent like
-		# blue) doesn't contrast as cleanly against itself/`light_color()` as
-		# black does, so pin the digit counter to plain black instead of
-		# tracking the theme.
-		counter_color <- "black"
+		if (tlight == "D") {
+			# Lighten the disc fill itself instead of the digit counter, so
+			# the counter can stay plain black (matching the border) while
+			# still contrasting well against the fill.
+			fill <- lighten_number_fill(fill)
+			counter_color <- "black"
+		} else {
+			# The light half's counter tracks the number-suit color directly
+			# (its disc is `light_color()`-filled, so the plain color already
+			# contrasts fine).
+			counter_color <- number_suits_color()
+		}
 	}
 	if (pip && tsuit %in% number_suits) {
 		# Repeated pip dots stay plain circles, matching how French suits'
@@ -232,7 +252,12 @@ bot_suit_grob <- function(bsuit, blight, red, ..., pip = FALSE) {
 	}
 	if (bsuit %in% number_suits && normalize_color(number_suits_color()) != "#000000") {
 		# See `top_suit_grob()`.
-		counter_color <- "black"
+		if (blight == "D") {
+			fill <- lighten_number_fill(fill)
+			counter_color <- "black"
+		} else {
+			counter_color <- number_suits_color()
+		}
 	}
 	if (pip && bsuit %in% number_suits) {
 		# See `top_suit_grob()`.
@@ -272,6 +297,10 @@ top_rank_grob <- function(trank, tlight, red, tsuit, ...) {
 	# unlike the suit glyphs, there's no separate light/dark rank glyph to
 	# fill instead.
 	fill <- if (hybrid) accent else ifelse(tlight == "D", accent, light_color())
+	if (tsuit %in% number_suits && tlight == "D") {
+		# See `top_suit_grob()`.
+		fill <- lighten_number_fill(fill)
+	}
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
 
@@ -294,6 +323,10 @@ bot_rank_grob <- function(brank, blight, red, bsuit, ...) {
 	# this same dark/light rule, so they no longer need a separate branch.
 	col <- if (blight == "D") "black" else accent
 	fill <- if (hybrid) accent else ifelse(blight == "D", accent, light_color())
+	if ((bsuit %in% number_suits || brank %in% c("O", "F")) && blight == "D") {
+		# See `top_suit_grob()`.
+		fill <- lighten_number_fill(fill)
+	}
 	dotaro.font:::rankGrob(glyph, col = col, fill = fill)
 }
 

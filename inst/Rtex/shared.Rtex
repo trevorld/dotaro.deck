@@ -1,0 +1,400 @@
+%% begin.rcode setup, echo=FALSE, message=FALSE
+set_knitr_opts("shared")
+envir <- dotaro_decks()
+cfg_full_trad <- envir$dotaro_full_traditional
+cfg_corner_trad <- envir$dotaro_corner_traditional
+cfg_corner_num <- envir$dotaro_corner_number
+
+IW <- cfg_corner_trad$get_width("card_face")
+IH <- cfg_corner_trad$get_height("card_face")
+X0 <- 0.1 + 0.5 * IW
+Y0 <- 0.1 - 0.5 * IH
+%% end.rcode
+
+\section{Overview}
+
+\begin{itemize}
+\item The \emph{Dotaro Deck} is a deck of 108 cards that can be used to play games from a variety of card game systems including:
+  \begin{itemize}
+  \item several traditional card game systems:
+    \begin{itemize}
+    \item one deck of traditional French-suited playing cards
+    \item two decks of traditional French-suited playing cards
+    \item one deck of traditional French-suited tarot cards
+    \item one double-nine set of dominoes
+    \item one set of Chinese dominoes
+    \end{itemize}
+  \item several modern card games including:
+    \begin{itemize}
+    \item 10 suits with up to 10 ranks
+    \item 8 suits with up to 13 ranks
+    \item 5 suits with up to 20 ranks
+    \item 4 suits with up to 27 ranks
+    \item Pyramid decks e.g. 1 one, 2 twos, \ldots, 10 tens
+    \item Sequential decks with an ordinal ordering of up to 100 cards
+    \item A set of d6 dice cards
+    \item 2 x 5 x 10 dimensional deck
+    \item 2 x 2 x 2 x 13 dimensional deck
+    \end{itemize}
+  \end{itemize}
+
+\item Each card of the \emph{Dotaro Deck} is vertically asymmetric with a light half and a dark half for a total of 2 x 108 = 216 card halves:
+  \begin{itemize}
+  \item 112 ``traditional suit'' halves = 2 (light vs. dark) x 4 (French suits) x 14 (10 number ranks plus 4 face ranks)
+  \item 100 ``number suit'' halves = 2 (light vs. dark) x 5 (number suits) x 10 (10 number ranks)
+  \item 4 ``fool'' halves = 2 (light vs. dark) x 2 (circle vs. star)
+  \end{itemize}
+
+\item Each light half and dark half are combined to create the three types of cards in the \emph{Dotaro Deck}:
+  \begin{itemize}
+  \item Each of the hundred ``number suit'' halves is paired with a ``traditional suit'' half. These halves are allocated such that there are double-9 domino, Chinese domino, and d6 dice card subdecks.
+	\item Each of the four ``knight'' rank halves is combined with the other ``knight'' rank half of the same French suit.
+	\item Each of the four unsuited ``fool'' halves is paired with either a Queen of Spades half or a Jack of Diamonds half (which are special cards in \href{https://www.pagat.com/marriage/bezique.html}{Bezique}, \href{https://www.pagat.com/reverse/hearts.html}{Hearts}, \href{https://www.pagat.com/marriage/pinmain.html}{Pinochle}, \href{https://en.wikipedia.org/wiki/Old_maid_(card_game)#Scabby_Queen}{Scabby Queen}, etc.).
+  \end{itemize}
+\end{itemize}
+
+%% begin.rcode number-cards, fig.width=9.5, fig.height=4, fig.cap="Example number suit halves paired with traditional suit halves"
+grid.piece("card_face",
+           suit = c(1L, 2L, 7L, 8L), rank = c(4L, 7L, 13L, 14L),
+           angle = c(0, 180, 180, 0),
+           x = seq(1.5, by = 2.25, length.out = 4L),
+           default.units = "in", cfg = cfg_full_trad)
+%% end.rcode
+
+
+%% begin.rcode knight-cards, fig.width=9.5, fig.height=4, fig.cap="The four knight cards"
+grid.piece("card_face",
+           suit = 1:4, rank = 12L,
+           x = seq(1.5, by = 2.25, length.out = 4L),
+           default.units = "in", cfg = cfg_full_trad)
+%% end.rcode
+
+
+%% begin.rcode fool-cards, fig.width=9.5, fig.height=4, fig.cap="The four fool cards"
+grid.piece("card_face",
+           suit = c(4L, 8L, 2L, 6L), rank = c(11L, 11L, 13L, 13L),
+           x = seq(1.5, by = 2.25, length.out = 4L),
+           default.units = "in", cfg = cfg_full_trad, angle = 180)
+%% end.rcode
+
+Each index shows the top orientated half's rank and suit in a larger size and then beneath it shows the bottom orientated half's rank and suit in a smaller size. Cards are ambidextrous (i.e. left and right corner indices are the same) so cards can be fanned either left or right as each player prefers. Thus if playing domino games all relevant card information is available on any of the four corners but for traditional card games one can just focus on the larger top most rank and suit symbol (on either the left or right side) after orienting the card halves to the correct side for the game (usually either traditional suit halves, number suit halves, dark halves, or light halves orientated up top).
+
+%% begin.rcode anatomy, fig.width=9.5, fig.height=4, fig.cap="Annotated Dotaro Deck card"
+grid.piece("card_face",
+           suit = 3L, rank = 9L,
+           x = c(7/24, 17/24), angle = c(0, 180), cfg = cfg_full_trad)
+grid.text("Top rank", y = 0.86, x = 0.15, just = "right")
+grid.text("Top suit", y = 0.78, x = 0.15, just = "right")
+grid.text("Bottom rank", y = 0.69, x = 0.15, just = "right")
+grid.text("Bottom suit", y = 0.63, x = 0.15, just = "right")
+grid.text("Light half", y = 0.30, x = 0.15, just = "right")
+grid.text("Number suit half", y = 0.20, x = 0.15, just = "right")
+
+grid.text("Top half", x = 0.5, y = 0.7)
+grid.text("⭮", x = 4/8, gp = gpar(fontsize = 28))
+grid.text("Bottom half", x = 0.5, y = 0.3)
+
+grid.text("Top rank", y = 0.86, x = 0.85, just = "left")
+grid.text("Top suit", y = 0.78, x = 0.85, just = "left")
+grid.text("Bottom rank", y = 0.69, x = 0.85, just = "left")
+grid.text("Bottom suit", y = 0.63, x = 0.85, just = "left")
+grid.text("Dark half", y = 0.30, x = 0.85, just = "left")
+grid.text("Traditional suit half", y = 0.20, x = 0.85, just = "left")
+%% end.rcode
+
+\clearpage
+\section{Orientations}
+\subsection{Dark halves up top}
+
+\begin{itemize}
+\item 4 traditional suits x 14 traditional ranks
+\item 5 number suits x 10 number ranks
+  \begin{itemize}
+  \item If the number suit number is treated as a tens digit and the rank as the ones digit then the number suit cards go from 00 to 49
+  \end{itemize}
+\item 2 fools
+\end{itemize}
+
+%% begin.rcode dark_up_dim
+dark_up_width <- (14 + 10) * IW + 0.5 + X0
+dark_up_height <- 5 * IH + 0.5 + 0.2
+%% end.rcode
+
+%% begin.rcode dark_up, fig.width=dark_up_width, fig.height=dark_up_height, fig.cap="Cards oriented with dark halves up top"
+df <- dotaro_orientation_dark_up(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
+%% end.rcode
+
+\clearpage
+\subsection{Light halves up top}
+
+\begin{itemize}
+\item 4 traditional suits x 14 traditional ranks
+\item 5 number suits x 10 number ranks
+  \begin{itemize}
+  \item If the number suit number is treated as a tens digit and the rank as the ones digit then the number suit cards go from 00 to 49
+  \end{itemize}
+\item 2 fools
+\end{itemize}
+
+%% begin.rcode light_up_dim
+light_up_width <- (14 + 10) * IW + 0.5 + X0
+light_up_height <- 5 * IH + 0.5 + 0.2
+%% end.rcode
+
+%% begin.rcode light_up, fig.width=light_up_width, fig.height=light_up_height, fig.cap="Cards oriented with light halves up top"
+df <- dotaro_orientation_light_up(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
+%% end.rcode
+
+\clearpage
+\subsection{Traditional suit halves up top}
+
+\begin{itemize}
+\item Note both halves of the four knights has a traditional suit.
+\item Can be treated in the following ways:
+  \begin{itemize}
+  \item 8 suits up to 13 ranks (i.e. treat light/dark suits as different suits)
+  \item 2 x 4 suits x 13 ranks (i.e. treat each French suit card as the same)
+  \item 4 suits x 27 ranks (i.e. treat each French suit as the same suit but let dark cards break ties with light cards)
+  \end{itemize}
+\end{itemize}
+
+%% begin.rcode trad_up_dim
+trad_up_width <- 28 * IW + 0.5 + X0 + 0.1
+trad_up_height <- 4 * IH + 0.5 + 0.1
+%% end.rcode
+
+%% begin.rcode trad_up, fig.width=trad_up_width, fig.height=trad_up_height, fig.cap="Cards oriented with traditional suit halves up top"
+df <- dotaro_orientation_trad_up(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
+%% end.rcode
+
+\clearpage
+\subsection{Traditional suit halves down below}
+
+\begin{itemize}
+\item Can be treated in the following ways:
+  \begin{itemize}
+  \item 10 suits up to 10 ranks (i.e. treat light/dark suits as different suits).
+  \item 2 x 5 suits x 10 ranks (i.e. treat light/dark suits as the same).
+  \item 5 suits x 20 ranks (i.e. treat light/dark suits as the same but let dark suit cards break ties with light suit cards).
+  \item Create a pyramid deck i.e. 1 one, 2 twos, \ldots, 10 zeros.
+  \item If you treat each number suit as the tens digit and each rank as the ones digit then you have two copies of two digit numbers going from 00 to 49. If you let the dark suit card break ties with light cards then you have an ordinal sequence of up to one hundred cards (some prefer to treat dark cards as a ``+50'').
+  \end{itemize}
+\item Note below omits the four knights which has a traditional suit on both halves.
+\end{itemize}
+
+%% begin.rcode num_up_dim
+num_up_width <- (10 + 10) * IW + 0.5 + X0
+num_up_height <- (5 + 1) * IH + 0.5 + 0.2
+%% end.rcode
+
+%% begin.rcode num_up, fig.width=num_up_width, fig.height=num_up_height, fig.cap="Cards oriented with number suit halves up top"
+df <- dotaro_orientation_num_up(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
+%% end.rcode
+
+\clearpage
+\section{Examples}
+
+\subsection{One deck of traditional French-suited playing cards}
+
+\begin{itemize}
+\item Orient dark halves up top.
+\item Treat the 0 rank as tens and the pawn rank as jacks.
+\item If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
+\end{itemize}
+
+%% begin.rcode one_french_dim
+one_french_width <- (13 + 1) * IW + 0.5 + 0.4
+one_french_height <- 4 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode one_french, fig.width=one_french_width, fig.height=one_french_height, fig.cap="One deck of traditional French-suited playing cards"
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 13L), 4L),
+                 y = Y0 + rep(4:1, each = 13L) * IH,
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(1, 4, 3, 2), each = 13L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df_fool_d <- filter(half_info, light == "D", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    mutate(piece_side = "card_face",
+           x = max(df$x) + IW + 0.2,
+           y = Y0 + 3:2 * IH)
+pmap_piece(df_fool_d, envir = envir, default.units = "in")
+%% end.rcode
+
+\clearpage
+\subsection{Two decks of traditional French-suited playing cards}
+
+\begin{itemize}
+\item Orient traditional suit halves up top.
+\item Treat each dark/light French suit as the same suit.
+\item If necessary use the four knights as jokers e.g. the two hearts/diamonds knights can serve as ``red'' jokers and the two spades/clubs knights can serve as ``black'' jokers.
+\item The four \href{https://www.pagat.com/marriage/pinmain.html}{Pinochle} legs (i.e. Queens of Spades / Jacks of Diamonds) are opposite the four Fool cards.
+\end{itemize}
+
+%% begin.rcode two_french_dim
+two_french_width <- (13 + 13 + 1) * IW + 0.5 + 0.1 + 0.5
+two_french_height <- 4 * IH + 0.5 + 0.1
+%% end.rcode
+
+%% begin.rcode two_french, fig.width=two_french_width, fig.height=two_french_height, fig.cap="Two decks of traditional French-suited playing cards"
+df_dark <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 13L), 4L),
+                 y = Y0 + rep(4:1, each = 13L) * IH,
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(1, 4, 3, 2), each = 13L))
+df_light <- data.frame(piece_side = "card_face",
+                 x = max(df_dark$x) + IW + 0.2 + rep(seq(0, by = IW, length.out = 13L), 4L),
+                 y = Y0 + rep(4:1, each = 13L) * IH,
+                 rank = rep(c(1:11, 13:14), 4L), suit = rep(c(5, 8, 7, 6), each = 13L))
+df <- bind_rows(df_dark, df_light)
+
+df_joker <- data.frame(piece_side = "card_face",
+                       x = max(df_light$x) + IW + 0.2,
+                       y = Y0 + 4:1 * IH,
+                       rank = 12, suit = c(1, 4, 3, 2))
+df <- bind_rows(df, df_joker)
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+%% end.rcode
+
+\clearpage
+\subsection{One deck of traditional French-suited tarot cards}
+
+\begin{itemize}
+\item \href{https://www.pagat.com/class/ftarot.html}{French-suited tarot cards} feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
+\item Orient dark halves up top.
+\item The traditional ``0'' rank is a ten and the ``pawn'' rank is a jack/page.
+\item For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
+\item Use the star fool as the Fool/Excuse (in French Tarot Nouveau decks the Fool is usually represented by a star index). However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to ``00'' or ``22''.
+\end{itemize}
+
+%% begin.rcode french_tarot_dim
+french_tarot_width <- (14 + 10) * IW + 1.0
+french_tarot_height <- 4 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode french_tarot, fig.width=french_tarot_width, fig.height=french_tarot_height, fig.cap="One deck of traditional French-suited tarot cards"
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
+                 y = Y0 + rep(4:1, each = 14L) * IH,
+                 rank = rep(c(1:14), 4L),
+                 suit = rep(c(1, 4, 3, 2), each = 14L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df <- data.frame(piece_side = "card_face",
+                 x = max(df$x) + IW + 0.2 + rep(seq(0, by = IW, length.out = 10L), 3L),
+                 y = Y0 + rep(3:1, each = 10L) * IH,
+                 rank = c(10, 1:9, 10, 1:9, 10, 1:9),
+                 suit = rep(1:3, each = 10L))
+df <- df[2:22, ]
+pmap_piece(df, cfg = cfg_corner_num, default.units = "in")
+
+df_fool_d <- filter(half_info, light == "D", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    slice(2L) |>
+    mutate(piece_side = "card_face",
+           x = min(df$x),
+           y = max(df$y) + IH)
+pmap_piece(df_fool_d, envir = envir, default.units = "in")
+%% end.rcode
+
+\clearpage
+\subsection{One double-nine set of dominoes}
+
+\begin{itemize}
+\item \href{https://www.pagat.com/domino/}{Double-nine dominoes} features all 55 pairings of the numbers 0 to 9 (including pairing each number with itself).
+\item Not only does each of the five number suits (ignoring light/dark distinctions) have exactly 11 cards but for this subset of cards each number suit equals the total number of pips on each card modulo 5. In particular a \emph{necessary} condition that a card is a scoring card in games like \href{https://www.pagat.com/domino/trick/42.html}{Texas 42} is that the number suit is zero.
+\end{itemize}
+
+%% begin.rcode double_nine_dim
+dom9_width <- 10 * IW + 0.5
+dom9_height <- 10 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode double_nine, fig.width=dom9_width, fig.height=dom9_height, out.height="6.8in", out.extra="keepaspectratio=true", fig.cap="One double-nine set of dominoes"
+df <- filter(card_info, double9) |>
+    mutate(lrank = pmin(trank, brank),
+           urank = pmax(trank, brank),
+           top = ifelse(trank == urank, TRUE, FALSE)) |>
+    arrange(lrank, urank) |>
+    select(card, top) |>
+    left_join(corner_info, by = c("card", "top")) |>
+    mutate(piece_side = "card_face",
+           x = X0 + IW * (sequence(10:1, from = 1:10) - 1),
+           y = Y0 + rep.int(10:1, 10:1) * IH)
+pmap_piece(df, envir = envir, default.units = "in")
+%% end.rcode
+
+\clearpage
+\subsection{One set of Chinese dominoes}
+
+\begin{itemize}
+\item \href{https://www.pagat.com/domino/chinese.html}{Chinese dominoes} has 32 combinations of throwing two d6 dice.
+\end{itemize}
+
+%% begin.rcode chinese_dim
+chinese_width <- 16 * IW + 0.5
+chinese_height <- 2 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode chinese, fig.width=chinese_width, fig.height=chinese_height, fig.cap="One set of Chinese dominoes"
+df <- filter(card_info, chinese) |>
+    mutate(lrank = pmin(trank, brank),
+           urank = pmax(trank, brank),
+           top = ifelse(trank == urank, TRUE, FALSE)) |>
+    arrange(lrank, urank) |>
+    select(card, top) |>
+    left_join(corner_info, by = c("card", "top")) |>
+    mutate(piece_side = "card_face",
+           x = X0 + rep(seq(0, by = IW, length.out = 16L), 2L),
+           y = Y0 + rep(2:1, each = 16L) * IH)
+pmap_piece(df, envir = envir, default.units = "in")
+%% end.rcode
+
+\subsection{One set of d6 dice cards}
+
+\begin{itemize}
+\item Each of the 36 possible combinations of throwing two d6 dice.
+\item For this subset of cards the number suit equals the total number of pips modulo five.
+\end{itemize}
+
+%% begin.rcode d6_dim
+d6_width <- 18 * IW + 0.5
+d6_height <- 2 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode d6, fig.width=d6_width, fig.height=d6_height, fig.cap="One set of d6 dice cards"
+df <- filter(card_info, d6) |>
+    mutate(lrank = pmin(trank, brank),
+           urank = pmax(trank, brank),
+           top = ifelse(trank == urank, TRUE, FALSE)) |>
+    arrange(lrank, urank) |>
+    select(card, top) |>
+    left_join(corner_info, by = c("card", "top")) |>
+    mutate(piece_side = "card_face",
+           x = X0 + rep(seq(0, by = IW, length.out = 18L), 2L),
+           y = Y0 + rep(2:1, each = 18L) * IH)
+pmap_piece(df, envir = envir, default.units = "in")
+%% end.rcode
+
+\clearpage
+\section{Frequently Asked Questions}
+
+\subsection{Why the name Dotaro?}
+
+\begin{itemize}
+\item The \emph{Dotaro Deck} is inspired by domino sets and tarot decks and Dotaro is an abbreviation of Domino Tarot.
+\item In Esperanto the word ``dotaro'' would mean something like ``collection of endowments'' and the \emph{Dotaro Deck} can be used to play a wide variety of the playing card legacies our ancestors have endowed us with.
+\end{itemize}

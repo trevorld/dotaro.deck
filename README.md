@@ -205,6 +205,7 @@
 
 ### Selected Multidecks
 
+* [The 144 Deck](https://boardgamegeek.com/boardgame/446495/the-144-deck)
 * [Badger Deck](https://boardgamegeek.com/boardgame/160950/the-badger-deck)
 * [Banjo Deck](https://banjodeck.com/)
 * [Baron's Proxy](https://www.drivethrucards.com/product/463233/The-Barons-Proxy)
@@ -230,6 +231,7 @@
 
 ### Dark/light suits
 
+* [The 144 Deck](https://boardgamegeek.com/boardgame/446495/the-144-deck)
 * [Blossom Deck](https://crabfragmentlabs.com/island-deck)
 * [Dual piecepacks](https://trevorldavis.com/piecepackr/dual-piecepacks-pnp.html)
 * [Duplhex Playing Cards](https://www.thegamecrafter.com/games/duplhex-playing-cards)

@@ -83,8 +83,12 @@ fool_grob <- function(rank, light, col = "black") {
 	# light color instead). The meeple's own outline stays flat accent,
 	# same as every other face rank's meeple.
 	border <- if (light == "D") "black" else col
+	# See `top_suit_grob()`: the dark half's fill gets lightened when `col`
+	# (== `number_suits_color()`) isn't black, so the still-black border
+	# keeps good contrast against it.
+	fill_col <- if (light == "D") lighten_number_fill(col) else col
 	if (suit_style() == "hybrid") {
-		icon_fill <- if (light == "D") col else light_color()
+		icon_fill <- if (light == "D") fill_col else light_color()
 		# The fool has its own dedicated icon (star/plain ring), so -- like the
 		# number suits -- it doesn't get the "hbinary" shading effect.
 		return(hybrid_fool_grob(rank, border, col, icon_fill, shading = "none"))
@@ -94,7 +98,7 @@ fool_grob <- function(rank, light, col = "black") {
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
 	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
 	# accent fill on the dark half, light-color fill on the light half.
-	index_fill <- if (light == "D") col else light_color()
+	index_fill <- if (light == "D") fill_col else light_color()
 	gp_triangle <- gpar(fill = index_fill, col = border, lwd = 1.5)
 	if (rank == "O") {
 		# Same index-matching fill as the triangle.
@@ -108,7 +112,7 @@ fool_grob <- function(rank, light, col = "black") {
 	if (light == "L") {
 		gp_star <- gpar(fill = NA, col = border, lwd = 1.5)
 	} else {
-		gp_star <- gpar(fill = col, col = border, lwd = 1.5)
+		gp_star <- gpar(fill = fill_col, col = border, lwd = 1.5)
 	}
 	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
 	vp_triangle <- viewport(height = unit(0.4, "in"), width = unit(0.30, "in"), y = y_triangle)

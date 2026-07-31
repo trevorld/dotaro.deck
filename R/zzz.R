@@ -1,9 +1,10 @@
 #' @importFrom dplyr arrange bind_rows filter left_join mutate slice
 #' @importFrom dplyr matches select
 #' @import grid
-#' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set col2rgb rgb
-#' @importFrom piecepackr as_pp_cfg has_font pp_cfg pp_shape pmap_piece crosshairGrob
-#' @importFrom rlang abort check_dots_empty .data
+#' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set col2rgb rgb palette.colors
+#' @importFrom knitr knit opts_chunk
+#' @importFrom piecepackr as_pp_cfg has_font pp_cfg pp_shape pmap_piece crosshairGrob grid.piece
+#' @importFrom rlang abort check_dots_empty .data local_options
 #' @importFrom stats median
 #' @importFrom stringr str_glue str_replace str_sub
 #' @importFrom utils packageDescription packageVersion
@@ -37,6 +38,48 @@ number_suits_color <- function() {
 }
 light_color <- function() {
 	getOption("dotaro.deck.light", "white")
+}
+
+#' Dotaro Deck color options
+#'
+#' `dotaro_deck_options()` returns the `dotaro.deck.*` option values for one
+#' of the three canonical (suit style, color palette) combinations, suitable
+#' for passing to [options()] or [rlang::local_options()].
+#' @param variant One of `"french_bw"`, `"french_color"`, or `"hybrid"`.
+#' @return A named list of `dotaro.deck.*` options.
+#' @export
+dotaro_deck_options <- function(variant = c("french_bw", "french_color", "hybrid")) {
+	variant <- match.arg(variant)
+	if (variant == "french_bw") {
+		return(list(
+			dotaro.deck.suits = "french",
+			dotaro.deck.hearts_diamonds_color = "black",
+			dotaro.deck.spades_clubs_color = "black",
+			dotaro.deck.number_suits_color = "black",
+			dotaro.deck.light = "white"
+		))
+	}
+	# Okabe-Ito colorblind-safe palette -- same colors as `dotaro.font`'s
+	# internal `RED`/`GREEN`/`BLUE`/`GOLD` constants, just reached via base
+	# R's own named palette instead of another package's unexported objects.
+	p <- palette.colors(names = TRUE)
+	if (variant == "hybrid") {
+		list(
+			dotaro.deck.suits = "hybrid",
+			dotaro.deck.hearts_diamonds_color = p[["vermillion"]],
+			dotaro.deck.spades_clubs_color = p[["bluishgreen"]],
+			dotaro.deck.number_suits_color = p[["blue"]],
+			dotaro.deck.light = p[["yellow"]]
+		)
+	} else {
+		list(
+			dotaro.deck.suits = "french",
+			dotaro.deck.hearts_diamonds_color = p[["vermillion"]],
+			dotaro.deck.spades_clubs_color = "grey30",
+			dotaro.deck.number_suits_color = p[["blue"]],
+			dotaro.deck.light = "white"
+		)
+	}
 }
 
 dotaro_fonts_available <- local({
