@@ -28,6 +28,56 @@ save_manual <- function(
 	}
 	filename <- normalizePath(filename)
 
+	# `knit()` only auto-detects a file's chunk syntax (e.g. Rtex's
+	# `%% begin.rcode`) -- and the plot/output hooks that go with it (e.g.
+	# LaTeX `\includegraphics` vs. an HTML `<embed>` tag) -- when no chunk
+	# pattern/hooks are currently active; otherwise it silently inherits
+	# whatever is already set, since that's what `knit_child()` relies on for
+	# same-format nesting. So when `save_manual()` is itself called from
+	# inside an *unrelated* enclosing knitr session (e.g. a website's own
+	# `.Rmd`/`.Rrst` page), it would otherwise inherit that session's
+	# leftover, wrong-format state. Saving and restoring the affected knitr
+	# globals in-process is fragile -- `render_latex()`/`render_markdown()`
+	# touch more than just the hooks (`opts_knit`'s `out.format`, `opts_chunk`'s
+	# `out.width`/`dev`, ...) and there's no guarantee that's the complete
+	# list. Instead do the actual knitting in a throwaway `Rscript`
+	# subprocess, which always starts with pristine knitr state, same as
+	# `pprules`' own `save_ruleset()`/`save_rulebook()`/`save_pamphlet()`
+	# (see websites/piecepackr/set_knitr_opts.R).
+	tr <- tempfile(fileext = ".R")
+	on.exit(unlink(tr))
+	trdata <- tempfile(fileext = ".RData")
+	on.exit(unlink(trdata), add = TRUE)
+	save(filename, variant, size, quietly, file = trdata)
+	code <- c(
+		"library(dotaro.deck)",
+		sprintf("load(%s)", shQuote(trdata)),
+		# `tryCatch()` + explicit `quit()` rather than letting the error
+		# propagate to R's default handler: some `Rscript` sessions configure
+		# `options(error = recover)` (or similar) in a site/user `.Rprofile`,
+		# which otherwise causes even a fatal error to exit with status 0.
+		"tryCatch(",
+		"  dotaro.deck:::save_manual_impl(filename, variant, size, quietly),",
+		"  error = function(e) {",
+		"    message(conditionMessage(e))",
+		"    quit(status = 1L, save = \"no\")",
+		"  }",
+		")"
+	)
+	writeLines(code, tr)
+	out <- suppressWarnings(system2("Rscript", tr, stdout = TRUE, stderr = TRUE))
+	if (!quietly) {
+		writeLines(out)
+	}
+	status <- attr(out, "status")
+	if (!is.null(status) && status != 0L) {
+		abort(c("`save_manual()` failed in a subprocess:", out))
+	}
+
+	invisible(filename)
+}
+
+save_manual_impl <- function(filename, variant, size, quietly) {
 	dir <- setup_tempdir(filename)
 	wd <- setwd(dir)
 	on.exit(setwd(wd))
