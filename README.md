@@ -195,9 +195,9 @@ Above we described the French-suited Dotaro Deck but we also offer a Dotaro Deck
 
 This deck can build all the decks that the French-suited Dotaro Deck can but also makes it a bit friendlier to make German-suited and Latin-suited playing card decks as well as play Hanafuda games.
 
-### One deck of German-playing cards
+### One deck of German-suited playing cards
 
-* The German suits are the *shaded* suits.
+* The German suits are the *shaded* traditional suits.
 * Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the *under*), knight (for the *ober*), and the king.
 * Pedantically the German *ace* is actually the *deuce* (rank two card) and is sometimes called the *Sow*.  Depending on your preference you could use the 1 rank card instead as the *ace*.
 * The suit symbol is only *over* the rank symbol in the *ober* face card.
@@ -208,20 +208,21 @@ This deck can build all the decks that the French-suited Dotaro Deck can but als
 
 <img src="man/figures/README-german-1.png" alt="One deck of German-playing cards selected from the Dotaro Deck"  />
 
-### One deck of Spanish playing cards
+### One deck of Spanish-suited playing cards
 
+* The Spanish suits are the *light* traditional suits.
 * Use pip cards 1-9 and use the pawn for the *sota*, knight for the *caballo*, and king for the *rey*.
 * If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
 * It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
 
 
 
-<img src="man/figures/README-spanish-1.png" alt="One deck of Spanish playing cards selected from the Dotaro Deck"  />
+<img src="man/figures/README-spanish-1.png" alt="One deck of Spanish-suited playing cards selected from the Dotaro Deck"  />
 
 ### One deck of Latin-suited tarot cards
 
 * [Latin-suited tarot cards](https://www.pagat.com/class/itarot.html) feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
-* Orient dark halves up top.
+* Orient light halves up top.
 * The traditional "0" rank is a ten and the "pawn" rank is a jack/page.
 * For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
 * Use the star fool as the Fool/Excuse.  However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to "00" or "22".
