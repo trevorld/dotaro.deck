@@ -102,6 +102,20 @@ grid.text("Dark half", y = 0.30, x = 0.85, just = "left")
 grid.text("Traditional suit half", y = 0.20, x = 0.85, just = "left")
 %% end.rcode
 
+%% begin.rcode hybrid_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(This \emph{Dotaro Deck} variant features hybrid French-German-Spanish suits:
+)")
+%% end.rcode
+
+%% begin.rcode hybrid_suits, eval=(variant == "hybrid"), fig.width=9, fig.height=6, fig.cap="Hybrid French-German-Spanish suits"
+grid.draw(hybrid_suits_table_grob())
+%% end.rcode
+
+%% begin.rcode hybrid_outro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(This deck can build all the decks that the French-suited \emph{Dotaro Deck} can but also makes it a bit friendlier to make German-suited and Latin-suited playing card decks as well as play Hanafuda games.
+)")
+%% end.rcode
+
 \clearpage
 \section{Orientations}
 \subsection{Dark halves up top}
@@ -387,6 +401,170 @@ df <- filter(card_info, d6) |>
            x = X0 + rep(seq(0, by = IW, length.out = 18L), 2L),
            y = Y0 + rep(2:1, each = 18L) * IH)
 pmap_piece(df, envir = envir, default.units = "in")
+%% end.rcode
+
+%% begin.rcode german_dim
+german_width <- 9 * IW + 0.5
+german_height <- 4 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode german_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(\clearpage
+\subsection{One deck of German-playing cards}
+
+\begin{itemize}
+\item The German suits are the \emph{shaded} suits.
+\item Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the \emph{under}), knight (for the \emph{ober}), and the king.
+\item Pedantically the German \emph{ace} is actually the \emph{deuce} (rank two card) and is sometimes called the \emph{Sow}.  Depending on your preference you could use the 1 rank card instead as the \emph{ace}.
+\item The suit symbol is only \emph{over} the rank symbol in the \emph{ober} face card.
+\item Northern German decks commonly omit the 6 rank card.
+\item Decks made by Italian manufacturers for South Tyroleans include a 5 rank card.
+\end{itemize}
+)")
+%% end.rcode
+
+%% begin.rcode german, eval=(variant == "hybrid"), fig.width=german_width, fig.height=german_height, fig.cap="One deck of German-playing cards"
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 9L), 4L),
+                 y = Y0 + rep(4:1, each = 9L) * IH,
+                 rank = rep(c(2, 6:9, 10:12, 14), 4L), suit = rep(c(1, 2, 7, 8), each = 9L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+%% end.rcode
+
+%% begin.rcode spanish_dim
+spanish_width <- (12 + 1) * IW + 0.5 + 0.4
+spanish_height <- 4 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode spanish_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(\clearpage
+\subsection{One deck of Spanish playing cards}
+
+\begin{itemize}
+\item Use pip cards 1-9 and use the pawn for the \emph{sota}, knight for the \emph{caballo}, and king for the \emph{rey}.
+\item If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
+\item It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
+\end{itemize}
+)")
+%% end.rcode
+
+%% begin.rcode spanish, eval=(variant == "hybrid"), fig.width=spanish_width, fig.height=spanish_height, fig.cap="One deck of Spanish playing cards"
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 12L), 4L),
+                 y = Y0 + rep(4:1, each = 12L) * IH,
+                 rank = rep(c(1:9, 11, 12, 14), 4L), suit = rep(c(5, 8, 7, 6), each = 12L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df_fool_l <- filter(half_info, light == "L", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    mutate(piece_side = "card_face",
+           x = max(df$x) + IW + 0.2,
+           y = Y0 + 3:2 * IH)
+pmap_piece(df_fool_l, envir = envir, default.units = "in")
+%% end.rcode
+
+%% begin.rcode latin_tarot_dim
+latin_tarot_width <- (14 + 10) * IW + 1.0
+latin_tarot_height <- 4 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode latin_tarot_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(\clearpage
+\subsection{One deck of Latin-suited tarot cards}
+
+\begin{itemize}
+\item \href{https://www.pagat.com/class/itarot.html}{Latin-suited tarot cards} feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
+\item Orient dark halves up top.
+\item The traditional ``0'' rank is a ten and the ``pawn'' rank is a jack/page.
+\item For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
+\item Use the star fool as the Fool/Excuse. However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to ``00'' or ``22''.
+\item Some Tarot games such as \href{https://www.pagat.com/tarot/minchiate.html}{Minchiate} will need extra trumps (you can keeping adding number suit cards for up to 50 ordered trump cards plus two fools).
+\end{itemize}
+)")
+%% end.rcode
+
+%% begin.rcode latin_tarot, eval=(variant == "hybrid"), fig.width=latin_tarot_width, fig.height=latin_tarot_height, fig.cap="One deck of Latin-suited tarot cards"
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
+                 y = Y0 + rep(4:1, each = 14L) * IH,
+                 rank = rep(c(1:14), 4L),
+                 suit = rep(c(5, 8, 7, 6), each = 14L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df <- data.frame(piece_side = "card_face",
+                 x = max(df$x) + IW + 0.2 + rep(seq(0, by = IW, length.out = 10L), 3L),
+                 y = Y0 + rep(3:1, each = 10L) * IH,
+                 rank = c(10, 1:9, 10, 1:9, 10, 1:9),
+                 suit = rep(6:8, each = 10L))
+df <- df[2:22, ]
+pmap_piece(df, cfg = cfg_corner_num, default.units = "in")
+
+df_fool_l <- filter(half_info, light == "L", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    slice(2L) |>
+    mutate(piece_side = "card_face",
+           x = min(df$x),
+           y = max(df$y) + IH)
+pmap_piece(df_fool_l, envir = envir, default.units = "in")
+%% end.rcode
+
+%% begin.rcode hanafuda_dim
+hanafuda_width <- 12 * IW + 0.5
+hanafuda_height <- 8 * IH + 0.5
+%% end.rcode
+
+%% begin.rcode hanafuda_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
+cat(r"(\clearpage
+\subsection{Deck of Hanafuda cards}
+
+\begin{itemize}
+\item For the twelve month Hanafuda \emph{suits} use Dotaro Deck \emph{ranks} 1-9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
+\item The green leaves, clovers, and acorns are \emph{chaff} (aka \emph{junk}). Acorns are the only yellow chaff so use the Acorns as the \emph{yellow} Paulownia.
+\item The heart-shaped hearts, cups, and swords are \emph{ribbons}. Use hearts as \emph{plain} ribbons, cups as \emph{embellished} ribbons (e.g. \emph{poetry} ribbons), and swords as \emph{dark} ribbons (e.g. \emph{blue} / \emph{purple} ribbons).
+\item The (hawk) bells are \emph{animals}.
+\item The \emph{diamonds} are \emph{brights}.
+\item Different arrangement of suits and categorizations of cards exist depending on the game. Here is an example for the ``standard'' order and categorization from the \href{https://fudawiki.org/en/hanafuda}{Fuda Wiki}:
+\end{itemize}
+)")
+%% end.rcode
+
+%% begin.rcode hanafuda, eval=(variant == "hybrid"), fig.width=hanafuda_width, fig.height=hanafuda_height, out.height="6.8in", out.extra="keepaspectratio=true", fig.cap="One deck of Hanafuda cards"
+month_rank <- c(1:9, 10, 11, 13)
+
+bright_months <- c(1, 3, 8, 11, 12)
+animal_months <- c(2, 4, 5, 6, 7, 8, 9, 10, 11)
+embellished_ribbon_months <- c(1, 2, 3)
+dark_ribbon_months <- c(6, 9, 10)
+plain_ribbon_months <- c(4, 5, 7, 11)
+yellow_chaff_months <- c(12)
+chaff_months_a <- setdiff(1:12, 11)
+chaff_months_b <- 1:12
+
+df <- bind_rows(
+    data.frame(months = bright_months, suit = 4, row = 1),
+    data.frame(months = animal_months, suit = 8, row = 2),
+    data.frame(months = embellished_ribbon_months, suit = 5, row = 3),
+    data.frame(months = dark_ribbon_months, suit = 6, row = 4),
+    data.frame(months = plain_ribbon_months, suit = 1, row = 5),
+    data.frame(months = yellow_chaff_months, suit = 7, row = 6),
+    data.frame(months = chaff_months_a, suit = 2, row = 7),
+    data.frame(months = chaff_months_b, suit = 3, row = 8)
+) |>
+    mutate(piece_side = "card_face",
+           x = X0 + (months - 1) * IW,
+           y = Y0 + (8 - row + 1) * IH,
+           rank = month_rank[months])
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
 %% end.rcode
 
 \clearpage

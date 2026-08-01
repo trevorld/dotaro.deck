@@ -388,7 +388,7 @@ pmap_piece(df, envir = envir, default.units = "in")
 
 Above we described the French-suited Dotaro Deck but we also offer a Dotaro Deck that features hybrid French-German-Spanish suits:
 
-```{r hybrid_suits, fig.width = 8, fig.height = 6, fig.alt = "Hybrid French-German-Spanish suits"}
+```{r hybrid_suits, fig.width = 9.0, fig.height = 6, fig.alt = "Hybrid French-German-Spanish suits"}
 options(dotaro.deck::dotaro_deck_options("hybrid"))
 grid.draw(dotaro.deck:::hybrid_suits_table_grob())
 ```
