@@ -43,7 +43,7 @@ hybrid_suits_table_grob <- function(name = NULL) {
 	headers <- c("Suit", "French", "Spanish", "German", "Hanafuda")
 
 	n <- 8L
-	lay <- grid.layout(nrow = n + 1L, ncol = 5L, widths = unit(c(1, 2.2, 1.1, 1.1, 1.9), "null"))
+	lay <- grid.layout(nrow = n + 1L, ncol = 5L, widths = unit(c(1, 2.2, 1.1, 1.1, 3.2), "null"))
 	x_text <- unit(0, "npc") + unit(2, "mm")
 
 	gl <- gList()
