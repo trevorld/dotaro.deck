@@ -43,20 +43,42 @@ hybrid_suits_table_grob <- function(name = NULL) {
 	headers <- c("Suit", "French", "Spanish", "German", "Hanafuda")
 
 	n <- 8L
-	lay <- grid.layout(nrow = n + 1L, ncol = 5L, widths = unit(c(1, 2.2, 1.1, 1.1, 3.2), "null"))
+	fontsize <- 18
+	# Size each label column to fit its widest cell (header or body) via a
+	# "strwidth" unit, resolved lazily against whatever device this actually
+	# draws on, instead of a fixed "null" ratio: the same nominal fontsize
+	# renders at a different width on different devices (e.g. cairo_pdf,
+	# used by the pdf manual, vs. the png device README.Rmd knits with), so a
+	# ratio tuned against one device can clip a label on the other.
+	col_width <- function(header, column) {
+		strs <- c(header, column)
+		do.call(unit.pmax, lapply(strs, function(s) unit(1, "strwidth", s))) + unit(6, "mm")
+	}
+	widths <- unit.c(
+		unit(1, "null"),
+		col_width(headers[2], labels$french),
+		col_width(headers[3], labels$spanish),
+		col_width(headers[4], labels$german),
+		col_width(headers[5], labels$hanafuda)
+	)
+	lay <- grid.layout(nrow = n + 1L, ncol = 5L, widths = widths)
 	x_text <- unit(0, "npc") + unit(2, "mm")
 
 	gl <- gList()
 	for (j in seq_along(headers)) {
 		vp <- viewport(layout.pos.row = 1L, layout.pos.col = j)
 		if (j == 1L) {
-			gl[[j]] <- textGrob(headers[j], gp = gpar(fontface = "bold", fontsize = 18), vp = vp)
+			gl[[j]] <- textGrob(
+				headers[j],
+				gp = gpar(fontface = "bold", fontsize = fontsize),
+				vp = vp
+			)
 		} else {
 			gl[[j]] <- textGrob(
 				headers[j],
 				x = x_text,
 				just = "left",
-				gp = gpar(fontface = "bold", fontsize = 18),
+				gp = gpar(fontface = "bold", fontsize = fontsize),
 				vp = vp
 			)
 		}
@@ -80,13 +102,19 @@ hybrid_suits_table_grob <- function(name = NULL) {
 				x = x_text,
 				just = "left",
 				vp = vp,
-				gp = gpar(fontsize = 18)
+				gp = gpar(fontsize = fontsize)
 			)
 		}
 	}
 	# The layout is established here, on the outer `gTree`'s own viewport; the
 	# cell viewports above are nested *inside* it (as each child's own `vp`),
 	# so their `layout.pos.row`/`layout.pos.col` resolve against this layout
-	# instead of needing (invalidly) to declare it themselves.
-	gTree(children = gl, vp = viewport(width = 0.95, height = 0.95, layout = lay), name = name)
+	# instead of needing (invalidly) to declare it themselves.  Its own `gp`
+	# also carries the same `fontsize` so the `strwidth` units in `widths`
+	# above resolve against the fontsize the cells actually draw at.
+	gTree(
+		children = gl,
+		vp = viewport(width = 0.95, height = 0.95, layout = lay, gp = gpar(fontsize = fontsize)),
+		name = name
+	)
 }

@@ -107,7 +107,7 @@ cat(r"(This \emph{Dotaro Deck} variant features hybrid French-German-Spanish sui
 )")
 %% end.rcode
 
-%% begin.rcode hybrid_suits, eval=(variant == "hybrid"), fig.width=9, fig.height=6, fig.cap="Hybrid French-German-Spanish suits"
+%% begin.rcode hybrid_suits, eval=(variant == "hybrid"), fig.width=9.0, fig.height=6, fig.cap="Hybrid French-German-Spanish suits"
 grid.draw(hybrid_suits_table_grob())
 %% end.rcode
 
@@ -410,10 +410,10 @@ german_height <- 4 * IH + 0.5
 
 %% begin.rcode german_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
 cat(r"(\clearpage
-\subsection{One deck of German-playing cards}
+\subsection{One deck of German-suited playing cards}
 
 \begin{itemize}
-\item The German suits are the \emph{shaded} suits.
+\item The German suits are the \emph{shaded} traditional suits.
 \item Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the \emph{under}), knight (for the \emph{ober}), and the king.
 \item Pedantically the German \emph{ace} is actually the \emph{deuce} (rank two card) and is sometimes called the \emph{Sow}.  Depending on your preference you could use the 1 rank card instead as the \emph{ace}.
 \item The suit symbol is only \emph{over} the rank symbol in the \emph{ober} face card.
@@ -423,7 +423,7 @@ cat(r"(\clearpage
 )")
 %% end.rcode
 
-%% begin.rcode german, eval=(variant == "hybrid"), fig.width=german_width, fig.height=german_height, fig.cap="One deck of German-playing cards"
+%% begin.rcode german, eval=(variant == "hybrid"), fig.width=german_width, fig.height=german_height, fig.cap="One deck of German-suited playing cards"
 df <- data.frame(piece_side = "card_face",
                  x = X0 + rep(seq(0, by = IW, length.out = 9L), 4L),
                  y = Y0 + rep(4:1, each = 9L) * IH,
@@ -439,9 +439,10 @@ spanish_height <- 4 * IH + 0.5
 
 %% begin.rcode spanish_intro, echo=FALSE, results='asis', eval=(variant == "hybrid")
 cat(r"(\clearpage
-\subsection{One deck of Spanish playing cards}
+\subsection{One deck of Spanish-suited playing cards}
 
 \begin{itemize}
+\item The Spanish suits are the \emph{light} traditional suits.
 \item Use pip cards 1-9 and use the pawn for the \emph{sota}, knight for the \emph{caballo}, and king for the \emph{rey}.
 \item If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
 \item It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
@@ -479,7 +480,7 @@ cat(r"(\clearpage
 
 \begin{itemize}
 \item \href{https://www.pagat.com/class/itarot.html}{Latin-suited tarot cards} feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
-\item Orient dark halves up top.
+\item Orient light halves up top.
 \item The traditional ``0'' rank is a ten and the ``pawn'' rank is a jack/page.
 \item For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
 \item Use the star fool as the Fool/Excuse. However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to ``00'' or ``22''.
