@@ -5,6 +5,7 @@
 * [Overview](#overview)
 * [Orientations](#orientations)
 * [Examples](#examples)
+* [Hybrid French-German-Spanish suits](#hybrid)
 * [Frequently Asked Questions](#faq)
 * [External links](#external)
 
@@ -30,13 +31,13 @@ X0 <- 0.1 + 0.5 * IW
 Y0 <- 0.1 - 0.5 * IH
 ```
 
-**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There are a couple of print-and-play files:
+**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There are a few print-and-play files:
 
-| Variant | File |
-| --- | --- |
-| Black and White French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) |
-| French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) |
-| Hybrid Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_a4.pdf) |
+| Variant | PnP Cards | Manual | Jacket |
+| --- | --- | --- | --- |
+| Black and White French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_bw_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_bw_a4.pdf) |
+| French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_color_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_color_a4.pdf) |
+| Hybrid Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_hybrid_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_hybrid_a4.pdf) |
 
 ## <a name="overview">Overview</a>
 
@@ -381,6 +382,157 @@ df <- filter(card_info, d6) |>
            x = X0 + rep(seq(0, by = IW, length.out = 18L), 2L),
            y = Y0 + rep(2:1, each = 18L) * IH)
 pmap_piece(df, envir = envir, default.units = "in")
+```
+
+## <a name="hybrid">Hybrid French-German-Spanish suits</a>
+
+Above we described the French-suited Dotaro Deck but we also offer a Dotaro Deck that features hybrid French-German-Spanish suits:
+
+```{r hybrid_suits, fig.width = 8, fig.height = 6, fig.alt = "Hybrid French-German-Spanish suits"}
+options(dotaro.deck::dotaro_deck_options("hybrid"))
+grid.draw(dotaro.deck:::hybrid_suits_table_grob())
+```
+
+This deck can build all the decks that the French-suited Dotaro Deck can but also makes it a bit friendlier to make German-suited and Latin-suited playing card decks as well as play Hanafuda games.
+
+### One deck of German-playing cards
+
+* The German suits are the *shaded* suits.
+* Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the *under*), knight (for the *ober*), and the king.
+* Pedantically the German *ace* is actually the *deuce* (rank two card) and is sometimes called the *Sow*.  Depending on your preference you could use the 1 rank card instead as the *ace*.
+* The suit symbol is only *over* the rank symbol in the *ober* face card.
+* Northern German decks commonly omit the 6 rank card.
+* Decks made by Italian manufacturers for South Tyroleans include a 5 rank card.
+
+```{r german_dim}
+german_width <- 9 * IW + 0.5
+german_height <- 4 * IH + 0.5
+```
+
+```{r german, fig.width = german_width, fig.height = german_height, fig.alt = "One deck of German-playing cards selected from the Dotaro Deck"}
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 9L), 4L),
+                 y = Y0 + rep(4:1, each = 9L) * IH,
+                 rank = rep(c(2, 6:9, 10:12, 14), 4L), suit = rep(c(1, 2, 7, 8), each = 9L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+```
+
+### One deck of Spanish playing cards
+
+* Use pip cards 1-9 and use the pawn for the *sota*, knight for the *caballo*, and king for the *rey*.
+* If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
+* It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
+
+```{r spanish_dim}
+spanish_width <- (12 + 1) * IW + 0.5 + 0.4
+spanish_height <- 4 * IH + 0.5
+```
+
+```{r spanish, fig.width = spanish_width, fig.height = spanish_height, fig.alt = "One deck of Spanish playing cards selected from the Dotaro Deck"}
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 12L), 4L),
+                 y = Y0 + rep(4:1, each = 12L) * IH,
+                 rank = rep(c(1:9, 11, 12, 14), 4L), suit = rep(c(5, 8, 7, 6), each = 12L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df_fool_l <- filter(half_info, light == "L", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    mutate(piece_side = "card_face",
+           x = max(df$x) + IW + 0.2,
+           y = Y0 + 3:2 * IH)
+pmap_piece(df_fool_l, envir = envir, default.units = "in")
+```
+
+### One deck of Latin-suited tarot cards
+
+* [Latin-suited tarot cards](https://www.pagat.com/class/itarot.html) feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
+* Orient dark halves up top.
+* The traditional "0" rank is a ten and the "pawn" rank is a jack/page.
+* For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
+* Use the star fool as the Fool/Excuse.  However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to "00" or "22".
+* Some Tarot games such as [Minchiate](https://www.pagat.com/tarot/minchiate.html) will need extra trumps (you can keeping adding number suit cards for up to 50 ordered trump cards plus two fools).
+
+```{r latin_tarot_dim}
+latin_tarot_width <- (14 + 10) * IW + 1.0
+latin_tarot_height <- 4 * IH + 0.5
+```
+
+```{r latin_tarot, fig.width = latin_tarot_width, fig.height = latin_tarot_height, fig.alt = "One deck of Latin-suited tarot cards selected from the Dotaro Deck"}
+df <- data.frame(piece_side = "card_face",
+                 x = X0 + rep(seq(0, by = IW, length.out = 14L), 4L),
+                 y = Y0 + rep(4:1, each = 14L) * IH,
+                 rank = rep(c(1:14), 4L),
+                 suit = rep(c(5, 8, 7, 6), each = 14L))
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+
+df <- data.frame(piece_side = "card_face",
+                 x = max(df$x) + IW + 0.2 + rep(seq(0, by = IW, length.out = 10L), 3L),
+                 y = Y0 + rep(3:1, each = 10L) * IH,
+                 rank = c(10, 1:9, 10, 1:9, 10, 1:9),
+                 suit = rep(6:8, each = 10L))
+df <- df[2:22, ]
+pmap_piece(df, cfg = cfg_corner_num, default.units = "in")
+
+df_fool_l <- filter(half_info, light == "L", is.na(suit)) |>
+    select("card", "top") |>
+    left_join(corner_info, by = c("card", "top")) |>
+    select("suit", "rank", "cfg") |>
+    arrange(rank) |>
+    slice(2L) |>
+    mutate(piece_side = "card_face",
+           x = min(df$x),
+           y = max(df$y) + IH)
+pmap_piece(df_fool_l, envir = envir, default.units = "in")
+```
+
+### Deck of Hanafuda cards
+
+* For the twelve month Hanafuda *suits* use Dotaro Deck *ranks* 1-9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
+* The green leaves, clovers, and acorns are *chaff* (aka *junk*).  Acorns are the only yellow chaff so use the Acorns as the *yellow* Paulownia.
+* The heart-shaped hearts, cups, and swords are *ribbons*.  Use hearts as *plain* ribbons, cups as *embellished* ribbons (e.g. *poetry* ribbons), and swords as *dark* ribbons (e.g. *blue* / *purple* ribbons).
+* The (hawk) bells are *animals*.
+* The *diamonds* are *brights*.
+* Different arrangement of suits and categorizations of cards exist depending on the game.  Here is an example for the "standard" order and categorization from the [Fuda Wiki](https://fudawiki.org/en/hanafuda):
+
+```{r hanafuda_dim}
+hanafuda_width <- 12 * IW + 0.5
+hanafuda_height <- 8 * IH + 0.5
+```
+
+```{r hanafuda, fig.width = hanafuda_width, fig.height = hanafuda_height, fig.alt = "One deck of Hanafuda cards selected from the Dotaro Deck"}
+month_rank <- c(1:9, 10, 11, 13)
+
+bright_months <- c(1, 3, 8, 11, 12)
+animal_months <- c(2, 4, 5, 6, 7, 8, 9, 10, 11)
+embellished_ribbon_months <- c(1, 2, 3)
+dark_ribbon_months <- c(6, 9, 10)
+plain_ribbon_months <- c(4, 5, 7, 11)
+yellow_chaff_months <- c(12)
+chaff_months_a <- setdiff(1:12, 11)
+chaff_months_b <- 1:12
+
+df <- bind_rows(
+    data.frame(months = bright_months, suit = 4, row = 1),
+    data.frame(months = animal_months, suit = 8, row = 2),
+    data.frame(months = embellished_ribbon_months, suit = 5, row = 3),
+    data.frame(months = dark_ribbon_months, suit = 6, row = 4),
+    data.frame(months = plain_ribbon_months, suit = 1, row = 5),
+    data.frame(months = yellow_chaff_months, suit = 7, row = 6),
+    data.frame(months = chaff_months_a, suit = 2, row = 7),
+    data.frame(months = chaff_months_b, suit = 3, row = 8)
+) |>
+    mutate(piece_side = "card_face",
+           x = X0 + (months - 1) * IW,
+           y = Y0 + (8 - row + 1) * IH,
+           rank = month_rank[months])
+
+pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
 ```
 
 ## <a name="faq">Frequently Asked Questions</a>

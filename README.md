@@ -5,18 +5,19 @@
 * [Overview](#overview)
 * [Orientations](#orientations)
 * [Examples](#examples)
+* [Hybrid French-German-Spanish suits](#hybrid)
 * [Frequently Asked Questions](#faq)
 * [External links](#external)
 
 
 
-**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There are a couple of print-and-play files:
+**Warning:** The *Dotaro Deck* is currently at the **prototype** stage of development.  There are a few print-and-play files:
 
-| Variant | File |
-| --- | --- |
-| Black and White French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) |
-| French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) |
-| Hybrid Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_a4.pdf) |
+| Variant | PnP Cards | Manual | Jacket |
+| --- | --- | --- | --- |
+| Black and White French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_bw_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_bw_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_bw_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_bw_a4.pdf) |
+| French Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_french_color_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_french_color_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_color_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_french_color_a4.pdf) |
+| Hybrid Suits | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_hybrid_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_manual_hybrid_a4.pdf) | [letter](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_hybrid_letter.pdf) / [A4](https://trevorldavis.com/piecepackr/share/pnp/dotaro_box_jacket_hybrid_a4.pdf) |
 
 ## <a name="overview">Overview</a>
 
@@ -185,6 +186,63 @@
 
 
 <img src="man/figures/README-d6-1.png" alt="One set of d6 dice cards selected from the Dotaro Deck"  />
+
+## <a name="hybrid">Hybrid French-German-Spanish suits</a>
+
+Above we described the French-suited Dotaro Deck but we also offer a Dotaro Deck that features hybrid French-German-Spanish suits:
+
+<img src="man/figures/README-hybrid_suits-1.png" alt="Hybrid French-German-Spanish suits"  />
+
+This deck can build all the decks that the French-suited Dotaro Deck can but also makes it a bit friendlier to make German-suited and Latin-suited playing card decks as well as play Hanafuda games.
+
+### One deck of German-playing cards
+
+* The German suits are the *shaded* suits.
+* Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the *under*), knight (for the *ober*), and the king.
+* Pedantically the German *ace* is actually the *deuce* (rank two card) and is sometimes called the *Sow*.  Depending on your preference you could use the 1 rank card instead as the *ace*.
+* The suit symbol is only *over* the rank symbol in the *ober* face card.
+* Northern German decks commonly omit the 6 rank card.
+* Decks made by Italian manufacturers for South Tyroleans include a 5 rank card.
+
+
+
+<img src="man/figures/README-german-1.png" alt="One deck of German-playing cards selected from the Dotaro Deck"  />
+
+### One deck of Spanish playing cards
+
+* Use pip cards 1-9 and use the pawn for the *sota*, knight for the *caballo*, and king for the *rey*.
+* If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
+* It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
+
+
+
+<img src="man/figures/README-spanish-1.png" alt="One deck of Spanish playing cards selected from the Dotaro Deck"  />
+
+### One deck of Latin-suited tarot cards
+
+* [Latin-suited tarot cards](https://www.pagat.com/class/itarot.html) feature four suits with 14 ranks each, 21 trumps numbered from 1 to 21, and a fool.
+* Orient dark halves up top.
+* The traditional "0" rank is a ten and the "pawn" rank is a jack/page.
+* For the trump cards treat each of the number suits as a two digit number with the number suit as the ten digit number and the rank as the one digit number.
+* Use the star fool as the Fool/Excuse.  However in some tarot card games the fool is the lowest or highest trump in which case it may make sense to instead use the number suit card corresponding to "00" or "22".
+* Some Tarot games such as [Minchiate](https://www.pagat.com/tarot/minchiate.html) will need extra trumps (you can keeping adding number suit cards for up to 50 ordered trump cards plus two fools).
+
+
+
+<img src="man/figures/README-latin_tarot-1.png" alt="One deck of Latin-suited tarot cards selected from the Dotaro Deck"  />
+
+### Deck of Hanafuda cards
+
+* For the twelve month Hanafuda *suits* use Dotaro Deck *ranks* 1-9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
+* The green leaves, clovers, and acorns are *chaff* (aka *junk*).  Acorns are the only yellow chaff so use the Acorns as the *yellow* Paulownia.
+* The heart-shaped hearts, cups, and swords are *ribbons*.  Use hearts as *plain* ribbons, cups as *embellished* ribbons (e.g. *poetry* ribbons), and swords as *dark* ribbons (e.g. *blue* / *purple* ribbons).
+* The (hawk) bells are *animals*.
+* The *diamonds* are *brights*.
+* Different arrangement of suits and categorizations of cards exist depending on the game.  Here is an example for the "standard" order and categorization from the [Fuda Wiki](https://fudawiki.org/en/hanafuda):
+
+
+
+<img src="man/figures/README-hanafuda-1.png" alt="One deck of Hanafuda cards selected from the Dotaro Deck"  />
 
 ## <a name="faq">Frequently Asked Questions</a>
 
