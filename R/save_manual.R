@@ -151,7 +151,7 @@ check_xelatex <- function() {
 	dir <- setup_tempdir("hello")
 	wd <- setwd(dir)
 	on.exit(setwd(wd), add = TRUE)
-	on.exit(unlink(dir), add = TRUE)
+	on.exit(unlink(dir, recursive = TRUE), add = TRUE)
 	test_file <- system.file("hello.tex", package = "dotaro.deck")
 	file.copy(test_file, "hello.tex")
 	xelatex("hello.tex")
