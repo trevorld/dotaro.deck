@@ -69,6 +69,25 @@
 
 <img src="man/figures/README-anatomy-1.png" alt="Annotated Dotaro Deck card"  />
 
+* Every card in the deck shares the same card back: a small tiling of squares, diamonds, and eight-pointed stars with the four light suit pips (plus the fool's star) in the squares on each side.
+
+  - The suits and star on each side are grouped in fives like the holes in a cribbage board:
+
+    + Line up six cards on top of each other and use two counters to use the two suited/starred columns as a 60-hole cribbage board.
+    + One card can be treated as a 10-hole board to keep score in games like [Euchre](https://www.pagat.com/euchre/euchre.html) or to represent each digit of a larger multiple digit number (in which case each digit needs a card and counter).
+
+  - Keep track of the trump suit by placing a counter next to (or on top of) that suit's pip. Represent "No Trump" by the star.
+
+  - Each card has a 2x4 grid of eight-pointed *stars*—arrange a 4x2 grid of cards to build an 8x8 grid of stars for playing abstract board games with small counters.
+
+  - Note the squares are 10mm wide so small counters like 8mm or 10mm cubes or a standard-sized meeple are best although you could go up to a 16mm die.
+
+  - For a more compact (if less easy to read at a glance) cribbage board instead arrange four card backs at right angles with the corners touching where the fool star squares meet.  Start at a star symbol square and follow the path of the non-black diamonds through the middle five squares as well and after you reach the opposite star square then jump to the star square on the next card.  This results in a snaking 60-square path.
+
+
+
+<img src="man/figures/README-pinwheel-1.png" alt="A snaking 60-square scoring path built from four card backs"  />
+
 ## <a name="orientations">Orientations</a>
 
 ### Dark halves up top
