@@ -8,17 +8,17 @@
 hybrid_suits_table_labels <- function() {
 	data.frame(
 		french = c(
-			"Hearts",
-			"Spades",
-			"Clubs",
-			"Diamonds",
-			"Hearts (extra)",
-			"Spades (extra)",
-			"Clubs (extra)",
-			"Diamonds (extra)"
+			"Hearts (dark)",
+			"Spades (dark)",
+			"Clubs (dark)",
+			"Diamonds (dark)",
+			"Hearts (light)",
+			"Spades (light)",
+			"Clubs (light)",
+			"Diamonds (light)"
 		),
-		spanish = c("", "", "", "", "Cups", "Swords", "Clubs", "Coins"),
 		german = c("Hearts", "Leaves", "", "", "", "", "Acorns", "Bells"),
+		spanish = c("", "", "", "", "Cups", "Swords", "Clubs", "Coins"),
 		hanafuda = c(
 			"Ribbon (plain)",
 			"Chaff",
@@ -40,7 +40,7 @@ hybrid_suits_table_labels <- function() {
 # so it always matches what the cards themselves look like.
 hybrid_suits_table_grob <- function(name = NULL) {
 	labels <- hybrid_suits_table_labels()
-	headers <- c("Suit", "French", "Spanish", "German", "Hanafuda")
+	headers <- c("Suit", "French", "German", "Spanish", "Hanafuda")
 
 	n <- 8L
 	fontsize <- 18
@@ -57,8 +57,8 @@ hybrid_suits_table_grob <- function(name = NULL) {
 	widths <- unit.c(
 		unit(1, "null"),
 		col_width(headers[2], labels$french),
-		col_width(headers[3], labels$spanish),
-		col_width(headers[4], labels$german),
+		col_width(headers[3], labels$german),
+		col_width(headers[4], labels$spanish),
 		col_width(headers[5], labels$hanafuda)
 	)
 	lay <- grid.layout(nrow = n + 1L, ncol = 5L, widths = widths)
