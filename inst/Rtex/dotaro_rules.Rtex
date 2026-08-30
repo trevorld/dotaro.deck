@@ -1,0 +1,114 @@
+%% Standalone knitting (e.g. for manual review) requires setting
+%% `options(dotaro.deck.suits = ...)` (and matching color options) by hand
+%% first -- see `dotaro_deck_options()` -- plus defining a `size` variable
+%% (`"letter"` or `"a4"`). `save_dotaro_rules()` normally does both itself
+%% before knitting this file.
+%% begin.rcode documentclass, echo=FALSE, results='asis'
+cat(str_glue("\\documentclass[{size}paper,onecolumn]{{article}}"))
+%% end.rcode
+
+\usepackage[top=0.4in, bottom=0.4in, left=0.75in, right=0.75in]{geometry}
+\usepackage[colorlinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\setlist{nosep, topsep=0pt}
+\titlespacing*{\section}{0pt}{3pt plus 1pt minus 1pt}{2pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\raggedbottom
+
+\title{Dotaro}
+\date{}
+
+\begin{document}
+\small
+\begin{center}
+{\LARGE\bfseries Dotaro}
+\end{center}
+\vspace{2pt}
+
+\begin{description}[nosep]
+\item[Players] 3--9
+\item[Equipment] One \emph{Dotaro Deck} (108 cards)
+\item[Objective] Score the \emph{fewest} points across a round of hands
+\item[License] \href{https://creativecommons.org/licenses/by/4.0/}{CC-BY-4.0}
+\end{description}
+
+\section{Overview}
+
+\emph{Dotaro}---named for \emph{Domino Tarot}---is a shedding game where you try to empty your hand of (high point) cards before your opponents do.
+All players build a single chain together, extending either of its two open ends domino-style using tarot-style card rankings.
+Fewest total points after a full round of hands wins the match.
+
+\section{Setup}
+
+Shuffle the full 108-card deck and deal 12 cards to each player. Any cards left over are set aside.
+
+\section{The chain}
+
+Whoever deals leads the hand by playing any one card from their hand, face up.
+Its two halves become the chain's two open ends.
+Play then passes around the table. On your turn, you may extend either open
+end if you can beat it (see below). If you cannot legally beat either end,
+you are skipped.
+
+\section{Extending an end}
+
+To extend an open end the \emph{light/dark of the extending half must match:} if your open end is light, then your extending half must also be light (and if your open end is dark, then your extending half must also be dark).
+Additionally the extending card half must \emph{beat the open end:}
+
+\begin{itemize}
+\item \emph{Traditional-suit end:} beat it with a higher rank in the
+      \emph{same} suit, with any number-suit half (number suits are
+      trumps: any number-suit half beats any traditional-suit half), or
+      with a fool half.
+\item \emph{Number-suit end:} read the end as a two-digit number, suit as
+      the tens digit and rank as the ones digit; beat it with a
+      higher two-digit number, or with a fool half. A traditional-suit
+      half can never beat a number-suit end.
+\item \emph{Fool end:} beaten by anything of the matching color.
+\end{itemize}
+
+Whichever half of your card you used to extend is now buried; the
+\emph{other} half of your played card becomes the new open end on that side.
+
+\section{Ending a hand}
+
+The hand ends as soon as either:
+
+\begin{itemize}
+\item \emph{Someone empties their hand}, or
+\item \emph{The chain blocks}---a full circuit of the table passes with
+      no successful play in between.
+\end{itemize}
+
+Either way, every player then scores their \emph{remaining} hand (see
+``Scoring'').
+
+\section{Scoring}
+
+For each card remaining in your hand, add up the point value of both its
+halves:
+
+\begin{itemize}
+\item Traditional-suit half: its rank value (1--10, or 11/12/13/14 for
+      pawn\slash knight\slash queen\slash king).
+\item Number-suit half: its two-digit value (suit as the tens digit, rank as
+      the ones digit), 0--49.
+\item Fool half: 0.
+\end{itemize}
+
+Your score for the hand is the sum over all your remaining cards. If you
+went out, your hand is empty and you score zero.
+
+\section{Playing a match}
+
+\begin{itemize}
+\item A match is one full round: each player deals and leads exactly one
+      hand, then the round ends.
+\item Points accumulate hand to hand across the round.
+\item Whoever has the \emph{lowest} total after the round wins the match (ties are possible).
+\end{itemize}
+
+\end{document}
