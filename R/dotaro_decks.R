@@ -211,7 +211,7 @@ makeContent.dotaro_card_back <- function(x) {
 	mat_grob <- shape$mat(opt$mat_width, gp = gp_mat, name = "mat")
 
 	# Every card in the deck shares this one back design (no suit/rank).
-	main_grob <- card_back_grob()
+	main_grob <- card_back_grob(scale = x$scale)
 
 	if (x$border) {
 		gp_border <- gpar(col = opt$border_color, fill = NA, lex = opt$border_lex)
@@ -363,7 +363,10 @@ makeContent.dotaro_fool_face <- function(x) {
 	suit <- x$suit
 	light <- ifelse(suit < 2L, "D", "L")
 	df_card <- filter(card_info, .data$blight == light, is.na(.data$bsuit), .data$brank == rank)
-	main_grob <- grobTree(do.call(card_grob, df_card), vp = viewport(angle = 180))
+	main_grob <- grobTree(
+		do.call(card_grob, c(as.list(df_card), list(scale = x$scale))),
+		vp = viewport(angle = 180)
+	)
 
 	if (x$border) {
 		gp_border <- gpar(col = opt$border_color, fill = NA, lex = opt$border_lex)
@@ -440,7 +443,10 @@ makeContent.dotaro_num_face <- function(x) {
 	light <- ifelse(suit <= 5L, "D", "L")
 	suit <- (ifelse(suit > 5L, suit - 5L, suit) - 1L) |> as.character()
 	df_card <- filter(card_info, .data$blight == light, .data$bsuit == suit, .data$brank == rank)
-	main_grob <- grobTree(do.call(card_grob, df_card), vp = viewport(angle = 180))
+	main_grob <- grobTree(
+		do.call(card_grob, c(as.list(df_card), list(scale = x$scale))),
+		vp = viewport(angle = 180)
+	)
 
 	if (x$border) {
 		gp_border <- gpar(col = opt$border_color, fill = NA, lex = opt$border_lex)
@@ -521,7 +527,7 @@ makeContent.dotaro_trad_face <- function(x) {
 	light <- ifelse(suit <= 4L, "D", "L")
 	suit <- switch((suit %% 4L) + 1L, "D", "H", "S", "C")
 	df_card <- filter(card_info, .data$tlight == light, .data$tsuit == suit, .data$trank == rank)
-	main_grob <- do.call(card_grob, df_card)
+	main_grob <- do.call(card_grob, c(as.list(df_card), list(scale = x$scale)))
 	if (rank == "N" && light == "L") {
 		main_grob <- grobTree(main_grob, vp = viewport(angle = 180))
 	}
@@ -606,7 +612,7 @@ makeContent.dotaro_trad_corner <- function(x) {
 	suit <- switch((suit %% 4L) + 1L, "D", "H", "S", "C")
 	if (rank == "N" && light == "L") {
 		df_card <- filter(card_info, .data$tlight == "D", .data$tsuit == suit, .data$trank == rank)
-		main_grob <- do.call(bot_corner_grob, df_card)
+		main_grob <- do.call(bot_corner_grob, c(as.list(df_card), list(scale = x$scale)))
 	} else {
 		df_card <- filter(
 			card_info,
@@ -614,7 +620,7 @@ makeContent.dotaro_trad_corner <- function(x) {
 			.data$tsuit == suit,
 			.data$trank == rank
 		)
-		main_grob <- do.call(top_corner_grob, df_card)
+		main_grob <- do.call(top_corner_grob, c(as.list(df_card), list(scale = x$scale)))
 	}
 	# main_grob <- grobTree(main_grob, vp = viewport(y = 0.4))
 
@@ -695,7 +701,7 @@ makeContent.dotaro_num_corner <- function(x) {
 	suit <- as.character(suit - 1L)
 
 	df_card <- filter(card_info, .data$blight == light, .data$bsuit == suit, .data$brank == rank)
-	main_grob <- do.call(bot_corner_grob, df_card)
+	main_grob <- do.call(bot_corner_grob, c(as.list(df_card), list(scale = x$scale)))
 	# main_grob <- grobTree(main_grob, vp = viewport(y = 0.4))
 
 	if (x$border) {
@@ -774,7 +780,7 @@ makeContent.dotaro_fool_corner <- function(x) {
 	light <- ifelse(suit < 2L, "D", "L")
 
 	df_card <- filter(card_info, .data$blight == light, is.na(.data$bsuit), .data$brank == rank)
-	main_grob <- do.call(bot_corner_grob, df_card)
+	main_grob <- do.call(bot_corner_grob, c(as.list(df_card), list(scale = x$scale)))
 	# main_grob <- grobTree(main_grob, vp = viewport(y = 0.4))
 
 	if (x$border) {

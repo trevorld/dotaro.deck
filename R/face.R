@@ -1,4 +1,4 @@
-top_face_grob <- function(...) {
+top_face_grob <- function(..., scale = 1) {
 	l <- list(...)
 	tsuit_grob <- do.call(top_suit_grob, l)
 	trank_grob <- do.call(top_rank_grob, l)
@@ -10,7 +10,7 @@ top_face_grob <- function(...) {
 		col <- spades_clubs_color()
 	}
 	if (trank == "N") {
-		return(knight_grob(tsuit_grob, trank_grob, col))
+		return(knight_grob(tsuit_grob, trank_grob, col, scale = scale))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.35, width = 0.55, height = 0.46),
@@ -20,12 +20,12 @@ top_face_grob <- function(...) {
 	trank_grob <- grobTree(trank_grob, vp = viewport(y = 0.70), gp = gpar(lex = 1.11, cex = 1.11))
 	gl <- gList(meeple_grob, tsuit_grob, trank_grob)
 
-	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
+	vp <- pip_viewport(scale)
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)
 }
 
-bot_face_grob <- function(...) {
+bot_face_grob <- function(..., scale = 1) {
 	l <- list(...)
 	bsuit_grob <- do.call(bot_suit_grob, l)
 	brank_grob <- do.call(bot_rank_grob, l)
@@ -36,7 +36,7 @@ bot_face_grob <- function(...) {
 	# just borrows whichever suit it happens to be paired with on the top
 	# half), so it gets the same dedicated color as the number suits instead.
 	if (brank %in% c("O", "F")) {
-		return(fool_grob(brank, blight, number_suits_color()))
+		return(fool_grob(brank, blight, number_suits_color(), scale = scale))
 	}
 	if (red == "R") {
 		col <- hearts_diamonds_color()
@@ -44,7 +44,7 @@ bot_face_grob <- function(...) {
 		col <- spades_clubs_color()
 	}
 	if (brank == "N") {
-		return(knight_grob(bsuit_grob, brank_grob, col))
+		return(knight_grob(bsuit_grob, brank_grob, col, scale = scale))
 	}
 	meeple_grob <- pp_shape("meeple")$shape(
 		vp = viewport(y = 0.35, width = 0.55, height = 0.46),
@@ -54,12 +54,12 @@ bot_face_grob <- function(...) {
 	brank_grob <- grobTree(brank_grob, vp = viewport(y = 0.70), gp = gpar(lex = 1.11, cex = 1.11))
 	gl <- gList(meeple_grob, bsuit_grob, brank_grob)
 
-	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
+	vp <- pip_viewport(scale)
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)
 }
 
-knight_grob <- function(suit_grob, rank_grob, col = "black") {
+knight_grob <- function(suit_grob, rank_grob, col = "black", scale = 1) {
 	# The knight/horse-head rank glyph is drawn last (on top of the meeple, via
 	# ordinary z-order in `gl` below), so its solid fill obscures the meeple's
 	# lower body --
@@ -71,12 +71,12 @@ knight_grob <- function(suit_grob, rank_grob, col = "black") {
 	suit_grob <- grobTree(suit_grob, vp = viewport(y = 0.75), gp = gpar(lex = 0.65, cex = 0.65))
 	knight_grob <- grobTree(rank_grob, vp = viewport(y = 0.44), gp = gpar(lex = 1.2, cex = 2.10))
 	gl <- gList(meeple_grob, suit_grob, knight_grob)
-	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
+	vp <- pip_viewport(scale)
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)
 }
 
-fool_grob <- function(rank, light, col = "black") {
+fool_grob <- function(rank, light, col = "black", scale = 1) {
 	# The border follows the same split as the suit badges (see
 	# `top_suit_grob()`): black on the dark half (whose icon fill is already
 	# the accent color), accent on the light half (whose icon fill is the
@@ -91,10 +91,14 @@ fool_grob <- function(rank, light, col = "black") {
 		icon_fill <- if (light == "D") fill_col else light_color()
 		# The fool has its own dedicated icon (star/plain ring), so -- like the
 		# number suits -- it doesn't get the "hbinary" shading effect.
-		return(hybrid_fool_grob(rank, border, col, icon_fill, shading = "none"))
+		return(hybrid_fool_grob(rank, border, col, icon_fill, shading = "none", scale = scale))
 	}
 	gp_meeple <- gpar(col = col, lwd = 2)
-	vp_meeple <- viewport(height = unit(0.7, "in"), width = unit(0.6, "in"), y = 0.3)
+	vp_meeple <- viewport(
+		height = unit(scale * 0.7, "in"),
+		width = unit(scale * 0.6, "in"),
+		y = 0.3
+	)
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
 	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
 	# accent fill on the dark half, light-color fill on the light half.
@@ -114,11 +118,19 @@ fool_grob <- function(rank, light, col = "black") {
 	} else {
 		gp_star <- gpar(fill = fill_col, col = border, lwd = 1.5)
 	}
-	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
-	vp_triangle <- viewport(height = unit(0.4, "in"), width = unit(0.30, "in"), y = y_triangle)
+	y_triangle <- unit(0.3, "npc") + unit(scale * (0.5 * 0.7 + 0.5 * 0.4 - 0.10), "in")
+	vp_triangle <- viewport(
+		height = unit(scale * 0.4, "in"),
+		width = unit(scale * 0.30, "in"),
+		y = y_triangle
+	)
 	triangle_grob <- pp_shape("pyramid")$shape(gp = gp_triangle, vp = vp_triangle)
-	y_circle <- y_triangle + unit(0.5 * 0.4 + 0.5 * 0.2 - 0.02, "in")
-	vp_circle <- viewport(height = unit(0.2, "in"), width = unit(0.2, "in"), y = y_circle)
+	y_circle <- y_triangle + unit(scale * (0.5 * 0.4 + 0.5 * 0.2 - 0.02), "in")
+	vp_circle <- viewport(
+		height = unit(scale * 0.2, "in"),
+		width = unit(scale * 0.2, "in"),
+		y = y_circle
+	)
 	circle_grob <- circleGrob(vp = vp_circle, gp = gp_circle)
 	if (rank == "F") {
 		star_grob <- pp_shape("concave5")$shape(gp = gp_star, vp = vp_circle)
@@ -135,23 +147,35 @@ fool_grob <- function(rank, light, col = "black") {
 	)
 }
 
-hybrid_fool_grob <- function(rank, border, accent, icon_fill, shading) {
+hybrid_fool_grob <- function(rank, border, accent, icon_fill, shading, scale = 1) {
 	# Unlike the triangle/ring/icon border (black on the dark half), the
 	# meeple's outline always stays the accent color.
 	gp_meeple <- gpar(col = accent, lwd = 2)
-	vp_meeple <- viewport(height = unit(0.7, "in"), width = unit(0.6, "in"), y = 0.3)
+	vp_meeple <- viewport(
+		height = unit(scale * 0.7, "in"),
+		width = unit(scale * 0.6, "in"),
+		y = 0.3
+	)
 	meeple_grob <- pp_shape("meeple")$shape(gp = gp_meeple, vp = vp_meeple)
 
 	# Match the fool corner index's own col/fill (see `bot_rank_grob()`):
 	# `border`/`icon_fill` are already that same black-or-accent border and
 	# accent-or-light-color fill, computed by the caller.
 	gp_triangle <- gpar(fill = icon_fill, col = border, lwd = 1.5)
-	y_triangle <- unit(0.3, "npc") + unit(0.5 * 0.7 + 0.5 * 0.4 - 0.10, "in")
-	vp_triangle <- viewport(height = unit(0.4, "in"), width = unit(0.30, "in"), y = y_triangle)
+	y_triangle <- unit(0.3, "npc") + unit(scale * (0.5 * 0.7 + 0.5 * 0.4 - 0.10), "in")
+	vp_triangle <- viewport(
+		height = unit(scale * 0.4, "in"),
+		width = unit(scale * 0.30, "in"),
+		y = y_triangle
+	)
 	triangle_grob <- pp_shape("pyramid")$shape(gp = gp_triangle, vp = vp_triangle)
 
-	y_circle <- y_triangle + unit(0.5 * 0.4 + 0.5 * 0.2 - 0.02, "in")
-	vp_circle <- viewport(height = unit(0.2, "in"), width = unit(0.2, "in"), y = y_circle)
+	y_circle <- y_triangle + unit(scale * (0.5 * 0.4 + 0.5 * 0.2 - 0.02), "in")
+	vp_circle <- viewport(
+		height = unit(scale * 0.2, "in"),
+		width = unit(scale * 0.2, "in"),
+		y = y_circle
+	)
 	gp_icon <- gpar(fill = dotaro.font:::shaded_fill(icon_fill, shading), col = border, lwd = 1.5)
 	if (rank == "F") {
 		# `pp_shape("concave5")`'s regular 5-point star polygon fits the ring

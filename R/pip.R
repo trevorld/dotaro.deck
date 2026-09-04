@@ -48,7 +48,7 @@ xya_pips_dominoes <- function(n_pips) {
 	)
 }
 
-top_pip_grob <- function(...) {
+top_pip_grob <- function(..., scale = 1) {
 	l <- list(...)
 	tsuit_grob <- do.call(top_suit_grob, c(l, list(pip = TRUE)))
 
@@ -62,12 +62,12 @@ top_pip_grob <- function(...) {
 		gl[[i]] <- grobTree(tsuit_grob, vp = vp)
 	}
 
-	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
+	vp <- pip_viewport(scale)
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)
 }
 
-bot_pip_grob <- function(...) {
+bot_pip_grob <- function(..., scale = 1) {
 	l <- list(...)
 	bsuit_grob <- do.call(bot_suit_grob, c(l, list(pip = TRUE)))
 
@@ -81,7 +81,7 @@ bot_pip_grob <- function(...) {
 		gl[[i]] <- grobTree(bsuit_grob, vp = vp)
 	}
 
-	vp <- viewport(width = unit(PIP_WIDTH, "in"), height = unit(0.5 * PIP_HEIGHT, "in"))
+	vp <- pip_viewport(scale)
 	gp <- gpar(cex = 1.2, lex = 1.2)
 	gTree(children = gl, vp = vp, gp = gp)
 }

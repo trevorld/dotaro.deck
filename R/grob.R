@@ -486,13 +486,29 @@ bot_border_grob <- function(...) {
 	grobTree(bb_grob, label_grob, bl_grob, br_grob, name = "bottom_half_bars")
 }
 
-card_grob <- function(...) {
-	l <- list(...)
-	top_corner <- do.call(top_corner_grob, l)
-	bot_corner <- do.call(bot_corner_grob, l)
+# The inner (non-index) drawing area of a single card half.  Several grobs
+# that fill it re-declare it at this same absolute size while nested inside
+# one another, so `scale` has to reach every one of them -- an unscaled inner
+# viewport inside a scaled outer one overflows it by `1 / scale`.
+pip_viewport <- function(scale = 1, ...) {
+	viewport(
+		width = unit(scale * PIP_WIDTH, "in"),
+		height = unit(scale * 0.5 * PIP_HEIGHT, "in"),
+		...
+	)
+}
 
-	top_inner <- do.call(top_inner_grob, l)
-	bot_inner <- do.call(bot_inner_grob, l)
+# Like `corner_index_y()` and `card_back_grob()`, every dimension here is an
+# absolute inch measure, so `scale` (matching whatever `scale` the enclosing
+# piece is drawn at) has to multiply all of them; otherwise the card's
+# contents stay at full size while its box shrinks out from under them.
+card_grob <- function(..., scale = 1) {
+	l <- list(...)
+	top_corner <- do.call(top_corner_grob, c(l, list(scale = scale)))
+	bot_corner <- do.call(bot_corner_grob, c(l, list(scale = scale)))
+
+	top_inner <- do.call(top_inner_grob, c(l, list(scale = scale)))
+	bot_inner <- do.call(bot_inner_grob, c(l, list(scale = scale)))
 
 	# top_border <- do.call(top_border_grob, l)
 	# bot_border <- do.call(bot_border_grob, l)
@@ -506,8 +522,8 @@ card_grob <- function(...) {
 	grob_other <- grobTree(
 		# rectGrob(gp = gpar(col = NA, fill = "yellow")), # bleed
 		rectGrob(
-			width = 2,
-			height = 3.25,
+			width = scale * 2,
+			height = scale * 3.25,
 			default.units = "in",
 			gp = gpar(col = NA, fill = "white")
 		),
@@ -524,9 +540,9 @@ card_grob <- function(...) {
 	)
 
 	gp_small <- gpar(cex = 0.5, lex = 0.5)
-	y_top_corner <- unit(1, "npc") - unit(BLEED + 0.5 * INDEX_HEIGHT, "in")
+	y_top_corner <- unit(1, "npc") - unit(scale * (BLEED + 0.5 * INDEX_HEIGHT), "in")
 	# Top
-	x_index_l <- unit(BLEED + 0.5 * INDEX_WIDTH, "in")
+	x_index_l <- unit(scale * (BLEED + 0.5 * INDEX_WIDTH), "in")
 	x_index_r <- unit(1, "npc") - x_index_l
 	grob_top <- grobTree(
 		grobTree(top_corner, vp = viewport(x = x_index_l, y = y_top_corner)),
@@ -542,34 +558,29 @@ card_grob <- function(...) {
 	gList(grob_other, grob_top, grob_bot)
 }
 
-top_inner_grob <- function(...) {
+top_inner_grob <- function(..., scale = 1) {
 	l <- list(...)
 	trank <- l$trank
 	if (trank %in% number_ranks) {
-		grob <- do.call(top_pip_grob, l)
+		grob <- do.call(top_pip_grob, c(l, list(scale = scale)))
 	} else {
-		grob <- do.call(top_face_grob, l)
+		grob <- do.call(top_face_grob, c(l, list(scale = scale)))
 	}
-	vp <- viewport(
-		width = unit(PIP_WIDTH, "in"),
-		height = unit(0.5 * PIP_HEIGHT, "in"),
-		y = unit(0.5, "npc") + unit(0.25 * PIP_HEIGHT, "in")
-	)
+	vp <- pip_viewport(scale, y = unit(0.5, "npc") + unit(scale * 0.25 * PIP_HEIGHT, "in"))
 	grobTree(grob, vp = vp)
 }
 
-bot_inner_grob <- function(...) {
+bot_inner_grob <- function(..., scale = 1) {
 	l <- list(...)
 	brank <- l$brank
 	if (brank %in% number_ranks) {
-		grob <- do.call(bot_pip_grob, l)
+		grob <- do.call(bot_pip_grob, c(l, list(scale = scale)))
 	} else {
-		grob <- do.call(bot_face_grob, l)
+		grob <- do.call(bot_face_grob, c(l, list(scale = scale)))
 	}
-	vp <- viewport(
-		width = unit(PIP_WIDTH, "in"),
-		height = unit(0.5 * PIP_HEIGHT, "in"),
-		y = unit(0.5, "npc") - unit(0.25 * PIP_HEIGHT, "in"),
+	vp <- pip_viewport(
+		scale,
+		y = unit(0.5, "npc") - unit(scale * 0.25 * PIP_HEIGHT, "in"),
 		angle = 180
 	)
 	grobTree(grob, vp = vp)
@@ -620,11 +631,18 @@ card_back_suit_grob <- function(key) {
 	dotaro.font:::suitGrob(glyphs[[paste0("D", key)]], col = accent, fill = light_color())
 }
 
-card_back_grob <- function() {
+# `scale` (matching whatever `scale` the enclosing piece is drawn at) must
+# multiply the square/gap constants, which are absolute (cm) lengths: every
+# other dimension here -- `pitch`, `total_width`/`total_height`, `X()`/`Y()`,
+# the star boxes, `diamond_side_in` -- derives from those two, so scaling them
+# scales the whole tiling.  Otherwise the tiling stays pinned at full size
+# while the card shrinks out from under it (`CARD_BACK_LWD` needs no such
+# treatment: the enclosing `gpar(lex = scale)` already multiplies it).
+card_back_grob <- function(scale = 1) {
 	nrow <- CARD_BACK_NROW
 	ncol <- CARD_BACK_NCOL
-	width <- CARD_BACK_SQUARE_WIDTH
-	gap <- CARD_BACK_SQUARE_GAP
+	width <- scale * CARD_BACK_SQUARE_WIDTH
+	gap <- scale * CARD_BACK_SQUARE_GAP
 
 	# `side` marks a cribbage-style score path (left/right columns), `middle`
 	# a possible snaking score path (center column), and the checkerboard
