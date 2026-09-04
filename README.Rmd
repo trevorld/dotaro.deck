@@ -551,38 +551,19 @@ pmap_piece(df_fool_l, envir = envir, default.units = "in")
 * Different arrangement of suits and categorizations of cards exist depending on the game.  Here is an example for the "standard" order and categorization from the [Fuda Wiki](https://fudawiki.org/en/hanafuda):
 
 ```{r hanafuda_dim}
-hanafuda_width <- 12 * IW + 0.5
+hanafuda_width <- 12 * IW + 0.5 + 0.7
 hanafuda_height <- 8 * IH + 0.5
 ```
 
 ```{r hanafuda, fig.width = hanafuda_width, fig.height = hanafuda_height, fig.alt = "One deck of Hanafuda cards selected from the Dotaro Deck"}
-month_rank <- c(1:9, 10, 11, 13)
-
-bright_months <- c(1, 3, 8, 11, 12)
-animal_months <- c(2, 4, 5, 6, 7, 8, 9, 10, 11)
-embellished_ribbon_months <- c(1, 2, 3)
-dark_ribbon_months <- c(6, 9, 10)
-plain_ribbon_months <- c(4, 5, 7, 11)
-yellow_chaff_months <- c(12)
-chaff_months_a <- setdiff(1:12, 11)
-chaff_months_b <- 1:12
-
-df <- bind_rows(
-    data.frame(months = bright_months, suit = 4, row = 1),
-    data.frame(months = animal_months, suit = 8, row = 2),
-    data.frame(months = embellished_ribbon_months, suit = 5, row = 3),
-    data.frame(months = dark_ribbon_months, suit = 6, row = 4),
-    data.frame(months = plain_ribbon_months, suit = 1, row = 5),
-    data.frame(months = yellow_chaff_months, suit = 7, row = 6),
-    data.frame(months = chaff_months_a, suit = 2, row = 7),
-    data.frame(months = chaff_months_b, suit = 3, row = 8)
-) |>
-    mutate(piece_side = "card_face",
-           x = X0 + (months - 1) * IW,
-           y = Y0 + (8 - row + 1) * IH,
-           rank = month_rank[months])
-
-pmap_piece(df, cfg = cfg_corner_trad, default.units = "in")
+df <- dotaro.deck:::dotaro_hanafuda_chart(envir = envir)
+pmap_piece(df, default.units = "in", envir = envir)
+grid.text(
+    dotaro.deck:::HANAFUDA_ROW_LABELS,
+    x = unit(max(df$x) + IW, "in"),
+    y = unit(dotaro.deck:::dotaro_hanafuda_row_y(df), "in"),
+    just = "left"
+)
 ```
 
 ## <a name="faq">Frequently Asked Questions</a>

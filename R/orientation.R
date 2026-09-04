@@ -244,3 +244,79 @@ dotaro_orientation_num_up <- function(
 	}
 	dotaro_scale_xy(df, scale)
 }
+
+# Row categories for `dotaro_hanafuda_chart()`, top-to-bottom in the same
+# row order that function lays its 8 rows out in (bright, animal, then 3
+# ribbon rows, then 3 chaff rows) -- see `README.Rmd`'s "Deck of Hanafuda
+# cards" section for what distinguishes each.
+HANAFUDA_ROW_LABELS <- c(
+	"Bright",
+	"Animal",
+	"Ribbon",
+	"Ribbon",
+	"Ribbon",
+	"Chaff",
+	"Chaff",
+	"Chaff"
+)
+
+#' Build a `pmap_piece()` data frame for the "Deck of Hanafuda cards" chart
+#'
+#' Selects, from the 108 *Dotaro Deck* cards, the corner-index pieces needed
+#' to build a standard Hanafuda deck (the "standard" order/categorization
+#' from the [Fuda Wiki](https://fudawiki.org/en/hanafuda)), arranged into 12
+#' month columns x the 8 rows `HANAFUDA_ROW_LABELS` names.
+#'
+#' @param scale A scale factor, applied to the `x`/`y` positions and passed
+#'   through to `pieceGrob()`/`pmap_piece()` to shrink the pieces themselves
+#'   by the same amount (see `dotaro_scale_xy()`).
+#' @param envir A named list of `piecepackr::pp_cfg()` objects, as returned
+#'   by `dotaro_decks()`.
+#' @return A data frame with `suit`, `rank`, `cfg`, `piece_side`, `x`, `y`,
+#'   and `scale` columns.
+#' @noRd
+dotaro_hanafuda_chart <- function(scale = 1, envir = dotaro_decks()) {
+	cfg_corner_trad <- envir$dotaro_corner_traditional
+	IW <- cfg_corner_trad$get_width("card_face")
+	IH <- cfg_corner_trad$get_height("card_face")
+	X0 <- 0.1 + 0.5 * IW
+	Y0 <- 0.1 - 0.5 * IH
+
+	month_rank <- c(1:9, 10, 11, 13)
+
+	bright_months <- c(1, 3, 8, 11, 12)
+	animal_months <- c(2, 4, 5, 6, 7, 8, 9, 10, 11)
+	embellished_ribbon_months <- c(1, 2, 3)
+	dark_ribbon_months <- c(6, 9, 10)
+	plain_ribbon_months <- c(4, 5, 7, 11)
+	yellow_chaff_months <- c(12)
+	chaff_months_a <- setdiff(1:12, 11)
+	chaff_months_b <- 1:12
+
+	df <- bind_rows(
+		data.frame(months = bright_months, suit = 4, row = 1),
+		data.frame(months = animal_months, suit = 8, row = 2),
+		data.frame(months = embellished_ribbon_months, suit = 5, row = 3),
+		data.frame(months = dark_ribbon_months, suit = 6, row = 4),
+		data.frame(months = plain_ribbon_months, suit = 1, row = 5),
+		data.frame(months = yellow_chaff_months, suit = 7, row = 6),
+		data.frame(months = chaff_months_a, suit = 2, row = 7),
+		data.frame(months = chaff_months_b, suit = 3, row = 8)
+	) |>
+		mutate(
+			piece_side = "card_face",
+			cfg = "dotaro_corner_traditional",
+			x = X0 + (months - 1) * IW,
+			y = Y0 + (8 - row + 1) * IH,
+			rank = month_rank[months]
+		)
+	dotaro_scale_xy(df, scale)
+}
+
+# `HANAFUDA_ROW_LABELS`' y positions, derived from `dotaro_hanafuda_chart()`'s
+# own output rather than re-deriving its `y = Y0 + (8 - row + 1) * IH`
+# formula -- row 1 (the topmost, largest `y`) sorts first, matching
+# `HANAFUDA_ROW_LABELS`' own top-to-bottom order.
+dotaro_hanafuda_row_y <- function(df) {
+	sort(unique(df$y), decreasing = TRUE)
+}
