@@ -7,13 +7,18 @@
 # divider line gets its own, smaller gaps:
 # `line_gap` on both sides of the line (symmetric), `small_gap` between the
 # pair itself.
-corner_index_y <- function() {
+# All these are absolute-inch distances, so `scale` (matching whatever
+# `scale` the enclosing piece is drawn at -- see `top_corner_grob()`) must
+# multiply every one of them, or they stay pinned to their full-scale
+# positions while the index's own enclosing box (sized off `INDEX_WIDTH`/
+# `INDEX_HEIGHT` times that same `scale`) shrinks out from under them.
+corner_index_y <- function(scale = 1) {
 	cex_small <- 0.6
-	rank_h <- 3 / 8
-	suit_h <- 0.25
-	gap <- 0.10
-	line_gap <- 0.075
-	small_gap <- 0.06
+	rank_h <- (3 / 8) * scale
+	suit_h <- 0.25 * scale
+	gap <- 0.10 * scale
+	line_gap <- 0.075 * scale
+	small_gap <- 0.06 * scale
 
 	suit_bottom <- rank_h + gap + suit_h
 	rank2_top <- suit_bottom + 2 * line_gap
@@ -29,7 +34,7 @@ corner_index_y <- function() {
 	)
 }
 
-top_corner_grob <- function(...) {
+top_corner_grob <- function(..., scale = 1) {
 	dotaro_fonts_available()
 	l <- list(...)
 	tsuit_grob <- do.call(top_suit_grob, l)
@@ -37,21 +42,27 @@ top_corner_grob <- function(...) {
 
 	bsuit_grob <- do.call(bot_suit_grob, l)
 	brank_grob <- do.call(bot_rank_grob, l)
-	y <- corner_index_y()
+	y <- corner_index_y(scale)
 	gp_small <- gpar(cex = y$cex_small, lex = y$cex_small)
 	small_lines <- linesGrob(y = 0.5)
 	grobTree(
 		# rectGrob(gp = gpar(col = NA, fill = "cyan")), # index area
 		grobTree(tsuit_grob, vp = viewport(y = y$suit)),
 		grobTree(trank_grob, vp = viewport(y = y$rank)),
-		grobTree(small_lines, vp = viewport(y = y$line, width = unit(INDEX_WIDTH * 0.5, "in"))),
+		grobTree(
+			small_lines,
+			vp = viewport(y = y$line, width = unit(INDEX_WIDTH * 0.5 * scale, "in"))
+		),
 		grobTree(bsuit_grob, vp = viewport(y = y$suit2), gp = gp_small),
 		grobTree(brank_grob, vp = viewport(y = y$rank2), gp = gp_small),
-		vp = viewport(width = unit(INDEX_WIDTH, "in"), height = unit(INDEX_HEIGHT, "in"))
+		vp = viewport(
+			width = unit(INDEX_WIDTH * scale, "in"),
+			height = unit(INDEX_HEIGHT * scale, "in")
+		)
 	)
 }
 
-bot_corner_grob <- function(...) {
+bot_corner_grob <- function(..., scale = 1) {
 	dotaro_fonts_available()
 	l <- list(...)
 	tsuit_grob <- do.call(top_suit_grob, l)
@@ -59,16 +70,19 @@ bot_corner_grob <- function(...) {
 
 	bsuit_grob <- do.call(bot_suit_grob, l)
 	brank_grob <- do.call(bot_rank_grob, l)
-	y <- corner_index_y()
+	y <- corner_index_y(scale)
 	gp_small <- gpar(cex = y$cex_small, lex = y$cex_small)
 	small_lines <- linesGrob(y = 0.5)
 	grobTree(
 		# rectGrob(gp = gpar(col = NA, fill = "cyan")), # index area
 		grobTree(bsuit_grob, vp = viewport(y = y$suit)),
 		grobTree(brank_grob, vp = viewport(y = y$rank)),
-		grobTree(small_lines, vp = viewport(y = y$line, width = unit(0.10, "in"))),
+		grobTree(small_lines, vp = viewport(y = y$line, width = unit(0.10 * scale, "in"))),
 		grobTree(tsuit_grob, vp = viewport(y = y$suit2), gp = gp_small),
 		grobTree(trank_grob, vp = viewport(y = y$rank2), gp = gp_small),
-		vp = viewport(width = unit(INDEX_WIDTH, "in"), height = unit(INDEX_HEIGHT, "in"))
+		vp = viewport(
+			width = unit(INDEX_WIDTH * scale, "in"),
+			height = unit(INDEX_HEIGHT * scale, "in")
+		)
 	)
 }
