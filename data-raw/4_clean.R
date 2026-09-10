@@ -1,7 +1,21 @@
 library("dplyr")
 library("stringr")
 
-df <- read.csv("data-raw/alpha.csv") |>
+# Reshapes a solved deck into the three data frames saved in `R/sysdata.rda`.
+#
+# `beta.csv` is written by `0_solve_monolith.R`, which solves steps 1--3 exactly as a single
+# mixed-integer program.  To recreate it:
+#
+#   Rscript data-raw/0_solve_monolith.R   # writes data-raw/beta.csv
+#   Rscript data-raw/4_clean.R            # rebuilds R/sysdata.rda
+#
+# `alpha.csv` is the earlier deck, found by the evolutionary prototype in
+# `1_evolve_domino_scheme.R` -> `2_filter_doubles.R` -> `3_evolve_suit_schemes.R`.  Those
+# scripts are kept for reference but are no longer part of the pipeline: `beta.csv` matches
+# or beats `alpha.csv` on every subdeck feature (notably "d6 dominoes" 28/28 vs 7/28,
+# "d6 dice" 4/4 vs 0/4, and the number/fr. suit pairing balance at its floor of 4 vs 26).
+
+df <- read.csv("data-raw/beta.csv") |>
 	arrange(tlabel) |>
 	select(
 		"tsuit",
