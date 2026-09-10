@@ -2,9 +2,11 @@
 # evolutionary algorithms to try to achieve further pleasing subdeck features
 #
 # * "shaded tarot" - If flip "shaded" side up do we have numbers 00--49
-# * "chinese dominoes" - Each 8 t. suits has 4 cards, each of 6 ranks at least once
+# * "chinese dominoes" - Each of 4 fr. suits has 8 cards, each of 6 ranks at least once
+#   (see `F_CHI` below for a stricter 8 t. suits variant that is not fully achievable)
 # * "d6 dice" - Each of 4 fr. suits has 9 cards
-# * "d6 dominoes" - Each of 4 fr. suits has 7 cards, each of 7 ranks at least once
+# * "d6 dominoes" - Each of 4 fr. suits has two halves for each of 7 ranks
+#   (`F_DOM6 <- 4L + 28L` below is a weaker variant: 7 cards, each of 7 ranks at least once)
 # * "doubles" - Each of 4 fr. suits has 5 cards
 library("dplyr")
 library("parallel")
@@ -110,6 +112,25 @@ fitness_shaded <- function(dfj) {
 # F_CHI <- 8L + 48L
 # chinese dominoes
 #   each of 8 t. suits has 4 cards, each of 6 ranks at least once
+#
+#   Note the stricter `8L + 48L` version above cannot be fully achieved:
+#
+#   * The `8L` count term (each of the 8 t. suits has 4 of the 32 Chinese domino cards)
+#     is possible but requires those 32 cards to be split 16/16 between the light and dark
+#     t. suit halves, which is already fixed by `step_1` / `step_2` (only 13 of the 57
+#     `step_2` candidates happen to do so).
+#   * The `48L` coverage term (each of the 8 t. suits sees each of the 6 ranks) is
+#     impossible for any candidate.  Rank 2 is only on seven of the 32 cards: the "Bench"
+#     2-2 civil tile twice plus the five military tiles 1-2, 2-3, 2-4, 2-5, and 2-6.
+#     Giving all 8 t. suits a rank 2 card needs at least four rank 2 cards of each of the
+#     light/dark shades i.e. at least eight cards.  Note `swap_chi()` cannot help since
+#     swapping the "a"/"b" copy of a military tile does not change that card's ranks.
+#
+#   (Compare the similar counting argument in `1_evolve_domino_scheme.R` for why not every
+#   card can have a number suit equal to its sum of pips modulo 5.)
+#
+#   The `4L + 24L` version below (each of the 4 fr. suits has 8 cards, each of 6 ranks at
+#   least once) is achievable.
 F_CHI <- 4L + 24L
 fitness_chinese <- function(dfj) {
 	dfc <- filter(dfj, chi)
