@@ -663,11 +663,11 @@ dotaro_domino_chart <- function(column, nrow, ncol, scale = 1, envir = dotaro_de
 
 	df <- filter(card_info, .data[[column]]) |>
 		mutate(
-			lrank = pmin(trank, brank),
-			urank = pmax(trank, brank),
-			top = trank == urank
+			lrank = pmin(.data$trank, .data$brank),
+			urank = pmax(.data$trank, .data$brank),
+			top = .data$trank == .data$urank
 		) |>
-		arrange(lrank, urank) |>
+		arrange(.data$lrank, .data$urank) |>
 		select("card", "top") |>
 		left_join(corner_info, by = c("card", "top")) |>
 		mutate(
