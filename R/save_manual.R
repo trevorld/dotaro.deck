@@ -65,7 +65,7 @@ save_manual <- function(
 		")"
 	)
 	writeLines(code, tr)
-	out <- suppressWarnings(system2("Rscript", tr, stdout = TRUE, stderr = TRUE))
+	out <- suppressWarnings(system2(rscript_path(), tr, stdout = TRUE, stderr = TRUE))
 	if (!quietly) {
 		writeLines(out)
 	}
@@ -75,6 +75,15 @@ save_manual <- function(
 	}
 
 	invisible(filename)
+}
+
+# The `Rscript` of the R that's currently running, rather than whichever
+# `Rscript` happens to be first on the `PATH`: `R CMD check` prepends stub
+# `R`/`Rscript` scripts to the `PATH` that deliberately fail with "'Rscript'
+# should not be used without a path -- see par. 1.6 of the manual".
+rscript_path <- function() {
+	ext <- if (.Platform$OS.type == "windows") ".exe" else ""
+	file.path(R.home("bin"), paste0("Rscript", ext))
 }
 
 save_manual_impl <- function(filename, variant, size, quietly) {
