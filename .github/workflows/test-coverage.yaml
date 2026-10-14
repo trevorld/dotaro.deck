@@ -26,12 +26,29 @@ jobs:
       - name: Install fonts on Ubuntu
         if: runner.os == 'Linux'
         run: |
-            sudo apt-get install -y fonts-dejavu
+            sudo apt-get update
+            sudo apt-get install -y fonts-dejavu python3-fontforge
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: covr
+
+      - name: Generate Dotaro fonts with FontForge
+        if: runner.os == 'Linux'
+        env:
+          RETICULATE_PYTHON: /usr/bin/python3
+        run: |
+          dir <- file.path(Sys.getenv("HOME"), ".local", "share", "fonts")
+          dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+          for (font in c("ranks", "suits")) {
+            sfd <- tempfile(fileext = ".sfd")
+            dotaro.font::generate_sfd(font, sfd)
+            dotaro.font::generate_font(sfd, file.path(dir, paste0("dotaro-", font, ".ttf")))
+          }
+          system("fc-cache -f")
+          stopifnot(system("fc-list | grep -q \"Dotaro Ranks\" && fc-list | grep -q \"Dotaro Suits\"") == 0L)
+        shell: Rscript {0}
 
       - name: Test coverage
         run: covr::codecov()
