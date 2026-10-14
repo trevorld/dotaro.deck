@@ -1,5 +1,5 @@
-dotaro.deck v0.4.0
-==================
+dotaro.deck v0.4.0 (development)
+================================
 
 Deck changes
 ------------
