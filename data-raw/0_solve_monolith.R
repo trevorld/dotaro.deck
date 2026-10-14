@@ -1,11 +1,15 @@
-# Solve steps 1--3 exactly, as a single mixed-integer program, and write `data-raw/beta.csv`
+# Solve steps 1--3 exactly, as a single mixed-integer program, and write `data-raw/gamma.csv`
 #
 # This script supersedes `1_evolve_domino_scheme.R`, `2_filter_doubles.R` and
 # `3_evolve_suit_schemes.R`.  Its output has the same columns as `data-raw/alpha.csv`, so
 # `4_clean.R` consumes it directly:
 #
-#   Rscript data-raw/0_solve_monolith.R   # writes data-raw/beta.csv (needs Gurobi; ~hours)
+#   Rscript data-raw/0_solve_monolith.R   # writes data-raw/gamma.csv (needs Gurobi; ~hours)
 #   Rscript data-raw/4_clean.R            # rebuilds R/sysdata.rda
+#
+# If `data-raw/gamma.csv` already exists it is handed to Gurobi as a warm start, so a re-run
+# is feasible from the first second and only spends its time limit looking for something
+# better.  `beta.csv` is the previous deck (shaded run 00--23 only), kept for reference.
 #
 # ## Why a single program
 #
@@ -26,6 +30,12 @@
 # jointly hard: HiGHS ran for hours on the d6 rank balance and the per-rank colour split
 # without finding a solution *or* proving infeasibility, while Gurobi settles the same
 # models.  A free academic licence covers this.
+#
+# Finding a feasible deck is dominated by the random seed.  On one probe a seed found a
+# solution in 11 minutes where another found nothing in 25 minutes, on a model with a known
+# solution; the old evolutionary scripts showed the same seed dependence.  So a timeout is
+# weak evidence of infeasibility, and `ConcurrentMIP` (several independent solves racing on
+# different seeds) is used in preference to one long single-seed run.
 #
 # ## The model
 #
@@ -48,13 +58,17 @@
 #
 # Subdeck features, all linear in the triples:
 #
-# * "shaded trumps"    - the shaded side shows an *unbroken* run of number values up from
-#                        00, which is what a tarot game needs (a count of covered values is
-#                        no use if there is a gap).  00--22 is required and 00--23 comes out
-#                        in practice.  That covers trumps 1--21 for French and Latin tarot,
-#                        leaves 0 usable as the lowest trump in older games, and the four
-#                        fool cards exist by construction regardless.  Values above the run
-#                        are scattered, so Minchiate-scale trumps are not contiguous.
+# * "shaded trumps"    - *every one* of the 50 number values 00--49 appears on a card whose
+#                        traditional half is plain (light hearts/spades or dark
+#                        clubs/diamonds).  There are exactly 50 plain halves, so each value
+#                        appears exactly once plain and once shaded.  Hence one group can take
+#                        the 50 shaded-suit cards (the German suits) and the other group is
+#                        left with the four plain suits *and* a complete 00--49 number deck
+#                        --- the way Euchre players left a Crazy Eights deck behind.  It also
+#                        gives an unbroken trump run for tarot, with 0 usable as the lowest
+#                        trump in older games and the four fool cards existing regardless.
+#                        Structurally, this forces both cards of a value onto the same side of
+#                        the hearts/spades vs clubs/diamonds split (25 values each way).
 # * "chinese dominoes" - each of the 8 trad. half-suits has 4 cards (so each of the 4 fr.
 #                        suits has 8), and each fr. suit sees each of 6 ranks at least once
 # * "d6 dice"          - each of 4 fr. suits has 9 cards, 4-5 per trad. half-suit, and
@@ -66,12 +80,14 @@
 #                        `2_filter_doubles.R` screened for) *and* 20 distinct number values,
 #                        so a double's number half identifies it uniquely
 # * "suit balance"     - the 5 number suits pair evenly with the 4 fr. suits (deviation 4,
-#                        its floor -- see below), every (trad. half-suit, number suit) cell
-#                        holds 2 or 3 cards, and each of the 10 half-number-suits pairs with
-#                        5 red and 5 black traditional halves
-# * "rank balance"     - every number rank pairs with 5 red and 5 black traditional halves
-#                        and shows at least one card of each fr. suit (1-4 in practice), so
-#                        the deck laid out by rank looks even
+#                        its floor -- see below); every (trad. half-suit, number suit) cell
+#                        holds 1-4 cards, 2-3 wherever the objective can manage it (4 cells
+#                        at 1 or 4 in practice); and each of the 10 half-number-suits pairs
+#                        with 5 red and 5 black traditional halves
+# * "rank balance"     - every number rank pairs with 4-6 red traditional halves, 5 wherever
+#                        the objective can manage it (5 6 4 6 5 4 5 5 4 6 in practice), and
+#                        shows at least one card of each fr. suit (1-4 in practice), so the
+#                        deck laid out by rank looks even
 # * "face cards"       - the 20 face-rank cards have 2 per half-number-suit, 4 per number
 #                        suit, and 20 distinct number values
 # * "civil pairs"      - each of the 11 doubled Chinese civil tiles has one light and one
@@ -86,23 +102,49 @@
 #                        id for all 108 cards -- including the fools and knights, which have
 #                        no number half -- and needs no constraint.
 #
+# The two "wherever the objective can manage it" features are the only soft ones.  The
+# objective minimises 64 x (cell deviation from 2-3) + 1 x (per-rank red deviation from 5),
+# which is lexicographic since the per-rank total cannot exceed 10 under its 4-6 bounds.
+# Everything else is a hard constraint.
+#
 # `suit balance` cannot be perfectly uniform.  The fools consume both Diamond Jacks and both
 # Queens of Spades, leaving 24 diamonds and 24 spades against 26 hearts and 26 clubs, so the
 # 20 (number suit, fr. suit) counts must deviate from 5 by at least
 # |26 - 25| * 2 + |24 - 25| * 2 = 4.  The program reaches that floor.
 #
-# ## What is *not* achievable
+# ## What is *not* achievable, or was not found
 #
 # * The stricter `8L + 48L` chinese variant discussed at `F_CHI` in
 #   `3_evolve_suit_schemes.R`.  Its coverage half is impossible for any deck: rank 2 is on
 #   only seven of the 32 Chinese domino cards, while covering all 8 traditional half-suits
 #   needs at least eight.  That is a counting proof, not a failed search.
-# * 5 red / 5 black per number rank together with the (trad. half-suit, number suit) cells
-#   at 2-3 --- proven infeasible while the shaded run was required to cover all 50 values.
-# * A full 00--49 shaded run alongside the d6 rank balance and the per-rank colour split.
-#   The old all-50 requirement is exactly what blocked those two features.  Runs of 35, 40
-#   and 45 were left *undecided* by the solver rather than proven impossible, so a longer
-#   run than 24 may well be reachable if it ever matters.
+# * The full shaded run together with cells at exactly 2-3 *and* 5 red / 5 black on every
+#   number rank --- proven infeasible by Gurobi.  Some loss on the colour split is therefore
+#   unavoidable once the run is required.
+# * The full shaded run together with cells at exactly 2-3 *and* the exact d6 rank balance.
+#   Not refuted, but roughly ten hours of solver time across many seeds (single-seed runs,
+#   4-seed concurrent runs, warm starts, and a tightened reformulation) never found one,
+#   while either feature alone with the run is found within an hour or two.  The deck here
+#   keeps the d6 balance exact and lets four cells slip to 1 or 4, on the grounds that an
+#   uneven dice subdeck is visible at the table and four pairing cells are not.  The other
+#   trade (cells exact, d6 off by one in four cells) is also reachable.
+# * Dropping the shaded-axis symmetry constraints does not help: the deck that recovered the
+#   exact d6 balance was found with them removed, yet satisfies all of them anyway.  They are
+#   kept as hard constraints.
+# * Giving the two copies of every number value different French suits (equivalently, one
+#   red and one black, since the run puts both copies in the same hearts/spades or
+#   clubs/diamonds family).  Impossible for all 50 values, by counting: it would need 25
+#   cards per fr. suit, and the fools leave 26/24/26/24.  The ceiling is 48 values, with one
+#   value doubled on hearts and one on clubs.  Even 48 was not found: 2 hours as a hard
+#   constraint found nothing, and 2 hours with the mismatches penalised instead returned the
+#   warm start (30 of 50 values split) unimproved.  Not refuted.
+# * One red and one black traditional half for the two copies of each double (and the five
+#   Chinese military pairs sharing a colour, probed alongside it).  No counting obstruction
+#   is known, but 2 hours as hard constraints found nothing, 2 hours penalised returned the
+#   warm start (4 of 10 doubles split, 1 of 5 military pairs matched) unimproved, and a
+#   further 2 hours penalising the doubles alone on another seed did the same.  Runs from
+#   scratch with the penalties found no deck at all in 2 hours, so they say nothing; the
+#   base model is already near the edge of what Gurobi finds in that time.  Not refuted.
 
 library("dplyr")
 library("stringr")
@@ -110,9 +152,10 @@ library("Matrix")
 stopifnot(requireNamespace("gurobi", quietly = TRUE))
 
 SUITS <- c("H", "S", "C", "D")
+OUTFILE <- "data-raw/gamma.csv"
 
 # ---------------------------------------------------------------------------------------
-# Reference tables (as in `3_evolve_suit_schemes.R`, so `beta.csv` matches `alpha.csv`)
+# Reference tables (as in `3_evolve_suit_schemes.R`, so `gamma.csv` matches `alpha.csv`)
 # ---------------------------------------------------------------------------------------
 
 dft <- tibble::tibble(
@@ -217,14 +260,40 @@ triples <- do.call(
 # Build and solve
 # ---------------------------------------------------------------------------------------
 
-solve_monolith <- function(time_limit = 28800) {
+# `time_limit` is spent looking for a better deck than the warm start (if any); a couple of
+# minutes (e.g. `DOTARO_TIME_LIMIT=120`) just re-validates `gamma.csv`, while the deck here
+# took about 70 minutes to find from scratch with `concurrent = 4` on 32 threads.
+solve_monolith <- function(
+	time_limit = as.numeric(Sys.getenv("DOTARO_TIME_LIMIT", 7200)),
+	concurrent = 4L,
+	seed = 11L,
+	start = OUTFILE
+) {
 	nz <- nrow(triples)
 	cells <- expand.grid(nsuit = as.character(0:4), s = 1:4, stringsAsFactors = FALSE)
-	NC <- nz + 2L * nrow(cells) + 20L
-	surplus <- function(k) nz + k
-	shortfall <- function(k) nz + nrow(cells) + k
-	hns_over <- function(q) nz + 2L * nrow(cells) + q
-	hns_under <- function(q) nz + 2L * nrow(cells) + 10L + q
+	hcells <- expand.grid(
+		nsuit = as.character(0:4),
+		s = 1:4,
+		sh = c("L", "D"),
+		stringsAsFactors = FALSE
+	)
+	hns <- sort(unique(triples$nlight_suit))
+
+	# continuous slack variables, laid out after the binaries
+	blocks <- c(
+		surplus = nrow(cells),
+		shortfall = nrow(cells), # suit balance, cap 4
+		hns_over = length(hns),
+		hns_under = length(hns), # half-number-suit red, cap 2
+		cell_over = nrow(hcells),
+		cell_under = nrow(hcells), # SOFT: cells outside 2-3
+		rank_over = length(NUM),
+		rank_under = length(NUM) # SOFT: per-rank red away from 5
+	)
+	offs <- nz + c(0, cumsum(blocks))[seq_along(blocks)]
+	names(offs) <- names(blocks)
+	NC <- nz + sum(blocks)
+	var <- function(block, k) offs[[block]] + k
 
 	ii <- jj <- xx <- lo <- hi <- numeric(0)
 	nr <- 0L
@@ -243,6 +312,7 @@ solve_monolith <- function(time_limit = 28800) {
 			add(k, 1, target, target)
 		}
 	}
+	nsh <- str_sub(triples$need, 1, 1) # the traditional half's shade
 
 	## structure
 	for (i in seq_len(nrow(cards))) {
@@ -267,7 +337,7 @@ solve_monolith <- function(time_limit = 28800) {
 	# is chosen as part of the solve.
 	for (sh in c("L", "D")) {
 		for (s in 1:4) {
-			k <- which(cards$chi[triples$i] & str_sub(triples$need, 1, 1) == sh & triples$s == s)
+			k <- which(cards$chi[triples$i] & nsh == sh & triples$s == s)
 			add(k, 1, 4, 4)
 		}
 	}
@@ -290,17 +360,21 @@ solve_monolith <- function(time_limit = 28800) {
 		}
 	}
 
+	## d6 dice: exactly 3 halves of each rank per fr. suit
+	for (s in 1:4) {
+		for (rk in as.character(1:6)) {
+			mult <- (cards$lrank[triples$i] == rk) + (cards$rrank[triples$i] == rk)
+			k <- which(cards$d6[triples$i] & triples$s == s & mult > 0)
+			add(k, mult[k], 3, 3)
+		}
+	}
+
 	## suit balance: count = 5 + surplus - shortfall, with the total deviation at its floor
 	for (k in seq_len(nrow(cells))) {
 		idx <- which(triples$nsuit == cells$nsuit[k] & triples$s == cells$s[k])
-		add(c(idx, surplus(k), shortfall(k)), c(rep(1, length(idx)), 1, -1), 5, 5)
+		add(c(idx, var("surplus", k), var("shortfall", k)), c(rep(1, length(idx)), 1, -1), 5, 5)
 	}
-	add(
-		c(surplus(seq_len(nrow(cells))), shortfall(seq_len(nrow(cells)))),
-		1,
-		0,
-		4
-	)
+	add(c(var("surplus", seq_len(nrow(cells))), var("shortfall", seq_len(nrow(cells)))), 1, 0, 4)
 
 	## each of the 5 number suits pairs with 10 red and 10 black traditional halves (each
 	## number suit has 20 cards, so fixing red at 10 fixes black at 10 too)
@@ -319,6 +393,11 @@ solve_monolith <- function(time_limit = 28800) {
 			add(k, 1, 1, 1)
 		}
 	}
+	## the 20 doubles use 20 distinct number values, so a double's number half identifies
+	## it uniquely among the doubles (only 4 of the 57 `step_2` candidates managed this)
+	for (v in unique(triples$nsuit_rank)) {
+		add(which(cards$is_double[triples$i] & triples$nsuit_rank == v), 1, 0, 1)
+	}
 
 	## the 20 face-rank cards mirror the doubles: 2 per half-number-suit, 4 per number suit,
 	## and 20 distinct number values.  (Their *traditional* suit split is not a choice: the
@@ -335,15 +414,15 @@ solve_monolith <- function(time_limit = 28800) {
 		add(which(is_face[triples$i] & triples$nsuit_rank == v), 1, 0, 1)
 	}
 
-	## every one of the 40 (trad. half-suit, number suit) cells holds 2 or 3 cards.  100 / 40
-	## is 2.5, so this is as even as the pairing can be made at half-suit resolution.
-	nsh <- str_sub(triples$need, 1, 1)
-	for (sh in c("L", "D")) {
-		for (s in 1:4) {
-			for (n in as.character(0:4)) {
-				add(which(nsh == sh & triples$s == s & triples$nsuit == n), 1, 2, 3)
-			}
-		}
+	## SOFT: every one of the 40 (trad. half-suit, number suit) cells holds 2 or 3 cards
+	## (100 / 40 is 2.5), as nearly as the objective can manage; 1-4 is a hard bound.
+	## count - over + under is in [2, 3], so over/under measure the excursion outside it.
+	for (q in seq_len(nrow(hcells))) {
+		idx <- which(
+			nsh == hcells$sh[q] & triples$s == hcells$s[q] & triples$nsuit == hcells$nsuit[q]
+		)
+		add(idx, 1, 1, 4)
+		add(c(idx, var("cell_over", q), var("cell_under", q)), c(rep(1, length(idx)), -1, 1), 2, 3)
 	}
 
 	## each of the 11 doubled Chinese "civil" tiles gets one light and one dark traditional
@@ -366,17 +445,10 @@ solve_monolith <- function(time_limit = 28800) {
 		}
 	}
 
-	## the 20 doubles use 20 distinct number values, so a double's number half identifies
-	## it uniquely among the doubles (only 4 of the 57 `step_2` candidates managed this)
-	for (v in unique(triples$nsuit_rank)) {
-		add(which(cards$is_double[triples$i] & triples$nsuit_rank == v), 1, 0, 1)
-	}
-
 	## every subdeck splits evenly between light and dark traditional halves, so "take the
-	## light-half cards" hands a game designer an even, nameable half of any subdeck.  `nsh`
-	## is the traditional half's shade (the opposite of the number half's).  The chinese
-	## (16/16) and doubles (10/10) splits already follow from constraints above; 55 is odd so
-	## the double-nine set can only reach 27/28.
+	## light-half cards" hands a game designer an even, nameable half of any subdeck.  The
+	## chinese (16/16) and doubles (10/10) splits already follow from constraints above; 55
+	## is odd so the double-nine set can only reach 27/28.
 	add(which(cards$dom6[triples$i] & nsh == "L"), 1, 14, 14)
 	add(which(cards$d6[triples$i] & nsh == "L"), 1, 18, 18)
 	add(which(cards$dom9[triples$i] & nsh == "L"), 1, 27, 28)
@@ -386,16 +458,15 @@ solve_monolith <- function(time_limit = 28800) {
 	##
 	## Note the slack: asking for this *exactly* --- as an equality, or as a cap of 0 on the
 	## total deviation --- does not solve within an hour, while allowing 2 and letting the
-	## solver settle finds a perfect 5/5 in minutes.  The `stopifnot()` below asserts the
-	## result really is 5/5, so a future change cannot silently degrade it.
-	hns <- sort(unique(triples$nlight_suit))
+	## solver settle finds a perfect 5/5.  The `stopifnot()` below asserts the result really
+	## is 5/5, so a future change cannot silently degrade it.
 	for (q in seq_along(hns)) {
 		idx <- which(triples$nlight_suit == hns[q] & triples$tsuit %in% c("H", "D"))
-		add(c(idx, hns_over(q), hns_under(q)), c(rep(1, length(idx)), 1, -1), 5, 5)
+		add(c(idx, var("hns_over", q), var("hns_under", q)), c(rep(1, length(idx)), 1, -1), 5, 5)
 	}
-	add(c(hns_over(seq_along(hns)), hns_under(seq_along(hns))), 1, 0, 2)
+	add(c(var("hns_over", seq_along(hns)), var("hns_under", seq_along(hns))), 1, 0, 2)
 
-	## the shaded partition axis, without the `shaded tarot` 50-value requirement
+	## the shaded partition axis
 	add(which(cards$is_double[triples$i] & triples$shaded), 1, 10, 10)
 	add(which(cards$dom6[triples$i] & triples$shaded), 1, 14, 14)
 	add(which(cards$dom9[triples$i] & triples$shaded), 1, 27, 28)
@@ -404,57 +475,87 @@ solve_monolith <- function(time_limit = 28800) {
 		add(which(triples$nlight_suit == m & triples$shaded), 1, 5, 5)
 	}
 
-	## an unbroken shaded trump run 00..22 (23 values).  The fool cards exist by
-	## construction, so 00 is not needed as the fool --- but including it lets 0 serve as
-	## the lowest trump in the older games.
-	RUN <- sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5))[seq_len(23L)]
-	for (v in RUN) {
-		add(which(triples$nsuit_rank == v & !triples$shaded), 1, 1, Inf)
+	## the full shaded run: every one of the 50 number values on exactly one plain card.
+	## (There are exactly 50 plain halves, so "at least one" would be equivalent, but the
+	## equality is tighter for the solver.)
+	for (v in unique(triples$nsuit_rank)) {
+		add(which(triples$nsuit_rank == v & !triples$shaded), 1, 1, 1)
 	}
 
 	## every number rank shows at least one card of each fr. suit, so no rank is missing a
 	## suit when the deck is laid out by rank
 	for (rk in NUM) {
-		for (sq in 1:4) {
-			add(which(triples$nrank == rk & triples$s == sq), 1, 1, Inf)
+		for (s in 1:4) {
+			add(which(triples$nrank == rk & triples$s == s), 1, 1, Inf)
 		}
 	}
 
-	## d6 dice: exactly 3 halves of each rank per fr. suit
-	for (sq in 1:4) {
-		for (rk in as.character(1:6)) {
-			mult <- (cards$lrank[triples$i] == rk) + (cards$rrank[triples$i] == rk)
-			k <- which(cards$d6[triples$i] & triples$s == sq & mult > 0)
-			add(k, mult[k], 3, 3)
-		}
-	}
-
-	## every number rank pairs with 5 red and 5 black traditional halves
-	for (rk in NUM) {
-		add(which(triples$nrank == rk & triples$tsuit %in% c("H", "D")), 1, 5, 5)
+	## SOFT: every number rank pairs with 5 red and 5 black traditional halves, as nearly as
+	## the objective can manage; 4-6 is a hard bound.  count + under - over = 5.
+	for (q in seq_along(NUM)) {
+		k <- which(triples$nrank == NUM[q] & triples$tsuit %in% c("H", "D"))
+		add(k, 1, 4, 6)
+		add(c(k, var("rank_over", q), var("rank_under", q)), c(rep(1, length(k)), -1, 1), 5, 5)
 	}
 
 	stopifnot(length(ii) == length(xx), length(jj) == length(xx))
 	A <- sparseMatrix(i = ii, j = jj, x = xx, dims = c(nr, NC))
 	cat("variables:", NC, " constraints:", nr, " non-zeros:", length(xx), "\n")
 
+	## lexicographic objective: cells first (64 exceeds the per-rank total's bound of 10)
+	obj <- numeric(NC)
+	obj[c(var("cell_over", seq_len(nrow(hcells))), var("cell_under", seq_len(nrow(hcells))))] <- 64
+	obj[c(var("rank_over", seq_along(NUM)), var("rank_under", seq_along(NUM)))] <- 1
+
 	eq <- which(lo == hi)
-	geq <- which(is.finite(lo) & lo != hi)
-	leq <- which(is.finite(hi) & lo != hi)
+	geq <- which(is.finite(lo) & lo != hi & !is.finite(hi))
+	leq <- which(is.finite(hi) & lo != hi & !is.finite(lo))
+	rng <- which(is.finite(lo) & is.finite(hi) & lo != hi)
+	# a ranged row l <= a'x <= u is written as two rows
 	model <- list(
-		A = rbind(A[eq, , drop = FALSE], A[geq, , drop = FALSE], A[leq, , drop = FALSE]),
-		obj = numeric(NC),
-		sense = c(rep("=", length(eq)), rep(">=", length(geq)), rep("<=", length(leq))),
-		rhs = c(lo[eq], lo[geq], hi[leq]),
+		A = rbind(
+			A[eq, , drop = FALSE],
+			A[geq, , drop = FALSE],
+			A[rng, , drop = FALSE],
+			A[leq, , drop = FALSE],
+			A[rng, , drop = FALSE]
+		),
+		obj = obj,
+		sense = c(
+			rep("=", length(eq)),
+			rep(">=", length(geq) + length(rng)),
+			rep("<=", length(leq) + length(rng))
+		),
+		rhs = c(lo[eq], lo[geq], lo[rng], hi[leq], hi[rng]),
 		vtype = c(rep("B", nz), rep("C", NC - nz)),
 		lb = numeric(NC),
 		ub = c(rep(1, nz), rep(20, NC - nz)),
 		modelsense = "min"
 	)
+
+	if (!is.null(start) && file.exists(start)) {
+		st <- read.csv(start, colClasses = "character")
+		key <- paste0(triples$nlight, triples$nsuit, " ", triples$nrank, "|", triples$tsuit)
+		chosen <- which(key == paste0(st$nlabel, "|", st$tsuit)[triples$i])
+		stopifnot(length(chosen) == nrow(cards))
+		model$start <- c(rep(0, nz), rep(NA_real_, NC - nz))
+		model$start[chosen] <- 1
+		cat("warm start loaded from", start, "\n")
+	}
+
 	cat("gurobi rows:", nrow(model$A), "\n")
 	flush.console()
-	r <- gurobi::gurobi(model, params = list(TimeLimit = time_limit, OutputFlag = 0L))
-	list(status_message = r$status, primal_solution = r$x)
+	r <- gurobi::gurobi(
+		model,
+		params = list(
+			TimeLimit = time_limit,
+			OutputFlag = 0L,
+			MIPFocus = 1L,
+			ConcurrentMIP = concurrent,
+			Seed = seed
+		)
+	)
+	list(status_message = r$status, primal_solution = r$x, objective = r$objval)
 }
 
 # ---------------------------------------------------------------------------------------
@@ -483,14 +584,27 @@ score <- function(dfj) {
 	)
 }
 
+# the objective, recomputed from a deck data frame (64 x cell deviation + per-rank red deviation)
+soft_objective <- function(df) {
+	cells <- table(paste0(df$tlight, df$tsuit), df$nsuit)
+	red <- table(df$nrank, df$tred)[, "R"]
+	64 * sum(pmax(0L, cells - 3L) + pmax(0L, 2L - cells)) + sum(abs(red - 5L))
+}
+
+start_objective <- if (file.exists(OUTFILE)) {
+	soft_objective(read.csv(OUTFILE, colClasses = "character"))
+} else {
+	Inf
+}
+
 res <- solve_monolith()
-cat("status:", res$status_message, "\n")
-if (!identical(res$status_message, "OPTIMAL")) {
+cat("status:", res$status_message, "  objective:", res$objective, "\n")
+if (is.null(res$primal_solution)) {
 	stop(
 		"gurobi returned '",
 		res$status_message,
-		"' rather than 'OPTIMAL' -- raise ",
-		"`time_limit`, or relax a feature (see the notes at the top of this file)"
+		"' with no solution -- raise `time_limit`, or relax a feature (see the notes at the ",
+		"top of this file)"
 	)
 }
 
@@ -508,6 +622,13 @@ dfj <- cards |>
 	left_join(dfn, by = "nlabel") |>
 	left_join(dft, by = "tlabel")
 
+d6_halves <- table(c(
+	paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$lrank),
+	paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$rrank)
+))
+cell_counts <- table(paste0(dfj$tlight, dfj$tsuit), dfj$nsuit)
+red_per_rank <- table(dfj$nrank, dfj$tred)[, "R"]
+
 stopifnot(
 	nrow(dfj) == 100L,
 	n_distinct(dfj$nlabel) == 100L, # every number suit half used once
@@ -519,39 +640,26 @@ stopifnot(
 	n_distinct(paste0(dfj$nlight, dfj$nrank)[1:20]) == 20L, # d100 doubles
 	all(table(dfj$nlight_suit, dfj$tred) == 5L), # half-number-suit x red/black
 	all(table(dfj$nlight_suit, dfj$tshaded) == 5L), # half-number-suit x shaded/plain
-	all(table(dfj$nrank, dfj$tred) == 5L), # 5 red / 5 black per number rank
 	all(table(dfj$nrank, dfj$tsuit) >= 1L), # every rank shows every fr. suit
-	all(
-		table(c(
-			paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$lrank),
-			paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$rrank)
-		)) ==
-			3L
-	), # 3 d6 halves per fr. suit x rank
-	all(
-		sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5))[1:23] %in%
-			filter(dfj, !tshaded)$nsuit_rank
-	) # unbroken shaded run 00..22
+	all(d6_halves == 3L), # 3 d6 halves per fr. suit x rank
+	all(sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5)) %in% filter(dfj, !tshaded)$nsuit_rank), # full run
+	# the two soft features must be at least as good as the deck adopted in 2026
+	all(cell_counts >= 1L & cell_counts <= 4L),
+	sum(pmax(0L, cell_counts - 3L) + pmax(0L, 2L - cell_counts)) <= 4L,
+	all(red_per_rank >= 4L & red_per_rank <= 6L),
+	sum(abs(red_per_rank - 5L)) <= 6L
 )
 print(score(dfj))
 
-vals <- sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5))
-present <- vals %in% filter(dfj, !tshaded)$nsuit_rank
-run <- if (all(present)) 50L else which.min(present) - 1L
-run1 <- if (all(present[2:50])) 49L else which.min(present[2:50]) - 1L
-cat("values covered:", sum(present), "/ 50   run from 00:", run, "  run from 01:", run1, "\n")
-cat(
-	"d6 halves per suit x rank:",
-	paste(
-		range(table(c(
-			paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$lrank),
-			paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$rrank)
-		))),
-		collapse = "-"
-	),
-	"\n"
-)
-cat("red per number rank:", paste(table(dfj$nrank, dfj$tred)[, "R"], collapse = " "), "\n")
+cat("d6 halves per suit x rank:", paste(range(d6_halves), collapse = "-"), "\n")
+cat("cells outside 2-3:", sum(cell_counts < 2L | cell_counts > 3L), "\n")
+cat("red per number rank:", paste(red_per_rank, collapse = " "), "\n")
 cat("pairing deviation:", sum(abs(table(dfj$nsuit, dfj$tsuit) - 5)), "\n")
-write.csv(dfj, "data-raw/beta.csv", row.names = FALSE)
-cat("wrote data-raw/beta.csv\n")
+# Gurobi often returns a *different* deck with the same objective (the face cards can be
+# permuted freely), so only replace the adopted deck when the solver strictly improves on it.
+if (round(soft_objective(dfj)) < start_objective) {
+	write.csv(dfj, OUTFILE, row.names = FALSE)
+	cat("wrote", OUTFILE, "\n")
+} else {
+	cat("no improvement on", OUTFILE, "(objective", start_objective, ") -- left unchanged\n")
+}
