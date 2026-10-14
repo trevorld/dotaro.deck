@@ -39,7 +39,7 @@ save_dotaro_rules <- function(
 		")"
 	)
 	writeLines(code, tr)
-	out <- suppressWarnings(system2("Rscript", tr, stdout = TRUE, stderr = TRUE))
+	out <- suppressWarnings(system2(rscript_path(), tr, stdout = TRUE, stderr = TRUE))
 	if (!quietly) {
 		writeLines(out)
 	}
