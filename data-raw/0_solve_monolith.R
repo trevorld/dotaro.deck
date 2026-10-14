@@ -7,9 +7,11 @@
 #   Rscript data-raw/0_solve_monolith.R   # writes data-raw/gamma.csv (needs Gurobi; ~hours)
 #   Rscript data-raw/4_clean.R            # rebuilds R/sysdata.rda
 #
-# If `data-raw/gamma.csv` already exists it is handed to Gurobi as a warm start, so a re-run
-# is feasible from the first second and only spends its time limit looking for something
-# better.  `beta.csv` is the previous deck (shaded run 00--23 only), kept for reference.
+# If `data-raw/gamma.csv` already exists it is checked against every constraint and handed
+# to Gurobi as a warm start, so a re-run is feasible from the first second and only spends
+# its time limit looking for something better (a deck that no longer satisfies the model
+# stops the script with the offending row, rather than being dropped silently).  `beta.csv`
+# is the previous deck (shaded run 00--23 only), kept for reference.
 #
 # ## Why a single program
 #
@@ -86,7 +88,7 @@
 #                        with 5 red and 5 black traditional halves
 # * "rank balance"     - every number rank pairs with 4-6 red traditional halves, 5 wherever
 #                        the objective can manage it (5 6 4 6 5 4 5 5 4 6 in practice), and
-#                        shows at least one card of each fr. suit (1-4 in practice), so the
+#                        shows at least one card of each fr. suit (1-5 in practice), so the
 #                        deck laid out by rank looks even
 # * "face cards"       - the 20 face-rank cards have 2 per half-number-suit, 4 per number
 #                        suit, and 20 distinct number values
@@ -263,12 +265,18 @@ triples <- do.call(
 # `time_limit` is spent looking for a better deck than the warm start (if any); a couple of
 # minutes (e.g. `DOTARO_TIME_LIMIT=120`) just re-validates `gamma.csv`, while the deck here
 # took about 70 minutes to find from scratch with `concurrent = 4` on 32 threads.
+default_time_limit <- function() {
+	tl <- Sys.getenv("DOTARO_TIME_LIMIT")
+	if (nzchar(tl)) as.numeric(tl) else 7200
+}
+
 solve_monolith <- function(
-	time_limit = as.numeric(Sys.getenv("DOTARO_TIME_LIMIT", 7200)),
+	time_limit = default_time_limit(),
 	concurrent = 4L,
 	seed = 11L,
 	start = OUTFILE
 ) {
+	stopifnot(is.finite(time_limit), time_limit > 0)
 	nz <- nrow(triples)
 	cells <- expand.grid(nsuit = as.character(0:4), s = 1:4, stringsAsFactors = FALSE)
 	hcells <- expand.grid(
@@ -374,7 +382,7 @@ solve_monolith <- function(
 		idx <- which(triples$nsuit == cells$nsuit[k] & triples$s == cells$s[k])
 		add(
 			c(idx, slack_col("surplus", k), slack_col("shortfall", k)),
-			c(rep(1, length(idx)), 1, -1),
+			c(rep(1, length(idx)), -1, 1),
 			5,
 			5
 		)
@@ -475,11 +483,12 @@ solve_monolith <- function(
 	## total deviation --- does not solve within an hour, while allowing 2 and letting the
 	## solver settle finds a perfect 5/5.  The `stopifnot()` below asserts the result really
 	## is 5/5, so a future change cannot silently degrade it.
+	## count = 5 + over - under, as for the cells and ranks below
 	for (q in seq_along(hns)) {
 		idx <- which(triples$nlight_suit == hns[q] & triples$tsuit %in% c("H", "D"))
 		add(
 			c(idx, slack_col("hns_over", q), slack_col("hns_under", q)),
-			c(rep(1, length(idx)), 1, -1),
+			c(rep(1, length(idx)), -1, 1),
 			5,
 			5
 		)
@@ -563,12 +572,77 @@ solve_monolith <- function(
 
 	if (!is.null(start) && file.exists(start)) {
 		st <- read.csv(start, colClasses = "character")
+		st <- st[match(cards$label, st$label), ] # by label, not by row position
+		stopifnot(!anyNA(st$label))
 		key <- paste0(triples$nlight, triples$nsuit, " ", triples$nrank, "|", triples$tsuit)
 		chosen <- which(key == paste0(st$nlabel, "|", st$tsuit)[triples$i])
 		stopifnot(length(chosen) == nrow(cards))
-		model$start <- c(rep(0, nz), rep(NA_real_, NC - nz))
-		model$start[chosen] <- 1
-		cat("warm start loaded from", start, "\n")
+		x <- numeric(NC)
+		x[chosen] <- 1
+		# Complete the start with the slack values the binaries imply, then check it against
+		# every row.  Gurobi discards an infeasible start without a word under `OutputFlag = 0`,
+		# and a short re-run would then report "no solution" as if the model were merely hard,
+		# when the real news is that `start` no longer satisfies the constraints.
+		ct <- triples[chosen, ]
+		ct$red <- ct$tsuit %in% c("H", "D")
+		ct$nsh <- nsh[chosen]
+		set_slack <- function(over, under, count, lo_t, hi_t) {
+			x[slack_col(over, seq_along(count))] <<- pmax(0, count - hi_t)
+			x[slack_col(under, seq_along(count))] <<- pmax(0, lo_t - count)
+		}
+		set_slack(
+			"surplus",
+			"shortfall",
+			vapply(
+				seq_len(nrow(cells)),
+				function(k) sum(ct$nsuit == cells$nsuit[k] & ct$s == cells$s[k]),
+				0
+			),
+			5,
+			5
+		)
+		set_slack(
+			"hns_over",
+			"hns_under",
+			vapply(hns, function(m) sum(ct$nlight_suit == m & ct$red), 0),
+			5,
+			5
+		)
+		set_slack(
+			"cell_over",
+			"cell_under",
+			vapply(
+				seq_len(nrow(hcells)),
+				function(q) {
+					sum(ct$nsh == hcells$sh[q] & ct$s == hcells$s[q] & ct$nsuit == hcells$nsuit[q])
+				},
+				0
+			),
+			2,
+			3
+		)
+		set_slack(
+			"rank_over",
+			"rank_under",
+			vapply(NUM, function(rk) sum(ct$nrank == rk & ct$red), 0),
+			5,
+			5
+		)
+		Ax <- as.vector(A %*% x)
+		bad <- which(Ax < lo - 1e-9 | Ax > hi + 1e-9)
+		if (length(bad)) {
+			stop(sprintf(
+				"warm start %s violates %d model row(s); first is row %d with value %g outside [%g, %g] -- was a constraint added since it was written?",
+				start,
+				length(bad),
+				bad[1],
+				Ax[bad[1]],
+				lo[bad[1]],
+				hi[bad[1]]
+			))
+		}
+		model$start <- x
+		cat("warm start loaded from", start, "and verified feasible\n")
 	}
 
 	cat("gurobi rows:", nrow(model$A), "\n")
@@ -650,10 +724,8 @@ dfj <- cards |>
 	left_join(dfn, by = "nlabel") |>
 	left_join(dft, by = "tlabel")
 
-d6_halves <- table(c(
-	paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$lrank),
-	paste0(filter(dfj, d6)$tsuit, filter(dfj, d6)$rrank)
-))
+df6 <- filter(dfj, d6)
+d6_halves <- table(c(paste0(df6$tsuit, df6$lrank), paste0(df6$tsuit, df6$rrank)))
 cell_counts <- table(paste0(dfj$tlight, dfj$tsuit), dfj$nsuit)
 red_per_rank <- table(dfj$nrank, dfj$tred)[, "R"]
 
@@ -671,11 +743,12 @@ stopifnot(
 	all(table(dfj$nrank, dfj$tsuit) >= 1L), # every rank shows every fr. suit
 	all(d6_halves == 3L), # 3 d6 halves per fr. suit x rank
 	all(sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5)) %in% filter(dfj, !tshaded)$nsuit_rank), # full run
-	# the two soft features must be at least as good as the deck adopted in 2026
 	all(cell_counts >= 1L & cell_counts <= 4L),
-	sum(pmax(0L, cell_counts - 3L) + pmax(0L, 2L - cell_counts)) <= 4L,
 	all(red_per_rank >= 4L & red_per_rank <= 6L),
-	sum(abs(red_per_rank - 5L)) <= 6L
+	# the soft objective must be at least as good as the deck adopted in 2026 (4 cells off,
+	# red deviation 6).  One bound, not one per term: a deck with 3 cells off and a worse
+	# colour split is strictly better under the lexicographic objective and must not abort.
+	soft_objective(dfj) <= 64L * 4L + 6L
 )
 print(score(dfj))
 
