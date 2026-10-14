@@ -293,7 +293,7 @@ solve_monolith <- function(
 	offs <- nz + c(0, cumsum(blocks))[seq_along(blocks)]
 	names(offs) <- names(blocks)
 	NC <- nz + sum(blocks)
-	var <- function(block, k) offs[[block]] + k
+	slack_col <- function(block, k) offs[[block]] + k
 
 	ii <- jj <- xx <- lo <- hi <- numeric(0)
 	nr <- 0L
@@ -372,9 +372,19 @@ solve_monolith <- function(
 	## suit balance: count = 5 + surplus - shortfall, with the total deviation at its floor
 	for (k in seq_len(nrow(cells))) {
 		idx <- which(triples$nsuit == cells$nsuit[k] & triples$s == cells$s[k])
-		add(c(idx, var("surplus", k), var("shortfall", k)), c(rep(1, length(idx)), 1, -1), 5, 5)
+		add(
+			c(idx, slack_col("surplus", k), slack_col("shortfall", k)),
+			c(rep(1, length(idx)), 1, -1),
+			5,
+			5
+		)
 	}
-	add(c(var("surplus", seq_len(nrow(cells))), var("shortfall", seq_len(nrow(cells)))), 1, 0, 4)
+	add(
+		c(slack_col("surplus", seq_len(nrow(cells))), slack_col("shortfall", seq_len(nrow(cells)))),
+		1,
+		0,
+		4
+	)
 
 	## each of the 5 number suits pairs with 10 red and 10 black traditional halves (each
 	## number suit has 20 cards, so fixing red at 10 fixes black at 10 too)
@@ -422,7 +432,12 @@ solve_monolith <- function(
 			nsh == hcells$sh[q] & triples$s == hcells$s[q] & triples$nsuit == hcells$nsuit[q]
 		)
 		add(idx, 1, 1, 4)
-		add(c(idx, var("cell_over", q), var("cell_under", q)), c(rep(1, length(idx)), -1, 1), 2, 3)
+		add(
+			c(idx, slack_col("cell_over", q), slack_col("cell_under", q)),
+			c(rep(1, length(idx)), -1, 1),
+			2,
+			3
+		)
 	}
 
 	## each of the 11 doubled Chinese "civil" tiles gets one light and one dark traditional
@@ -462,9 +477,14 @@ solve_monolith <- function(
 	## is 5/5, so a future change cannot silently degrade it.
 	for (q in seq_along(hns)) {
 		idx <- which(triples$nlight_suit == hns[q] & triples$tsuit %in% c("H", "D"))
-		add(c(idx, var("hns_over", q), var("hns_under", q)), c(rep(1, length(idx)), 1, -1), 5, 5)
+		add(
+			c(idx, slack_col("hns_over", q), slack_col("hns_under", q)),
+			c(rep(1, length(idx)), 1, -1),
+			5,
+			5
+		)
 	}
-	add(c(var("hns_over", seq_along(hns)), var("hns_under", seq_along(hns))), 1, 0, 2)
+	add(c(slack_col("hns_over", seq_along(hns)), slack_col("hns_under", seq_along(hns))), 1, 0, 2)
 
 	## the shaded partition axis
 	add(which(cards$is_double[triples$i] & triples$shaded), 1, 10, 10)
@@ -495,7 +515,12 @@ solve_monolith <- function(
 	for (q in seq_along(NUM)) {
 		k <- which(triples$nrank == NUM[q] & triples$tsuit %in% c("H", "D"))
 		add(k, 1, 4, 6)
-		add(c(k, var("rank_over", q), var("rank_under", q)), c(rep(1, length(k)), -1, 1), 5, 5)
+		add(
+			c(k, slack_col("rank_over", q), slack_col("rank_under", q)),
+			c(rep(1, length(k)), -1, 1),
+			5,
+			5
+		)
 	}
 
 	stopifnot(length(ii) == length(xx), length(jj) == length(xx))
@@ -504,8 +529,11 @@ solve_monolith <- function(
 
 	## lexicographic objective: cells first (64 exceeds the per-rank total's bound of 10)
 	obj <- numeric(NC)
-	obj[c(var("cell_over", seq_len(nrow(hcells))), var("cell_under", seq_len(nrow(hcells))))] <- 64
-	obj[c(var("rank_over", seq_along(NUM)), var("rank_under", seq_along(NUM)))] <- 1
+	obj[c(
+		slack_col("cell_over", seq_len(nrow(hcells))),
+		slack_col("cell_under", seq_len(nrow(hcells)))
+	)] <- 64
+	obj[c(slack_col("rank_over", seq_along(NUM)), slack_col("rank_under", seq_along(NUM)))] <- 1
 
 	eq <- which(lo == hi)
 	geq <- which(is.finite(lo) & lo != hi & !is.finite(hi))
