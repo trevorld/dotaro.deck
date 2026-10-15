@@ -1,4 +1,5 @@
 test_save_octavo_booklet <- function(variant, size = "letter") {
+	skip_if_not_installed("bittermelon")
 	skip_if_not_installed("systemfonts")
 	skip_if_not(piecepackr::has_font("DejaVu Sans"))
 	skip_if_not(piecepackr::has_font("Dotaro Ranks"))

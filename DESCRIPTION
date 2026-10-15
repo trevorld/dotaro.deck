@@ -25,6 +25,7 @@ Imports:
 	utils,
 	xmpdf
 Suggests:
+	bittermelon,
 	gridpattern,
 	svglite,
 	testthat (>= 3.0.0),
