@@ -27,28 +27,33 @@ jobs:
         if: runner.os == 'Linux'
         run: |
             sudo apt-get update
-            sudo apt-get install -y fonts-dejavu python3-fontforge
+            sudo apt-get install -y fonts-dejavu lcdf-typetools
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: covr
 
-      - name: Generate Dotaro fonts with FontForge
+      - name: Install Dotaro fonts
         if: runner.os == 'Linux'
-        env:
-          RETICULATE_PYTHON: /usr/bin/python3
         run: |
-          dir <- file.path(Sys.getenv("HOME"), ".local", "share", "fonts")
-          dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-          for (font in c("ranks", "suits")) {
-            sfd <- tempfile(fileext = ".sfd")
-            dotaro.font::generate_sfd(font, sfd)
-            dotaro.font::generate_font(sfd, file.path(dir, paste0("dotaro-", font, ".ttf")))
-          }
-          system("fc-cache -f")
-          stopifnot(system("fc-list | grep -q \"Dotaro Ranks\" && fc-list | grep -q \"Dotaro Suits\"") == 0L)
-        shell: Rscript {0}
+          mkdir -p ~/.local/share/fonts
+          for font in ranks suits; do
+            curl -fsSL -o ~/.local/share/fonts/dotaro-$font.ttf https://trevorldavis.com/share/fonts/dotaro-$font.ttf
+          done
+          fc-cache -f
+          fc-list | grep -q "Dotaro Ranks"
+          fc-list | grep -q "Dotaro Suits"
+          # the fonts' version string is set from the `{dotaro.font}` version that generated them
+          expected=$(Rscript -e 'cat(format(packageVersion("dotaro.font")))')
+          for font in ranks suits; do
+            actual=$(otfinfo -v ~/.local/share/fonts/dotaro-$font.ttf | awk '{print $2}')
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::dotaro-$font.ttf is version $actual but {dotaro.font} is $expected; redeploy the fonts to trevorldavis.com"
+              exit 1
+            fi
+          done
+        shell: bash
 
       - name: Test coverage
         run: covr::codecov()
