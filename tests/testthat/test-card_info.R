@@ -71,7 +71,7 @@ test_that("number suits pair evenly with the traditional suits", {
 	# deviation 4 is the floor imposed by the 26/24/26/24 French suit totals
 	expect_equal(sum(abs(table(df$bsuit, df$tsuit) - 5L)), 4L)
 	cells <- table(df$tlight_suit, df$bsuit)
-	expect_true(all(cells >= 1L & cells <= 4L))
+	expect_true(all(cells >= 2L & cells <= 3L))
 	expect_true(all(table(df$nlight_suit, df$red) == 5L))
 	expect_true(all(table(df$nlight_suit, df$tshaded) == 5L))
 })

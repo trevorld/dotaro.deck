@@ -13,6 +13,9 @@
 # stops the script with the offending row, rather than being dropped silently).  `beta.csv`
 # is the previous deck (shaded run 00--23 only), kept for reference.
 #
+# Setting `DOTARO_PIN=numhalf` (or `DOTARO_PIN=suit`) pins the 80 non-face cards' number
+# halves (or French suits) to the warm start and re-solves the rest (see "Polishing" below).
+#
 # ## Why a single program
 #
 # The staged pipeline searches randomly at both ends: step 1 samples number suit halves
@@ -82,12 +85,12 @@
 #                        `2_filter_doubles.R` screened for) *and* 20 distinct number values,
 #                        so a double's number half identifies it uniquely
 # * "suit balance"     - the 5 number suits pair evenly with the 4 fr. suits (deviation 4,
-#                        its floor -- see below); every (trad. half-suit, number suit) cell
-#                        holds 1-4 cards, 2-3 wherever the objective can manage it (4 cells
-#                        at 1 or 4 in practice); and each of the 10 half-number-suits pairs
-#                        with 5 red and 5 black traditional halves
+#                        its floor -- see below); every one of the 40 (trad. half-suit,
+#                        number suit) cells holds 2 or 3 cards (100 / 40 is 2.5); and each of
+#                        the 10 half-number-suits pairs with 5 red and 5 black traditional
+#                        halves
 # * "rank balance"     - every number rank pairs with 4-6 red traditional halves, 5 wherever
-#                        the objective can manage it (5 6 4 6 5 4 5 5 4 6 in practice), and
+#                        the objective can manage it (4 4 6 4 5 6 5 5 6 5 in practice), and
 #                        shows at least one card of each fr. suit (1-5 in practice), so the
 #                        deck laid out by rank looks even
 # * "face cards"       - the 20 face-rank cards have 2 per half-number-suit, 4 per number
@@ -104,10 +107,8 @@
 #                        id for all 108 cards -- including the fools and knights, which have
 #                        no number half -- and needs no constraint.
 #
-# The two "wherever the objective can manage it" features are the only soft ones.  The
-# objective minimises 64 x (cell deviation from 2-3) + 1 x (per-rank red deviation from 5),
-# which is lexicographic since the per-rank total cannot exceed 10 under its 4-6 bounds.
-# Everything else is a hard constraint.
+# The per-rank red split is the only soft feature: the objective minimises the total
+# deviation of the ten per-rank red counts from 5.  Everything else is a hard constraint.
 #
 # `suit balance` cannot be perfectly uniform.  The fools consume both Diamond Jacks and both
 # Queens of Spades, leaving 24 diamonds and 24 spades against 26 hearts and 26 clubs, so the
@@ -122,15 +123,14 @@
 #   needs at least eight.  That is a counting proof, not a failed search.
 # * The full shaded run together with cells at exactly 2-3 *and* 5 red / 5 black on every
 #   number rank --- proven infeasible by Gurobi.  Some loss on the colour split is therefore
-#   unavoidable once the run is required.
-# * The full shaded run together with cells at exactly 2-3 *and* the exact d6 rank balance.
-#   Not refuted, but roughly ten hours of solver time across many seeds (single-seed runs,
-#   4-seed concurrent runs, warm starts, and a tightened reformulation) never found one,
-#   while either feature alone with the run is found within an hour or two.  The deck here
-#   keeps the d6 balance exact and lets four cells slip to 1 or 4, on the grounds that an
-#   uneven dice subdeck is visible at the table and four pairing cells are not.  The other
-#   trade (cells exact, d6 off by one in four cells) is also reachable.
-# * Dropping the shaded-axis symmetry constraints does not help: the deck that recovered the
+#   unavoidable once the run is required; the deck here is off by 6 (three ranks at 4, three
+#   at 6).  Letting the face cards pair with any of the number ranks 0/7/8/9 (instead of J
+#   with 7/0, Q with 9/8 and K two each) reaches a deviation of 4, but exact 5/5 stayed
+#   infeasible in both pinned neighbourhoods of that deck, and 2 h from scratch with every
+#   soft feature made hard found nothing.  Not adopted, since it would move the face cards'
+#   ranks, but kept as `data-raw/gamma_candidate.csv` (same columns as `gamma.csv`; its
+#   face-card labels are relabelled by the pairing chosen, e.g. `Q-7a`).
+# * Dropping the shaded-axis symmetry constraints does not help: a deck that recovered the
 #   exact d6 balance was found with them removed, yet satisfies all of them anyway.  They are
 #   kept as hard constraints.
 # * Giving the two copies of every number value different French suits (equivalently, one
@@ -147,6 +147,19 @@
 #   further 2 hours penalising the doubles alone on another seed did the same.  Runs from
 #   scratch with the penalties found no deck at all in 2 hours, so they say nothing; the
 #   base model is already near the edge of what Gurobi finds in that time.  Not refuted.
+#
+# ## Polishing
+#
+# The full program is near the edge of what Gurobi handles: the cells-at-2-3 feature was
+# believed unreachable alongside the exact d6 balance after roughly ten hours of solver time
+# (single-seed runs, 4-seed concurrent runs, warm starts, a tightened reformulation), and
+# warm-started runs returned their start unimproved every time.  Yet pinning the 80 non-face
+# cards' number halves to that start and re-solving only the French suits (`DOTARO_PIN=
+# numhalf`) found the current deck -- cells exact (instead of 4 at 1 or 4), d6 exact, red
+# deviation still 6 -- to proven optimality in minutes.  Pinning suits and re-solving
+# the number halves instead (`DOTARO_PIN=suit`), and alternating the two, found nothing
+# better, so the deck is locally optimal for both neighbourhoods.  Try the pins before
+# spending hours on the full program.
 
 library("dplyr")
 library("stringr")
@@ -263,8 +276,9 @@ triples <- do.call(
 # ---------------------------------------------------------------------------------------
 
 # `time_limit` is spent looking for a better deck than the warm start (if any); a couple of
-# minutes (e.g. `DOTARO_TIME_LIMIT=120`) just re-validates `gamma.csv`, while the deck here
-# took about 70 minutes to find from scratch with `concurrent = 4` on 32 threads.
+# minutes (e.g. `DOTARO_TIME_LIMIT=120`) just re-validates `gamma.csv`.  From scratch the
+# full program took about 70 minutes to find a deck with `concurrent = 4` on 32 threads.
+# `pin` (default `DOTARO_PIN`) is "", "numhalf" or "suit" -- see "Polishing" in the header.
 default_time_limit <- function() {
 	tl <- Sys.getenv("DOTARO_TIME_LIMIT")
 	if (nzchar(tl)) as.numeric(tl) else 7200
@@ -274,9 +288,14 @@ solve_monolith <- function(
 	time_limit = default_time_limit(),
 	concurrent = 4L,
 	seed = 11L,
-	start = OUTFILE
+	start = OUTFILE,
+	pin = Sys.getenv("DOTARO_PIN")
 ) {
 	stopifnot(is.finite(time_limit), time_limit > 0)
+	stopifnot(pin %in% c("", "numhalf", "suit"))
+	if (nzchar(pin) && (is.null(start) || !file.exists(start))) {
+		stop("pin = \"", pin, "\" needs a warm start, but there is no ", deparse(start))
+	}
 	nz <- nrow(triples)
 	cells <- expand.grid(nsuit = as.character(0:4), s = 1:4, stringsAsFactors = FALSE)
 	hcells <- expand.grid(
@@ -293,8 +312,6 @@ solve_monolith <- function(
 		shortfall = nrow(cells), # suit balance, cap 4
 		hns_over = length(hns),
 		hns_under = length(hns), # half-number-suit red, cap 2
-		cell_over = nrow(hcells),
-		cell_under = nrow(hcells), # SOFT: cells outside 2-3
 		rank_over = length(NUM),
 		rank_under = length(NUM) # SOFT: per-rank red away from 5
 	)
@@ -432,20 +449,13 @@ solve_monolith <- function(
 		add(which(is_face[triples$i] & triples$nsuit_rank == v), 1, 0, 1)
 	}
 
-	## SOFT: every one of the 40 (trad. half-suit, number suit) cells holds 2 or 3 cards
-	## (100 / 40 is 2.5), as nearly as the objective can manage; 1-4 is a hard bound.
-	## count - over + under is in [2, 3], so over/under measure the excursion outside it.
+	## every one of the 40 (trad. half-suit, number suit) cells holds 2 or 3 cards (100 / 40
+	## is 2.5).
 	for (q in seq_len(nrow(hcells))) {
 		idx <- which(
 			nsh == hcells$sh[q] & triples$s == hcells$s[q] & triples$nsuit == hcells$nsuit[q]
 		)
-		add(idx, 1, 1, 4)
-		add(
-			c(idx, slack_col("cell_over", q), slack_col("cell_under", q)),
-			c(rep(1, length(idx)), -1, 1),
-			2,
-			3
-		)
+		add(idx, 1, 2, 3)
 	}
 
 	## each of the 11 doubled Chinese "civil" tiles gets one light and one dark traditional
@@ -483,7 +493,7 @@ solve_monolith <- function(
 	## total deviation --- does not solve within an hour, while allowing 2 and letting the
 	## solver settle finds a perfect 5/5.  The `stopifnot()` below asserts the result really
 	## is 5/5, so a future change cannot silently degrade it.
-	## count = 5 + over - under, as for the cells and ranks below
+	## count = 5 + over - under, as for the ranks below
 	for (q in seq_along(hns)) {
 		idx <- which(triples$nlight_suit == hns[q] & triples$tsuit %in% c("H", "D"))
 		add(
@@ -536,12 +546,8 @@ solve_monolith <- function(
 	A <- sparseMatrix(i = ii, j = jj, x = xx, dims = c(nr, NC))
 	cat("variables:", NC, " constraints:", nr, " non-zeros:", length(xx), "\n")
 
-	## lexicographic objective: cells first (64 exceeds the per-rank total's bound of 10)
+	## objective: the total per-rank red deviation from 5
 	obj <- numeric(NC)
-	obj[c(
-		slack_col("cell_over", seq_len(nrow(hcells))),
-		slack_col("cell_under", seq_len(nrow(hcells)))
-	)] <- 64
 	obj[c(slack_col("rank_over", seq_along(NUM)), slack_col("rank_under", seq_along(NUM)))] <- 1
 
 	eq <- which(lo == hi)
@@ -609,19 +615,6 @@ solve_monolith <- function(
 			5
 		)
 		set_slack(
-			"cell_over",
-			"cell_under",
-			vapply(
-				seq_len(nrow(hcells)),
-				function(q) {
-					sum(ct$nsh == hcells$sh[q] & ct$s == hcells$s[q] & ct$nsuit == hcells$nsuit[q])
-				},
-				0
-			),
-			2,
-			3
-		)
-		set_slack(
 			"rank_over",
 			"rank_under",
 			vapply(NUM, function(rk) sum(ct$nrank == rk & ct$red), 0),
@@ -643,6 +636,14 @@ solve_monolith <- function(
 		}
 		model$start <- x
 		cat("warm start loaded from", start, "and verified feasible\n")
+		# polishing: pin the non-face cards' number halves or French suits to the start
+		if (nzchar(pin)) {
+			col <- if (pin == "numhalf") "h" else "s"
+			pinned <- ct[[col]][match(triples$i, ct$i)]
+			off <- which(!is_face[triples$i] & triples[[col]] != pinned)
+			model$ub[off] <- 0
+			cat("pin = ", pin, ": disabled ", length(off), " non-face triples\n", sep = "")
+		}
 	}
 
 	cat("gurobi rows:", nrow(model$A), "\n")
@@ -686,11 +687,10 @@ score <- function(dfj) {
 	)
 }
 
-# the objective, recomputed from a deck data frame (64 x cell deviation + per-rank red deviation)
+# the objective, recomputed from a deck data frame (total per-rank red deviation from 5)
 soft_objective <- function(df) {
-	cells <- table(paste0(df$tlight, df$tsuit), df$nsuit)
 	red <- table(df$nrank, df$tred)[, "R"]
-	64 * sum(pmax(0L, cells - 3L) + pmax(0L, 2L - cells)) + sum(abs(red - 5L))
+	sum(abs(red - 5L))
 }
 
 start_objective <- if (file.exists(OUTFILE)) {
@@ -743,17 +743,14 @@ stopifnot(
 	all(table(dfj$nrank, dfj$tsuit) >= 1L), # every rank shows every fr. suit
 	all(d6_halves == 3L), # 3 d6 halves per fr. suit x rank
 	all(sprintf("%d%d", rep(0:4, each = 10), rep(0:9, 5)) %in% filter(dfj, !tshaded)$nsuit_rank), # full run
-	all(cell_counts >= 1L & cell_counts <= 4L),
+	all(cell_counts >= 2L & cell_counts <= 3L),
 	all(red_per_rank >= 4L & red_per_rank <= 6L),
-	# the soft objective must be at least as good as the deck adopted in 2026 (4 cells off,
-	# red deviation 6).  One bound, not one per term: a deck with 3 cells off and a worse
-	# colour split is strictly better under the lexicographic objective and must not abort.
-	soft_objective(dfj) <= 64L * 4L + 6L
+	# the colour split must be at least as good as the deck adopted in October 2026
+	soft_objective(dfj) <= 6L
 )
 print(score(dfj))
 
 cat("d6 halves per suit x rank:", paste(range(d6_halves), collapse = "-"), "\n")
-cat("cells outside 2-3:", sum(cell_counts < 2L | cell_counts > 3L), "\n")
 cat("red per number rank:", paste(red_per_rank, collapse = " "), "\n")
 cat("pairing deviation:", sum(abs(table(dfj$nsuit, dfj$tsuit) - 5)), "\n")
 # Gurobi often returns a *different* deck with the same objective (the face cards can be
