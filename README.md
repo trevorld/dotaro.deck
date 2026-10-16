@@ -4,8 +4,8 @@
 
 * [Overview](#overview)
 * [Orientations](#orientations)
-* [Examples](#examples)
-* [Hybrid French-German-Spanish suits](#hybrid)
+* [French suit examples](#examples)
+* [Hybrid French-German-Spanish suit examples](#hybrid)
 * [Frequently Asked Questions](#faq)
 * [External links](#external)
 
@@ -217,7 +217,7 @@ This deck can build all the decks that the French-suited Dotaro Deck can but als
 ### One deck of German-suited playing cards
 
 * The German suits are the *shaded* traditional suits.
-* Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the *under*), knight (for the *ober*), and the king.
+* Use pip cards 2, 6–9, 0 (interpreted as ten) and use the pawn (for the *under*), knight (for the *ober*), and the king.
 * Pedantically the German *ace* is actually the *deuce* (rank two card) and is sometimes called the *Sow*.  Depending on your preference you could use the 1 rank card instead as the *ace*.
 * The suit symbol is only *over* the rank symbol in the *ober* face card.
 * Northern German decks commonly omit the 6 rank card.
@@ -230,7 +230,7 @@ This deck can build all the decks that the French-suited Dotaro Deck can but als
 ### One deck of Spanish-suited playing cards
 
 * The Spanish suits are the *light* traditional suits.
-* Use pip cards 1-9 and use the pawn for the *sota*, knight for the *caballo*, and king for the *rey*.
+* Use pip cards 1–9 and use the pawn for the *sota*, knight for the *caballo*, and king for the *rey*.
 * If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
 * It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
 
@@ -251,9 +251,9 @@ This deck can build all the decks that the French-suited Dotaro Deck can but als
 
 <img src="man/figures/README-latin_tarot-1.png" alt="One deck of Latin-suited tarot cards selected from the Dotaro Deck"  />
 
-### Deck of Hanafuda cards
+### One deck of Hanafuda cards
 
-* For the twelve month Hanafuda *suits* use Dotaro Deck *ranks* 1-9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
+* For the twelve month Hanafuda *suits* use Dotaro Deck *ranks* 1–9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
 * The green leaves, clovers, and acorns are *chaff* (aka *junk*).  Acorns are the only yellow chaff so use the Acorns as the *yellow* Paulownia.
 * The heart-shaped hearts, cups, and swords are *ribbons*.  Use hearts as *plain* ribbons, cups as *embellished* ribbons (e.g. *poetry* ribbons), and swords as *dark* ribbons (e.g. *blue* / *purple* ribbons).
 * The (hawk) bells are *animals*.
@@ -270,6 +270,53 @@ This deck can build all the decks that the French-suited Dotaro Deck can but als
 
 * The *Dotaro Deck* is inspired by domino sets and tarot decks and Dotaro is an abbreviation of Domino Tarot.
 * In Esperanto the word "dotaro" would mean something like "collection of endowments" and the *Dotaro Deck* can be used to play a wide variety of the playing card legacies our ancestors have endowed us with.
+
+### How are the top and bottom halves allocated?
+
+* The eight knight halves are manually allocated so the dark/light versions of each French suit are on the same card
+
+  - Each knight card has a light half, a dark half, a shaded half, and an unshaded half
+  - There are two "red" knights and two "black" knights
+
+* The four fool halves are manually allocated to the four pinochle legs (the two queens of spades and two jacks of diamonds)
+
+  - There are two fools when orienting light halves up top, dark halves up top, shaded suits down below, or unshaded suits down below.
+
+* The remaining 100 cards each pair one number suit half with one traditional suit half. A fixed domino scheme (`data-raw/basic_domino_scheme.csv`) decides which pair of ranks each of these 100 cards has, so that the deck contains:
+
+  + a double-nine domino subdeck
+  + a Chinese domino subdeck
+  + a d6 dice card subdeck
+  + two complete sets of doubles 0–9
+
+  For the 70 double-nine domino and d6 dice cards the scheme also fixes the number suit as the sum of pips modulo 5.
+
+  Given that scheme, a (likely non-unique) solution of a Mixed-Integer Linear Program (MILP) decides, for each card, which of its two ranks goes on the number suit half, whether that half is light or dark, its number suit (where the scheme hasn't fixed it), and the French suit of its traditional suit half.
+
+  + Hard constraints:
+
+    - Each card has one light half and one dark half, and each of the 100 number suit halves and 100 traditional suit halves is used exactly once.
+    - A complete set of number suits 00–49 plus two fools when "shaded" suits are oriented down.
+    - A complete set of number suits 00–49 plus two fools when "unshaded" suits are oriented down.
+    - Every subdeck (the twenty doubles, the double-six dominoes, the Chinese dominoes, the d6 dice cards, and the double-nine dominoes) splits evenly (10/10, 14/14, 16/16, 18/18, and 27/28) between light and dark traditional suit halves, between red and black traditional suit halves, and between shaded and unshaded traditional suit halves.
+    - Subdecks are spread evenly across the four French suits:
+
+      + Each French suit has 5 of the 20 doubles and 13–14 of the 55 double-nine dominoes.
+      + Each French suit has 8 Chinese dominoes (4 per light/dark half-suit) and has each of the six ranks on at least one of its Chinese domino cards.
+      + Each French suit has 9 d6 dice cards (4–5 per light/dark half-suit) with exactly 3 halves of each of the six ranks.
+      + Each French suit has two halves of each of the seven ranks in the double-six dominoes.
+
+    - The twenty doubles have two per light/dark number suit, twenty distinct number suit values (00–49), and each combination of light/dark and rank exactly once on their traditional suit halves (so one set of doubles 0–9 has light number suit halves and the other dark).
+    - Each of the eleven doubled Chinese "civil" tiles has one light and one dark traditional suit half so its two copies read as a matched pair.
+    - The twenty face rank halves paired with a number suit half have two per light/dark number suit, four per number suit, and twenty distinct number suit values.
+    - The five number suits are paired as evenly as possible with the four French suits.  This can't be perfectly even since the traditional suit halves available for pairing are 26 hearts, 24 spades, 26 clubs, and 24 diamonds (the knights take two halves of each French suit and the fools take both Queens of Spades and both Jacks of Diamonds).
+    - Each combination of light/dark traditional half-suit and number suit holds 2–3 cards.
+    - Each light/dark number suit is paired with five red and five black traditional suit halves.
+    - Each number rank is paired with 4–6 red traditional suit halves and at least one card of each French suit.
+
+  + Soft goal (the MILP's objective minimizes the total deviation from this):
+
+    - Each number rank is paired with exactly 5 red traditional suit halves (met by 4 of the 10 ranks; the other six are paired with 4 or 6).
 
 ## <a name="external">External links</a>
 

@@ -461,7 +461,7 @@ cat(r"(\clearpage
 
 \begin{itemize}
 \item The German suits are the \emph{shaded} traditional suits.
-\item Use pip cards 2, 6-9, 0 (interpreted as ten) and use the pawn (for the \emph{under}), knight (for the \emph{ober}), and the king.
+\item Use pip cards 2, 6--9, 0 (interpreted as ten) and use the pawn (for the \emph{under}), knight (for the \emph{ober}), and the king.
 \item Pedantically the German \emph{ace} is actually the \emph{deuce} (rank two card) and is sometimes called the \emph{Sow}.  Depending on your preference you could use the 1 rank card instead as the \emph{ace}.
 \item The suit symbol is only \emph{over} the rank symbol in the \emph{ober} face card.
 \item Northern German decks commonly omit the 6 rank card.
@@ -490,7 +490,7 @@ cat(r"(\clearpage
 
 \begin{itemize}
 \item The Spanish suits are the \emph{light} traditional suits.
-\item Use pip cards 1-9 and use the pawn for the \emph{sota}, knight for the \emph{caballo}, and king for the \emph{rey}.
+\item Use pip cards 1--9 and use the pawn for the \emph{sota}, knight for the \emph{caballo}, and king for the \emph{rey}.
 \item If necessary use the two fools as jokers (if you need more jokers you also have four knights and fifty number cards).
 \item It is common for Spanish-suited decks to omit jokers and/or the 8 and 9 ranks.
 \end{itemize}
@@ -575,7 +575,7 @@ cat(r"(\clearpage
 \subsection{Deck of Hanafuda cards}
 
 \begin{itemize}
-\item For the twelve month Hanafuda \emph{suits} use Dotaro Deck \emph{ranks} 1-9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
+\item For the twelve month Hanafuda \emph{suits} use Dotaro Deck \emph{ranks} 1--9, 0 (as ten = October), pawn (as eleven = November), and queen (as twelve = December).
 \item The green leaves, clovers, and acorns are \emph{chaff} (aka \emph{junk}). Acorns are the only yellow chaff so use the Acorns as the \emph{yellow} Paulownia.
 \item The heart-shaped hearts, cups, and swords are \emph{ribbons}. Use hearts as \emph{plain} ribbons, cups as \emph{embellished} ribbons (e.g. \emph{poetry} ribbons), and swords as \emph{dark} ribbons (e.g. \emph{blue} / \emph{purple} ribbons).
 \item The (hawk) bells are \emph{animals}.

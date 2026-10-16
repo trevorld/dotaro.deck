@@ -15,8 +15,8 @@ library("stringr")
 # `3_evolve_suit_schemes.R`.  Those scripts are kept for reference but are no longer part of
 # the pipeline: `beta.csv` matched or beat `alpha.csv` on every subdeck feature (notably "d6
 # dominoes" 28/28 vs 7/28, "d6 dice" 4/4 vs 0/4, and the number/fr. suit pairing balance at
-# its floor of 4 vs 26), and `gamma.csv` adds the full run at the cost of four pairing cells
-# at 1 or 4 instead of 2-3 and a per-rank red/black split of 4-6 instead of 5/5.
+# its floor of 4 vs 26), and `gamma.csv` adds the full run at the cost of a per-rank
+# red/black split of 4-6 instead of 5/5 (the only feature the full run cannot keep).
 
 df <- read.csv("data-raw/gamma.csv") |>
 	arrange(tlabel) |>
