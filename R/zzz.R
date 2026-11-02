@@ -1,7 +1,7 @@
 #' @importFrom dplyr arrange bind_rows filter left_join mutate slice
 #' @importFrom dplyr matches select
 #' @import grid
-#' @importFrom grDevices dev.cur cairo_pdf dev.off dev.set col2rgb rgb palette.colors
+#' @importFrom grDevices cairo_pdf col2rgb rgb palette.colors
 #' @importFrom knitr knit opts_chunk
 #' @importFrom piecepackr as_pp_cfg has_font pp_cfg pp_shape pmap_piece crosshairGrob grid.piece
 #' @importFrom rlang abort check_dots_empty .data local_options
@@ -98,28 +98,26 @@ dotaro_fonts_available <- local({
 
 save_images <- function(label = "dotaro", dir = "tmp") {
 	envir <- dotaro_decks(border = FALSE)
-	current_dev <- dev.cur()
-	if (current_dev > 1) {
-		on.exit(dev.set(current_dev), add = TRUE)
-	}
-
 	filename <- file.path(
 		dir,
 		paste0(label, "_v", packageDescription("dotaro.deck")$Version, ".pdf")
 	)
-	cairo_pdf(filename, width = CARD_WIDTH, height = CARD_HEIGHT, onefile = TRUE)
 	df <- half_info |>
 		filter(.data$top) |>
 		select("card", "top") |>
 		left_join(full_info, by = c("card", "top")) |>
 		arrange(.data$suit, .data$rank)
-	for (i in seq_len(nrow(df))) {
-		grid.newpage()
-		dfx <- df[i, ] |>
-			select("suit", "rank", "cfg") |>
-			mutate(piece_side = "card_face")
-		pmap_piece(dfx, envir = envir)
-	}
-	dev.off()
+	with_temp_dev(
+		function() cairo_pdf(filename, width = CARD_WIDTH, height = CARD_HEIGHT, onefile = TRUE),
+		{
+			for (i in seq_len(nrow(df))) {
+				grid.newpage()
+				dfx <- df[i, ] |>
+					select("suit", "rank", "cfg") |>
+					mutate(piece_side = "card_face")
+				pmap_piece(dfx, envir = envir)
+			}
+		}
+	)
 	invisible(filename)
 }

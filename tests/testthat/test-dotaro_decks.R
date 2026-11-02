@@ -1,7 +1,6 @@
 write_svg <- function(plot, file, title = "") {
-	svglite::svglite(file)
-	plot()
-	invisible(grDevices::dev.off())
+	with_temp_dev(function() svglite::svglite(file), plot())
+	invisible(NULL)
 }
 
 draw_card <- function(cfg, suit, rank) {
@@ -29,19 +28,15 @@ test_that("dotaro_full_traditional renders", {
 		writer = write_svg
 	)
 
-	dev_cur <- grDevices::dev.cur()
-	if (dev_cur > 1) {
-		on.exit(grDevices::dev.set(dev_cur), add = TRUE)
-	}
-	pdf(NULL)
-	on.exit(grDevices::dev.off(), add = TRUE)
-	expect_s3_class(
-		grid::grobCoords(
-			piecepackr::pieceGrob("card_face", cfg = decks$dotaro_full_traditional),
-			closed = TRUE
-		),
-		"GridGrobCoords"
-	)
+	with_temp_dev(function() grDevices::pdf(NULL), {
+		expect_s3_class(
+			grid::grobCoords(
+				piecepackr::pieceGrob("card_face", cfg = decks$dotaro_full_traditional),
+				closed = TRUE
+			),
+			"GridGrobCoords"
+		)
+	})
 })
 
 test_that("dotaro_full_number renders", {

@@ -43,7 +43,11 @@ save_octavo_booklet <- function(
 	# fixed (unscaled) radius exceeds half the shrunk card box, which makes
 	# the border rectangle degenerate and silently fail to draw.
 	envir <- dotaro_decks(round = FALSE)
-	pages <- octavo_booklet_pages(envir, variant = variant)
+	# Building the pages converts units (e.g. `convertWidth()`), which opens
+	# a default device if none is open; do it on a temporary null device.
+	pages <- with_temp_dev(function() grDevices::pdf(NULL), {
+		octavo_booklet_pages(envir, variant = variant)
+	})
 
 	layout1 <- pnpmisc::layout_octavo(
 		width = CARD_WIDTH,
@@ -84,18 +88,16 @@ save_octavo_booklet <- function(
 	paper_width <- switch(size, letter = 8.5, a4 = pnpmisc:::A4_WIDTH)
 	paper_height <- switch(size, letter = 11, a4 = pnpmisc:::A4_HEIGHT)
 
-	current_dev <- dev.cur()
-	if (current_dev > 1) {
-		on.exit(dev.set(current_dev), add = TRUE)
-	}
-
-	cairo_pdf(filename, onefile = TRUE, width = paper_height, height = paper_width)
-	grid.newpage()
-	pnpmisc::grid_add_layout(pages, layout = layout1)
-	pnpmisc::grid_add_cropmarks(layout = cropmark_layout)
-	grid.newpage()
-	pnpmisc::grid_add_layout(pages, layout = layout2)
-	dev.off()
+	with_temp_dev(
+		function() cairo_pdf(filename, onefile = TRUE, width = paper_height, height = paper_width),
+		{
+			grid.newpage()
+			pnpmisc::grid_add_layout(pages, layout = layout1)
+			pnpmisc::grid_add_cropmarks(layout = cropmark_layout)
+			grid.newpage()
+			pnpmisc::grid_add_layout(pages, layout = layout2)
+		}
+	)
 
 	tmpfile1 <- pnpmisc::pdf_set_xmp(filename, xmp = xmp)
 	on.exit(unlink(tmpfile1), add = TRUE)
