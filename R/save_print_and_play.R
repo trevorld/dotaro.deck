@@ -33,11 +33,6 @@ save_print_and_play <- function(
 	width <- switch(size, letter = 8.5, a4 = pnpmisc:::A4_WIDTH)
 	height <- switch(size, letter = 11, a4 = pnpmisc:::A4_HEIGHT)
 
-	current_dev <- dev.cur()
-	if (current_dev > 1) {
-		on.exit(dev.set(current_dev), add = TRUE)
-	}
-
 	df <- half_info |>
 		filter(.data$top) |>
 		select("card", "top") |>
@@ -54,47 +49,46 @@ save_print_and_play <- function(
 		orientation = "portrait"
 	)
 
-	cairo_pdf(filename, onefile = TRUE, width = width, height = height)
-
-	grid.newpage()
-	grid.draw(creditsGrob(xmp))
-
-	# Deliberately blank:
-	# keeps the instructions page from ending up printed on the back of the
-	# first sheet of cards, so the interleaved front/back pages below start
-	# together on a fresh physical sheet under duplex printing.
-	grid.newpage()
-	grid.text(
-		"This page deliberately left blank.",
-		gp = gpar(fontfamily = "DejaVu Sans", col = "black", fontsize = 12)
-	)
-
-	for (page in 1:12) {
-		idx <- seq.int(from = (page - 1L) * 9L + 1L, length.out = 9L)
-		dfx <- df[idx, ] |>
-			select("suit", "rank", "cfg") |>
-			mutate(piece_side = "card_face", x = layout$x, y = layout$y)
-
+	with_temp_dev(function() cairo_pdf(filename, onefile = TRUE, width = width, height = height), {
 		grid.newpage()
-		pmap_piece(dfx, default.units = "in", envir = envir)
-		if ("front" %in% crosshairs) {
-			pnpmisc::grid_add_crosshairs(layout = layout)
-			pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
-		}
+		grid.draw(creditsGrob(xmp))
 
-		# Every card shares the same back design, so re-using `dfx`'s own
-		# `suit`/`rank`/`cfg` (unused by `card_back`'s grob_fn) at the same
-		# `x`/`y` slots keeps this page aligned with the front page above it
-		# under a standard "flip on long edge" duplex setting.
+		# Deliberately blank:
+		# keeps the instructions page from ending up printed on the back of the
+		# first sheet of cards, so the interleaved front/back pages below start
+		# together on a fresh physical sheet under duplex printing.
 		grid.newpage()
-		dfx_back <- mutate(dfx, piece_side = "card_back")
-		pmap_piece(dfx_back, default.units = "in", envir = envir)
-		if ("back" %in% crosshairs) {
-			pnpmisc::grid_add_crosshairs(layout = layout)
-			pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+		grid.text(
+			"This page deliberately left blank.",
+			gp = gpar(fontfamily = "DejaVu Sans", col = "black", fontsize = 12)
+		)
+
+		for (page in 1:12) {
+			idx <- seq.int(from = (page - 1L) * 9L + 1L, length.out = 9L)
+			dfx <- df[idx, ] |>
+				select("suit", "rank", "cfg") |>
+				mutate(piece_side = "card_face", x = layout$x, y = layout$y)
+
+			grid.newpage()
+			pmap_piece(dfx, default.units = "in", envir = envir)
+			if ("front" %in% crosshairs) {
+				pnpmisc::grid_add_crosshairs(layout = layout)
+				pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+			}
+
+			# Every card shares the same back design, so re-using `dfx`'s own
+			# `suit`/`rank`/`cfg` (unused by `card_back`'s grob_fn) at the same
+			# `x`/`y` slots keeps this page aligned with the front page above it
+			# under a standard "flip on long edge" duplex setting.
+			grid.newpage()
+			dfx_back <- mutate(dfx, piece_side = "card_back")
+			pmap_piece(dfx_back, default.units = "in", envir = envir)
+			if ("back" %in% crosshairs) {
+				pnpmisc::grid_add_crosshairs(layout = layout)
+				pnpmisc::grid_add_cropmarks(layout = layout, cm_length = unit(1, "in"))
+			}
 		}
-	}
-	dev.off()
+	})
 
 	tmpfile1 <- pnpmisc::pdf_set_xmp(filename, xmp = xmp)
 	on.exit(unlink(tmpfile1), add = TRUE)
